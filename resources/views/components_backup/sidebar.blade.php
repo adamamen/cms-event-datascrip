@@ -1,30 +1,25 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="{{ url('/dashboard') }}">
-                <img src="{{ asset('img/datascrip-logo.png') }}" height="54">
-            </a>
+            <a href="index.html">Stisla</a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="{{ url('/dashboard') }}">
-                <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
-            </a>
+            <a href="index.html">St</a>
         </div>
         <ul class="sidebar-menu">
-            <li class="menu-header">Menu</li>
-            <li class="{{ Request::is('dashboard') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <li class="menu-header">Dashboard</li>
+            <li class="nav-item dropdown {{ $type_menu === 'home' ? 'active' : '' }}">
+                <a href="#" class="nav-link has-dropdown"><i class="fas fa-fire"></i><span>Dashboard</span></a>
+                <ul class="dropdown-menu">
+                    <li class='{{ Request::is('dashboard-general-dashboard') ? 'active' : '' }}'>
+                        <a class="nav-link" href="{{ url('dashboard-general-dashboard') }}">General Dashboard</a>
+                    </li>
+                    <li class="{{ Request::is('dashboard-ecommerce-dashboard') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ url('dashboard-ecommerce-dashboard') }}">Ecommerce Dashboard</a>
+                    </li>
+                </ul>
             </li>
-
-            <li class="menu-header">Event</li>
-            <li class="{{ Request::is('master-event') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/master-event') }}"><i class="fa-solid fa-calendar-days"></i> <span>Master Event</span></a>
-            </li>
-
-            <li class="{{ Request::is('registrasi') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/registrasi') }}"><i class="fa-solid fa-registered"></i> <span>Registrasi</span></a>
-            </li>
-            <li class="menu-header">Menu</li>
+            <li class="menu-header">Starter</li>
             <li class="nav-item dropdown {{ $type_menu === 'layout' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Layout</span></a>
                 <ul class="dropdown-menu">

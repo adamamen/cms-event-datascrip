@@ -1,6 +1,9 @@
 "use strict";
 
-var ctx = document.getElementById("myChart").getContext("2d");
+if (document.getElementById("myChart").getContext("2d") !== null) {
+    var ctx = document.getElementById("myChart").getContext("2d");
+}
+
 var myChart = new Chart(ctx, {
     type: "line",
     data: {

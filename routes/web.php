@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MasterEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/dashboard-general-dashboard');
+Route::redirect('/', '/dashboard');
+
+Route::get('/dashboard', function () {
+    return view('dashboard.index', ['type_menu' => 'dashboard']);
+});
+
+Route::get('/data-event', function () {
+    return view('data_event.index', ['type_menu' => 'dashboard']);
+});
+
+Route::get('/data-user', function () {
+    return view('data_user.index', ['type_menu' => 'dashboard']);
+});
+
+Route::get('/master-event', function () {
+    return view('master_event.index', ['type_menu' => 'dashboard']);
+});
+
+Route::get('/master-event/add-event', function () {
+    return view('master_event.add_event', ['type_menu' => 'dashboard']);
+});
+
+Route::post('/add', [MasterEventController::class, 'add'])->name('add');
+
+
+
+// Route::redirect('/', '/dashboard-general-dashboard');
 
 // Dashboard
 Route::get('/dashboard-general-dashboard', function () {
