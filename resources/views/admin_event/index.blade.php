@@ -1,6 +1,29 @@
+<?php
+function tgl_indo($tanggal)
+{
+    $bulan = array(
+        1 =>   'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    );
+    $pecahkan = explode('-', $tanggal);
+
+    return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
+}
+
+?>
 @extends('layouts.app')
 
-@section('title', 'Master Event')
+@section('title', 'Admin Event')
 
 @push('style')
 <!-- CSS Libraries -->
@@ -19,16 +42,16 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>Master Event</h1>
+            <h1>Admin Event</h1>
         </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Master Event</h4>
+                        <h4>Admin Event</h4>
                         <div class="article-cta">
-                            <!-- <a href="{{ url('/master-event/add-event') }}" class="btn btn-success">Add Event</a> -->
-                            <a href="{{ route('add_index', ['page' => 'cms']) }}" class="btn btn-success">Add Event</a>
+                            <!-- <a href="{{ url('/admin-event/add-admin-event') }}" class="btn btn-success">Add Admin</a> -->
+                            <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success">Add Admin</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -37,81 +60,37 @@
                             <table class="table-striped table" id="table-1">
                                 <thead>
                                     <tr>
-                                        <th>
-                                            <center>No</center>
-                                        </th>
-                                        <th>
-                                            <center>Nama Event</center>
-                                        </th>
-                                        <th>
-                                            <center>Status</center>
-                                        </th>
-                                        <th>
-                                            <center>Logo</center>
-                                        </th>
-                                        <th>
-                                            <center>Start Event</center>
-                                        </th>
-                                        <th>
-                                            <center>Divisi</center>
-                                        </th>
-                                        <th>
-                                            <center>End Event</center>
-                                        </th>
-                                        <th>
-                                            <center>Deskripsi</center>
-                                        </th>
-                                        <th>
-                                            <center>Lokasi</center>
-                                        </th>
-                                        <th>
-                                            <center>Created At</center>
-                                        </th>
-                                        <th>
-                                            <center>Created By</center>
-                                        </th>
-                                        <th>
-                                            <center>Updated At</center>
-                                        </th>
-                                        <th>
-                                            <center>Updated By</center>
-                                        </th>
-                                        <th>
-                                            <center>Action</center>
-                                        </th>
+                                        <th>No</th>
+                                        <th>Username</th>
+                                        <th>Password</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Nama Event</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $value)
                                     <tr>
                                         <td>{{ $value['RowNumber'] }}</td>
+                                        <td>{{ $value['username'] }}</td>
+                                        <td>{{ $value['password_encrypts'] }}</td>
+                                        <td>{{ $value['full_name'] }}</td>
                                         <td>{{ $value['title'] }}</td>
                                         <td>
                                             @if ($value['status'] == 'A')
-                                            <center><span class="badge badge-success">Aktif</span></center>
+                                            <span class="badge badge-success">Aktif</span>
                                             @else
-                                            <center><span class="badge badge-danger">Tidak Aktif</span></center>
+                                            <span class="badge badge-danger">Tidak Aktif</span>
                                             @endif
                                         </td>
-                                        <td> <img src="{{ asset('images/' . $value['logo']) }}" alt="Image" class="image-thumbnail"></td>
-                                        <td>{{ $value['start_event'] }}</td>
-                                        <td>{{ $value['nama_divisi'] }}</td>
-                                        <td>{{ $value['end_event'] }}</td>
-                                        <td>{{ $value['desc'] }}</td>
-                                        <td>{{ $value['location'] }}</td>
-                                        <td>{{ $value['created_at'] }}</td>
-                                        <td>{{ $value['createed_by'] }}</td>
-                                        <td>{{ $value['updated_at'] }}</td>
-                                        <td>{{ $value['updated_by'] }}</td>
                                         <td>
-                                            <center>
-                                                <form action="{{ route('edit', ['id' => $value['id_event']]) }}" method="POST">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <button name="edit" id="edit" class="btn btn-primary">Edit</button>
-                                                    <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    <a href="#" class="btn btn-danger" data-id="{{ $value['id_event'] }}" name="btn_delete" id="btn_delete">Delete</a>
-                                                </form>
-                                            </center>
+                                            <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST">
+                                                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                                                <button name="edit" id="edit" class="btn btn-primary">Edit</button>
+                                                <meta name="csrf-token" content="{{ csrf_token() }}">
+                                                <a href="#" class="btn btn-danger" data-id="{{ $value['admin_id'] }}" name="btn_delete" id="btn_delete">Delete</a>
+                                            </form>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -158,7 +137,7 @@
             .then((ok) => {
                 if (ok) {
                     $.ajax({
-                        url: '{{ route("delete", ":id") }}'.replace(':id', recordId),
+                        url: '{{ route("delete-admin", ":id") }}'.replace(':id', recordId),
                         type: "DELETE",
                         dataType: 'json',
                         headers: {
@@ -170,10 +149,10 @@
                             if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil di delete...', 'success').then(okay => {
                                     if (okay) {
-                                        window.location.href = "/master-event/cms";
+                                        window.location.href = "/admin-event/cms";
                                     }
                                 });
-                            } else {
+                            } else if (alerts == "failed") {
                                 swal('Gagal', 'Data gagal di delete...', 'warning');
                             }
                         },

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Event')
+@section('title', 'Edit Event')
 
 @push('style')
 <!-- CSS Libraries -->
@@ -14,21 +14,23 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>Add Event</h1>
+            <h1>Edit Event</h1>
         </div>
         <div class="section-body">
-            <h2 class="section-title">Add Event</h2>
+            <h2 class="section-title">Edit Events</h2>
             <!-- <p class="section-lead">This article component is based on card and flexbox.</p> -->
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card">
+                        @foreach($data as $value)
                         <div class="card-body">
                             <meta name="csrf-token" content="{{ csrf_token() }}">
                             <div class="row">
                                 <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                 <div class="form-group col-md-4 col-12">
                                     <label>Nama Event</label>
-                                    <input type="text" class="form-control" value="" required="" name="nama_event" id="nama_event">
+                                    <input type="text" class="form-control" value="{{ $value->title }}" required="" name="nama_event" id="nama_event">
+                                    <input type="hidden" class="form-control" value="{{ $value->id_event }}" required="" name="id_event" id="id_event">
                                     <div class="invalid-feedback">
                                         Nama Event Wajib Diisi
                                     </div>
@@ -36,9 +38,8 @@
                                 <div class="form-group col-md-4 col-12">
                                     <label>Status</label>
                                     <select class="form-control select2" name="status" id="status">
-                                        <option selected disabled>-- Silahkan Pilih --</option>
-                                        <option value="A">Aktif</option>
-                                        <option value="D">Tidak Aktif</option>
+                                        <option value="A" {{ ( $value->status == "A") ? 'selected' : '' }}>Aktif</option>
+                                        <option value="D" {{ ( $value->status == "D") ? 'selected' : '' }}>Tidak Aktif</option>
                                     </select>
                                     <div class="invalid-feedback">
                                         Status Wajib Diisi
@@ -47,7 +48,7 @@
                                 <div class="form-group col-md-4 col-12">
                                     <label>Logo</label>
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" accept="image/png, image/jpg, image/jpeg" name="logo" id="logo">
+                                        <input type="file" class="custom-file-input" accept="image/png, image/jpg, image/jpeg" name="logo" id="logo" value="{{ $value->logo }}">
                                         <label class="custom-file-label" for="customFile">Choose file</label>
                                     </div>
                                     <div class="invalid-feedback">
@@ -58,14 +59,14 @@
                             <div class="row">
                                 <div class="form-group col-md-4 col-12">
                                     <label>Start Event</label>
-                                    <input type="text" class="form-control datepicker" value="" required="" name="start_event" id="start_event">
+                                    <input type="text" class="form-control datepicker" value="{{ $value->start_event }}" required="" name="start_event" id="start_event">
                                     <div class="invalid-feedback">
                                         Start Event Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4 col-12">
                                     <label>End Event</label>
-                                    <input type="text" class="form-control datepicker" value="" required="" name="end_event" id="end_event">
+                                    <input type="text" class="form-control datepicker" value="{{ $value->end_event }}" required="" name="end_event" id="end_event">
                                     <div class="invalid-feedback">
                                         End Event Wajib Diisi
                                     </div>
@@ -74,8 +75,8 @@
                                     <label>Divisi</label>
                                     <select class="form-control select2" name="divisi" id="divisi">
                                         <option selected disabled>-- Silahkan Pilih --</option>
-                                        @foreach ($listDivisi as $value)
-                                        <option value="{{ $value->id }}">{{ $value->name }}</option>
+                                        @foreach ($listDivisi as $divisi)
+                                        <option value="{{ $divisi->id }}" {{ $divisi->id == $value->company ? 'selected' : ''  }}>{{ $divisi->name }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
@@ -87,7 +88,7 @@
                                 <div class="form-group col-md-6 col-12">
                                     <div class="form-group">
                                         <label>Deskripsi</label>
-                                        <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi"></textarea>
+                                        <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi">{{ $value->desc }}</textarea>
                                     </div>
                                     <div class="invalid-feedback">
                                         Deskripsi Wajib Diisi
@@ -96,7 +97,7 @@
                                 <div class="form-group col-md-6 col-12">
                                     <div class="form-group">
                                         <label>Lokasi</label>
-                                        <textarea class="form-control" data-height="150" name="lokasi" id="lokasi"></textarea>
+                                        <textarea class="form-control" data-height="150" name="lokasi" id="lokasi">{{ $value->location }}</textarea>
                                     </div>
                                     <div class="invalid-feedback">
                                         Lokasi Wajib Diisi
@@ -107,6 +108,7 @@
                             <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
                             <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel">Cancel</a>
                         </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -154,27 +156,22 @@
         });
     });
 
-    // Show File Name Upload 
-    $('input[type="file"]').change(function(e) {
-        var fileName = e.target.files[0].name;
-        $('.custom-file-label').html(fileName);
-    });
-
     $(document).ready(function() {
         $("#btn_submit").click(function() {
             $("#btn_progress").show();
             $("#btn_submit").hide();
 
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var id_event = $('#id_event').val();
             var namaEvent = $('#nama_event').val();
             var status = $('#status').val();
-            var divisi = $('#divisi').val();
             var logo = $("#logo")[0].files[0];
             var startEvent = $('#start_event').val();
             var endEvent = $('#end_event').val();
             var deskripsi = $('#deskripsi').val();
             var lokasi = $('#lokasi').val();
             var username = $('#username').val();
+            var divisi = $('#divisi').val();
 
             var formData = new FormData();
             formData.append("namaEvent", namaEvent);
@@ -184,154 +181,41 @@
             formData.append("endEvent", endEvent);
             formData.append("deskripsi", deskripsi);
             formData.append("lokasi", lokasi);
+            formData.append("id_event", id_event);
             formData.append("username", username);
             formData.append("divisi", divisi);
 
-            if (namaEvent == "") {
-                var name = "Nama Event";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (status == null) {
-                var name = "Status";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (divisi == null) {
-                var name = "Divisi";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (logo == undefined) {
-                var name = "Logo";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (startEvent == "") {
-                var name = "Start Event";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (endEvent == "") {
-                var name = "End Event";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (deskripsi == "") {
-                var name = "Deskripsi";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (lokasi == "") {
-                var name = "Lokasi";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else {
-                $.ajax({
-                    url: '{{ route("add") }}',
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    success: function(response) {
-                        var alerts = response.message
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
+            $.ajax({
+                url: '{{ route("update") }}',
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(response) {
+                    var alerts = response.message
+                    $("#btn_progress").hide();
+                    $("#btn_submit").show();
 
-                        if (alerts == "success") {
-                            swal('Sukses', 'Data berhasil disimpan...', 'success').then(okay => {
-                                if (okay) {
-                                    window.location.href = "/master-event/cms";
-                                }
-                            });
-                        } else {
-                            swal('Gagal', 'Data gagal disimpan...', 'warning');
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-
-                        console.log(textStatus, errorThrown);
+                    if (alerts == "success") {
+                        swal('Sukses', 'Data berhasil diupdate...', 'success').then(okay => {
+                            if (okay) {
+                                window.location.href = "/master-event/cms";
+                            }
+                        });
+                    } else {
+                        swal('Gagal', 'Data gagal diupdate...', 'warning');
                     }
-                });
-            }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $("#btn_progress").hide();
+                    $("#btn_submit").show();
+
+                    console.log(textStatus, errorThrown);
+                }
+            });
         });
     });
 </script>

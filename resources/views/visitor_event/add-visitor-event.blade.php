@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Event')
+@section('title', 'Add Visitor Event')
 
 @push('style')
 <!-- CSS Libraries -->
@@ -14,92 +14,75 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
-            <h1>Add Event</h1>
+            <h1>Add Visitor Event</h1>
         </div>
         <div class="section-body">
-            <h2 class="section-title">Add Event</h2>
-            <!-- <p class="section-lead">This article component is based on card and flexbox.</p> -->
+            <h2 class="section-title">Add Visitor Event</h2>
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card">
                         <div class="card-body">
                             <meta name="csrf-token" content="{{ csrf_token() }}">
                             <div class="row">
-                                <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>Nama Event</label>
-                                    <input type="text" class="form-control" value="" required="" name="nama_event" id="nama_event">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" class="form-control" value="" required="" name="nama_lengkap" id="nama_lengkap">
                                     <div class="invalid-feedback">
-                                        Nama Event Wajib Diisi
+                                        Nama Lengkap Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>Status</label>
-                                    <select class="form-control select2" name="status" id="status">
+                                    <label>Event</label>
+                                    <select class="form-control select2" name="nama_event" id="nama_event">
                                         <option selected disabled>-- Silahkan Pilih --</option>
-                                        <option value="A">Aktif</option>
-                                        <option value="D">Tidak Aktif</option>
+                                        @foreach ($data as $value)
+                                        <option value="{{ $value->id_event }}">{{ $value->title }}</option>
+                                        @endforeach
                                     </select>
                                     <div class="invalid-feedback">
                                         Status Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>Logo</label>
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" accept="image/png, image/jpg, image/jpeg" name="logo" id="logo">
-                                        <label class="custom-file-label" for="customFile">Choose file</label>
-                                    </div>
+                                    <label>No Handphone</label>
+                                    <input type="text" class="form-control" value="" required="" name="no_handphone" id="no_handphone" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                                     <div class="invalid-feedback">
-                                        Logo Wajib Diisi
+                                        No Handphone Wajib Diisi
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
+                                <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>Start Event</label>
-                                    <input type="text" class="form-control datepicker" value="" required="" name="start_event" id="start_event">
+                                    <label>No Tiket</label>
+                                    <input type="text" class="form-control" value="" required="" name="no_tiket" id="no_tiket" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                                     <div class="invalid-feedback">
-                                        Start Event Wajib Diisi
+                                        No Tiket Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>End Event</label>
-                                    <input type="text" class="form-control datepicker" value="" required="" name="end_event" id="end_event">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" value="" required="" name="email" id="email">
                                     <div class="invalid-feedback">
-                                        End Event Wajib Diisi
+                                        Email Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4 col-12">
-                                    <label>Divisi</label>
-                                    <select class="form-control select2" name="divisi" id="divisi">
-                                        <option selected disabled>-- Silahkan Pilih --</option>
-                                        @foreach ($listDivisi as $value)
-                                        <option value="{{ $value->id }}">{{ $value->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <label>Tanggal Registrasi</label>
+                                    <input type="text" class="form-control datepicker" value="" required="" name="tanggal_registrasi" id="tanggal_registrasi">
                                     <div class="invalid-feedback">
-                                        Divisi Wajib Diisi
+                                        Tanggal Registrasi Wajib Diisi
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-6 col-12">
                                     <div class="form-group">
-                                        <label>Deskripsi</label>
-                                        <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi"></textarea>
+                                        <label>Alamat</label>
+                                        <textarea class="form-control" data-height="150" name="alamat" id="alamat"></textarea>
                                     </div>
                                     <div class="invalid-feedback">
-                                        Deskripsi Wajib Diisi
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-6 col-12">
-                                    <div class="form-group">
-                                        <label>Lokasi</label>
-                                        <textarea class="form-control" data-height="150" name="lokasi" id="lokasi"></textarea>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Lokasi Wajib Diisi
+                                        Alamat Wajib Diisi
                                     </div>
                                 </div>
                             </div>
@@ -148,16 +131,10 @@
                 })
                 .then((ok) => {
                     if (ok) {
-                        window.location.href = "/master-event/cms";
+                        window.location.href = "/visitor-event/cms";
                     }
                 });
         });
-    });
-
-    // Show File Name Upload 
-    $('input[type="file"]').change(function(e) {
-        var fileName = e.target.files[0].name;
-        $('.custom-file-label').html(fileName);
     });
 
     $(document).ready(function() {
@@ -166,28 +143,40 @@
             $("#btn_submit").hide();
 
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var namaLengkap = $('#nama_lengkap').val();
             var namaEvent = $('#nama_event').val();
-            var status = $('#status').val();
-            var divisi = $('#divisi').val();
-            var logo = $("#logo")[0].files[0];
-            var startEvent = $('#start_event').val();
-            var endEvent = $('#end_event').val();
-            var deskripsi = $('#deskripsi').val();
-            var lokasi = $('#lokasi').val();
+            var email = $('#email').val();
+            var noHandphone = $('#no_handphone').val();
+            var noTiket = $('#no_tiket').val();
+            var tanggalRegistrasi = $('#tanggal_registrasi').val();
+            var alamat = $('#alamat').val();
             var username = $('#username').val();
 
             var formData = new FormData();
+            formData.append("namaLengkap", namaLengkap);
             formData.append("namaEvent", namaEvent);
-            formData.append("status", status);
-            formData.append("logo", logo);
-            formData.append("startEvent", startEvent);
-            formData.append("endEvent", endEvent);
-            formData.append("deskripsi", deskripsi);
-            formData.append("lokasi", lokasi);
+            formData.append("email", email);
+            formData.append("noHandphone", noHandphone);
+            formData.append("noTiket", noTiket);
+            formData.append("tanggalRegistrasi", tanggalRegistrasi);
+            formData.append("alamat", alamat);
             formData.append("username", username);
-            formData.append("divisi", divisi);
 
-            if (namaEvent == "") {
+            if (namaLengkap == "") {
+                var name = "Nama Lengkap";
+                var content = document.createElement('div');
+                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
+                swal({
+                    title: 'Warning',
+                    content: content,
+                    icon: "warning",
+                }).then(okay => {
+                    if (okay) {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    }
+                });
+            } else if (namaEvent == null) {
                 var name = "Nama Event";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
@@ -201,8 +190,8 @@
                         $("#btn_submit").show();
                     }
                 });
-            } else if (status == null) {
-                var name = "Status";
+            } else if (email == "") {
+                var name = "Email";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
@@ -215,8 +204,8 @@
                         $("#btn_submit").show();
                     }
                 });
-            } else if (divisi == null) {
-                var name = "Divisi";
+            } else if (noHandphone == "") {
+                var name = "No Handphone";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
@@ -229,8 +218,8 @@
                         $("#btn_submit").show();
                     }
                 });
-            } else if (logo == undefined) {
-                var name = "Logo";
+            } else if (noTiket == "") {
+                var name = "No Tiket";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
@@ -243,8 +232,8 @@
                         $("#btn_submit").show();
                     }
                 });
-            } else if (startEvent == "") {
-                var name = "Start Event";
+            } else if (tanggalRegistrasi == "") {
+                var name = "Tanggal Registrasi";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
@@ -257,36 +246,8 @@
                         $("#btn_submit").show();
                     }
                 });
-            } else if (endEvent == "") {
-                var name = "End Event";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (deskripsi == "") {
-                var name = "Deskripsi";
-                var content = document.createElement('div');
-                content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
-                swal({
-                    title: 'Warning',
-                    content: content,
-                    icon: "warning",
-                }).then(okay => {
-                    if (okay) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    }
-                });
-            } else if (lokasi == "") {
-                var name = "Lokasi";
+            } else if (alamat == "") {
+                var name = "Alamat";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
@@ -301,7 +262,7 @@
                 });
             } else {
                 $.ajax({
-                    url: '{{ route("add") }}',
+                    url: '{{ route("add-visitor") }}',
                     type: "POST",
                     data: formData,
                     contentType: false,
@@ -317,7 +278,7 @@
                         if (alerts == "success") {
                             swal('Sukses', 'Data berhasil disimpan...', 'success').then(okay => {
                                 if (okay) {
-                                    window.location.href = "/master-event/cms";
+                                    window.location.href = "/visitor-event/cms";
                                 }
                             });
                         } else {

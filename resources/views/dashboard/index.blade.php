@@ -18,14 +18,29 @@
             <h1>Dashboard</h1>
         </div>
         <div class="row">
+            @if (!empty($masterEvent))
+            @foreach ($masterEvent as $value)
             <div class="col-md-6">
                 <div class="card card-hero">
                     <div class="card-header">
                         <div class="card-icon">
                             <i class="far fa-question-circle"></i>
                         </div>
-                        <h4>14</h4>
-                        <a href="{{ url('/data-event') }}">
+                        <h4>{{ $divisiEvent }}</h4>
+                        <a href="{{ url('/company-event') }}">
+                            <div class="card-description" style="color:white">Total Divisi</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-hero">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="far fa-question-circle"></i>
+                        </div>
+                        <h4>{{ $masterEventCount }}</h4>
+                        <a href="{{ url('/master-event') }}">
                             <div class="card-description" style="color:white">Total Event</div>
                         </a>
                     </div>
@@ -37,13 +52,55 @@
                         <div class="card-icon">
                             <i class="far fa-question-circle"></i>
                         </div>
-                        <h4>10</h4>
-                        <a href="{{ url('/data-user') }}">
+                        <h4>{{ $adminEventCount }}</h4>
+                        <a href="{{ url('/admin-event') }}">
                             <div class="card-description" style="color:white">Total User</div>
                         </a>
                     </div>
                 </div>
             </div>
+            @endforeach
+            @else
+            <div class="col-md-6">
+                <div class="card card-hero">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="far fa-question-circle"></i>
+                        </div>
+                        <h4>{{ $divisiEvent }}</h4>
+                        <a href="{{ route('company_event.index', ['page' => 'cms']) }}">
+                            <div class="card-description" style="color:white">Total Divisi</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-hero">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="far fa-question-circle"></i>
+                        </div>
+                        <h4>{{ $masterEventCount }}</h4>
+                        <a href="{{ route('index', ['page' => 'cms']) }}">
+                            <div class="card-description" style="color:white">Total Event</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-hero">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="far fa-question-circle"></i>
+                        </div>
+                        <h4>{{ $adminEventCount }}</h4>
+                        <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
+                            <div class="card-description" style="color:white">Total User</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </section>
 </div>
@@ -58,5 +115,5 @@
 <script src="{{ asset('library/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
 
 <!-- Page Specific JS File -->
-<script src="{{ asset('js/page/index.js') }}"></script>
+<!-- <script src="{{ asset('js/page/index.js') }}"></script> -->
 @endpush

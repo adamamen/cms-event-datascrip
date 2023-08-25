@@ -13,21 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tbl_master_event', function (Blueprint $table) {
-            $table->id('id_event');
+        Schema::create('tbl_company_event', function (Blueprint $table) {
+            $table->id('id');
             $table->string('status');
-            $table->string('title');
-            $table->text('desc');
-            $table->string('company');
-            $table->timestamp('start_event');
-            $table->timestamp('end_event');
-            $table->string('logo');
-            $table->string('location');
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            $table->string('updated_by');
+            $table->string('name');
+            $table->string('description');
             $table->string('created_by');
-            $table->string('title_url');
+            $table->timestamp('created_at')->nullable();
+            $table->string('updated_by');
+            $table->timestamp('updated_at')->nullable();
         });
     }
 
