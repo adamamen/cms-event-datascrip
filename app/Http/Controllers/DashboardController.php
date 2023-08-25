@@ -21,7 +21,7 @@ class DashboardController extends Controller
             ->get();
         $divisiEvent = M_CompanyEvent::count();
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        
+
         if (!empty($masterEvent) || $page == "cms") {
             return view('dashboard.index', [
                 'masterEvent' => empty($masterEvent) ? '' : $masterEvent,

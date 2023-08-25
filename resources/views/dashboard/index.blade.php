@@ -3,117 +3,117 @@
 @section('title', 'Home')
 
 @push('style')
-<!-- CSS Libraries -->
-<link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
-<link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
-<link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.carousel.min.css') }}">
-<link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.theme.default.min.css') }}">
-<link rel="stylesheet" href="{{ asset('library/flag-icon-css/css/flag-icon.min.css') }}">
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/owl.carousel/dist/assets/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/flag-icon-css/css/flag-icon.min.css') }}">
 @endpush
 
 @section('main')
-<div class="main-content">
-    <section class="section">
-        <div class="section-header">
-            <h1>Dashboard</h1>
-        </div>
-        <div class="row">
-            @if (!empty($masterEvent))
-            @foreach ($masterEvent as $value)
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
-                        </div>
-                        <h4>{{ $divisiEvent }}</h4>
-                        <a href="{{ url('/company-event') }}">
-                            <div class="card-description" style="color:white">Total Divisi</div>
-                        </a>
-                    </div>
-                </div>
+    <div class="main-content">
+        <section class="section">
+            <div class="section-header">
+                <h1>Dashboard</h1>
             </div>
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
+            <div class="row">
+                @if (!empty($masterEvent))
+                    @foreach ($masterEvent as $value)
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="far fa-question-circle"></i>
+                                    </div>
+                                    <h4>{{ $divisiEvent }}</h4>
+                                    <a href="{{ route('company_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total Divisi</div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <h4>{{ $masterEventCount }}</h4>
-                        <a href="{{ url('/master-event') }}">
-                            <div class="card-description" style="color:white">Total Event</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="far fa-question-circle"></i>
+                                    </div>
+                                    <h4>{{ $masterEventCount }}</h4>
+                                    <a href="{{ route('index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total Event</div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <h4>{{ $adminEventCount }}</h4>
-                        <a href="{{ url('/admin-event') }}">
-                            <div class="card-description" style="color:white">Total User</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-            @else
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="far fa-question-circle"></i>
+                                    </div>
+                                    <h4>{{ $adminEventCount }}</h4>
+                                    <a href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total User</div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <h4>{{ $divisiEvent }}</h4>
-                        <a href="{{ route('company_event.index', ['page' => 'cms']) }}">
-                            <div class="card-description" style="color:white">Total Divisi</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
+                    @endforeach
+                @else
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="far fa-question-circle"></i>
+                                </div>
+                                <h4>{{ $divisiEvent }}</h4>
+                                <a href="{{ route('company_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total Divisi</div>
+                                </a>
+                            </div>
                         </div>
-                        <h4>{{ $masterEventCount }}</h4>
-                        <a href="{{ route('index', ['page' => 'cms']) }}">
-                            <div class="card-description" style="color:white">Total Event</div>
-                        </a>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card card-hero">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="far fa-question-circle"></i>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="far fa-question-circle"></i>
+                                </div>
+                                <h4>{{ $masterEventCount }}</h4>
+                                <a href="{{ route('index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total Event</div>
+                                </a>
+                            </div>
                         </div>
-                        <h4>{{ $adminEventCount }}</h4>
-                        <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
-                            <div class="card-description" style="color:white">Total User</div>
-                        </a>
                     </div>
-                </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="far fa-question-circle"></i>
+                                </div>
+                                <h4>{{ $adminEventCount }}</h4>
+                                <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total User</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
-            @endif
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
 @endsection
 
 @push('scripts')
-<!-- JS Libraies -->
-<script src="{{ asset('library/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
-<script src="{{ asset('library/chart.js/dist/Chart.js') }}"></script>
-<script src="{{ asset('library/owl.carousel/dist/owl.carousel.min.js') }}"></script>
-<script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
-<script src="{{ asset('library/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
+    <!-- JS Libraies -->
+    <script src="{{ asset('library/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
+    <script src="{{ asset('library/chart.js/dist/Chart.js') }}"></script>
+    <script src="{{ asset('library/owl.carousel/dist/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('library/summernote/dist/summernote-bs4.min.js') }}"></script>
+    <script src="{{ asset('library/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
 
-<!-- Page Specific JS File -->
-<!-- <script src="{{ asset('js/page/index.js') }}"></script> -->
+    <!-- Page Specific JS File -->
+    <!-- <script src="{{ asset('js/page/index.js') }}"></script> -->
 @endpush

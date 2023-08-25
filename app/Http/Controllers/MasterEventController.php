@@ -19,7 +19,7 @@ class MasterEventController extends Controller
         if (!empty($masterEvent) || $page == "cms") {
             return view('master_event.index', [
                 'masterEvent' => $masterEvent,
-                'data' => $data,
+                'data' => !empty($data) ? $data : array(),
                 'type_menu' => $type_menu
             ]);
         }

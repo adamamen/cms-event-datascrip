@@ -26,7 +26,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->string('updated_by');
-            $table->string('created_by');
+            $table->string('createed_by');
             $table->string('title_url');
         });
     }

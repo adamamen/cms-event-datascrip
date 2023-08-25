@@ -21,10 +21,7 @@ use App\Http\Middleware\NoBackHistory;
 |
 */
 
-//Sidebar
-// Route::get('/', [LoginController::class, 'index'])->name('login');
-
-// Login 
+// Login
 Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::get('/{page}', [LoginController::class, 'index_parameter'])->name('login_param');
 Route::post('/login', [LoginController::class, 'login_action'])->name('login_action');
@@ -32,7 +29,7 @@ Route::post('/login', [LoginController::class, 'login_action'])->name('login_act
 // Logout
 Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Register 
+// Register
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
 
@@ -43,39 +40,31 @@ Route::middleware(['auth', NoBackHistory::class])->group(function () {
 
     // Divisi Event
     Route::get('/company-event/{page?}', [CompanyEventController::class, 'index'])->name('company_event.index');
-    // Route::get('/company-event', [CompanyEventController::class, 'index'])->name('company_event.index');
     Route::get('/company-event/add-company-event/{page?}', [CompanyEventController::class, 'add_company_index'])->name('add_company_index');
-    // Route::get('/company-event/add-company-event', [CompanyEventController::class, 'add_company_index'])->name('add_company_index');
     Route::post('/add-company', [CompanyEventController::class, 'add'])->name('add-company');
     Route::post('/edit-company/edit/{id}', [CompanyEventController::class, 'edit'])->name('edit-company');
     Route::post('/update-company', [CompanyEventController::class, 'update'])->name('update-company');
     Route::delete('/delete-company/{id}', [CompanyEventController::class, 'delete'])->name('delete-company');
 
-    // Master Event 
+    // Master Event
     Route::get('/master-event/{page?}', [MasterEventController::class, 'index'])->name('index');
-    // Route::get('/master-event', [MasterEventController::class, 'index'])->name('index');
     Route::get('/master-event/add-event/{page?}', [MasterEventController::class, 'add_index'])->name('add_index');
-    // Route::get('/master-event/add-event', [MasterEventController::class, 'add_index'])->name('add_index');
     Route::post('/add', [MasterEventController::class, 'add'])->name('add');
     Route::post('/master-event/edit/{id}', [MasterEventController::class, 'edit'])->name('edit');
     Route::post('/update', [MasterEventController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [MasterEventController::class, 'delete'])->name('delete');
 
-    // Visitor Event 
+    // Visitor Event
     Route::get('/visitor-event/{page?}', [VisitorEventController::class, 'index'])->name('visitor_event.index');
-    // Route::get('/visitor-event', [VisitorEventController::class, 'index'])->name('visitor_event.index');
     Route::get('/visitor-event/add-visitor-event/{page?}', [VisitorEventController::class, 'add_visitor_index'])->name('add_visitor_index');
-    // Route::get('/visitor-event/add-visitor-event', [VisitorEventController::class, 'add_visitor_index'])->name('add_visitor_index');
     Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
     Route::post('/edit-visitor/edit/{id}', [VisitorEventController::class, 'edit'])->name('edit-visitor');
     Route::post('/update-visitor', [VisitorEventController::class, 'update'])->name('update-visitor');
     Route::delete('/delete-visitor/{id}', [VisitorEventController::class, 'delete'])->name('delete-visitor');
 
-    // Admin Event 
+    // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
-    // Route::get('/admin-event', [AdminEventController::class, 'index'])->name('admin_event.index');
     Route::get('/admin-event/add-admin-event/{page?}', [AdminEventController::class, 'add_admin_index'])->name('add_admin_index');
-    // Route::get('/admin-event/add-admin-event', [AdminEventController::class, 'add_admin_index'])->name('add_admin_index');
     Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
     Route::post('/edit-admin/edit/{id}', [AdminEventController::class, 'edit'])->name('edit-admin');
     Route::post('/update-admin', [AdminEventController::class, 'update'])->name('update-admin');

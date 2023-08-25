@@ -17,10 +17,7 @@ return new class extends Migration
             $table->id('id');
             $table->string('username');
             $table->string('password');
-            $table->string('password_confirmation');
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('no_handphone');
+            $table->string('full_name');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });
