@@ -2,75 +2,83 @@
     <aside id="sidebar-wrapper">
         <ul class="sidebar-menu">
             @if (!empty($masterEvent))
-            @foreach ($masterEvent as $value)
-            <div class="sidebar-brand">
-                <!-- <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"> -->
-                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
-                    <img src="{{ asset('images/' . $value['logo']) }}" height="54">
-                </a>
-            </div>
-            <div class="sidebar-brand sidebar-brand-sm">
-                <!-- <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"> -->
-                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
-                    <img src="{{ asset('images/' . $value['logo']) }}" height="50">
-                </a>
-            </div>
-            <li class="menu-header">Dashboard</li>
-            <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-            </li>
-            <li class="menu-header">Event</li>
-            <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('company_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-building"></i> <span>Divisi Event</span></a>
-            </li>
-            <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('index', ['page' => $value['title_url']]) }}"><i class="fas fa-calendar"></i> <span>Master Event</span></a>
-            </li>
-            <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
-            </li>
-            <li class="menu-header">Admin</li>
-            <li class="{{ Request::is('admin-event') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
-            </li>
-            @endforeach
+                @foreach ($masterEvent as $value)
+                    <div class="sidebar-brand">
+                        <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <img src="{{ asset('images/' . $value['logo']) }}" height="54">
+                        </a>
+                    </div>
+                    <div class="sidebar-brand sidebar-brand-sm">
+                        <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <img src="{{ asset('images/' . $value['logo']) }}" height="50">
+                        </a>
+                    </div>
+                    <li class="menu-header">Dashboard</li>
+                    <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}"><i
+                                class="fas fa-home"></i> <span>Dashboard</span></a>
+                    </li>
+                    <li class="menu-header">Event</li>
+                    {{-- <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
+                        <a class="nav-link"
+                            href="{{ route('company_event.index', ['page' => $value['title_url']]) }}"><i
+                                class="fas fa-building"></i> <span>Divisi Event</span></a>
+                    </li>
+                    <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('index', ['page' => $value['title_url']]) }}"><i
+                                class="fas fa-calendar"></i> <span>Master Event</span></a>
+                    </li> --}}
+                    <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
+                        <a class="nav-link"
+                            href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i
+                                class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
+                    </li>
+                    <li class="menu-header">Admin</li>
+                    <li class="{{ Request::is('admin-event') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i
+                                class="fas fa-user"></i> <span>Admin Event</span></a>
+                    </li>
+                @endforeach
             @else
-            <div class="sidebar-brand">
-                <a href="{{ route('dashboard', ['page' => 'cms']) }}">
-                    <img src="{{ asset('img/datascrip-logo.png') }}" height="54">
-                </a>
-            </div>
-            <div class="sidebar-brand sidebar-brand-sm">
-                <a href="{{ route('dashboard', ['page' => 'cms']) }}">
-                    <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
-                </a>
-            </div>
-            <li class="menu-header">Dashboard</li>
-            <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('dashboard', ['page' => 'cms']) }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-            </li>
-            <li class="menu-header">Event</li>
-            <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('company_event.index', ['page' => 'cms']) }}"><i class="fas fa-building"></i> <span>Divisi Event</span></a>
-            </li>
-            <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('index', ['page' => 'cms']) }}"><i class="fas fa-calendar"></i> <span>Master Event</span></a>
-            </li>
-            <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('visitor_event.index', ['page' => 'cms']) }}"><i class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
-            </li>
-            <li class="menu-header">Admin</li>
-            <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i class="fas fa-gears"></i> <span>Add Role</span></a>
-            </li>
-            <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
-            </li>
+                <div class="sidebar-brand">
+                    <a href="{{ route('dashboard', ['page' => 'cms']) }}">
+                        <img src="{{ asset('img/datascrip-logo.png') }}" height="54">
+                    </a>
+                </div>
+                <div class="sidebar-brand sidebar-brand-sm">
+                    <a href="{{ route('dashboard', ['page' => 'cms']) }}">
+                        <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
+                    </a>
+                </div>
+                <li class="menu-header">Dashboard</li>
+                <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('dashboard', ['page' => 'cms']) }}"><i class="fas fa-home"></i>
+                        <span>Dashboard</span></a>
+                </li>
+                <li class="menu-header">Event</li>
+                <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('company_event.index', ['page' => 'cms']) }}"><i
+                            class="fas fa-building"></i> <span>Divisi Event</span></a>
+                </li>
+                <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('index', ['page' => 'cms']) }}"><i class="fas fa-calendar"></i>
+                        <span>Master Event</span></a>
+                </li>
+                <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('visitor_event.index', ['page' => 'cms']) }}"><i
+                            class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
+                </li>
+                <li class="menu-header">Admin</li>
+                <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i
+                            class="fas fa-user"></i> <span>Admin Event</span></a>
+                </li>
             @endif
 
             <li class="menu-header">Menu</li>
             <li class="nav-item dropdown {{ $type_menu === 'layout' ? 'active' : '' }}">
-                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Layout</span></a>
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i>
+                    <span>Layout</span></a>
                 <ul class="dropdown-menu">
                     <li class="{{ Request::is('layout-default-layout') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('layout-default-layout') }}">Default Layout</a>
@@ -84,7 +92,8 @@
                 </ul>
             </li>
             <li class="{{ Request::is('blank-page') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('blank-page') }}"><i class="far fa-square"></i> <span>Blank Page</span></a>
+                <a class="nav-link" href="{{ url('blank-page') }}"><i class="far fa-square"></i> <span>Blank
+                        Page</span></a>
             </li>
             <li class="nav-item dropdown {{ $type_menu === 'bootstrap' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-th"></i> <span>Bootstrap</span></a>
@@ -166,7 +175,8 @@
                         <a class="nav-link" href="{{ url('components-chat-box') }}">Chat Box</a>
                     </li>
                     <li class="{{ Request::is('components-empty-state') ? 'active' : '' }}">
-                        <a class="nav-link beep beep-sidebar" href="{{ url('components-empty-state') }}">Empty State</a>
+                        <a class="nav-link beep beep-sidebar" href="{{ url('components-empty-state') }}">Empty
+                            State</a>
                     </li>
                     <li class="{{ Request::is('components-gallery') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('components-gallery') }}">Gallery</a>
@@ -198,7 +208,8 @@
                 </ul>
             </li>
             <li class="nav-item dropdown {{ $type_menu === 'forms' ? 'active' : '' }}">
-                <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i> <span>Forms</span></a>
+                <a href="#" class="nav-link has-dropdown"><i class="far fa-file-alt"></i>
+                    <span>Forms</span></a>
                 <ul class="dropdown-menu">
                     <li class="{{ Request::is('forms-advanced-form') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('forms-advanced-form') }}">Advanced Form</a>
@@ -307,7 +318,8 @@
                 </ul>
             </li>
             <li class="nav-item dropdown {{ $type_menu === 'features' ? 'active' : '' }}">
-                <a href="#" class="nav-link has-dropdown"><i class="fas fa-bicycle"></i> <span>Features</span></a>
+                <a href="#" class="nav-link has-dropdown"><i class="fas fa-bicycle"></i>
+                    <span>Features</span></a>
                 <ul class="dropdown-menu">
                     <li class="{{ Request::is('features-activities') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ url('features-activities') }}">Activities</a>
@@ -364,29 +376,29 @@
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="script.js"></script> -->
 <!-- @push('scripts') -->
-<!-- <script>
-    $(document).on('click', '#company_event', function() {
-        $.ajax({
-            var username = $('#username').val();
+    <!-- <script>
+        $(document).on('click', '#company_event', function() {
+            $.ajax({
+                var username = $('#username').val();
 
-            url: '{{ route("company_event.index", ["page" => "samsung-galaxy"]) }}',
-            // url: '{{ route("add-company") }}',
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            },
-            success: function(response) {
-                //
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $("#btn_progress").hide();
-                $("#btn_submit").show();
+                url: '{{ route('company_event.index', ['page' => 'samsung-galaxy']) }}',
+                // url: '{{ route('add-company') }}',
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(response) {
+                    //
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $("#btn_progress").hide();
+                    $("#btn_submit").show();
 
-                console.log(textStatus, errorThrown);
-            }
+                    console.log(textStatus, errorThrown);
+                }
+            });
         });
-    });
-</script> -->
+    </script> -->

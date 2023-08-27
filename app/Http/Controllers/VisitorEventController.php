@@ -7,12 +7,15 @@ use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Session;
 use Mockery\Undefined;
 
 class VisitorEventController extends Controller
 {
     function index($page)
     {
+        // dd(Auth::user());
         $type_menu = 'visitor_event';
         $data = $this->query();
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
