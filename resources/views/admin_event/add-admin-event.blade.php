@@ -242,7 +242,14 @@
                             $("#btn_progress").hide();
                             $("#btn_submit").show();
 
-                            if (alerts == "success") {
+                            if (alerts == "failed_space") {
+                                swal('Gagal',
+                                    'Username tidak boleh terdapat spasi, silahkan coba lagi...',
+                                    'warning');
+                            } else if (alerts == "failed") {
+                                swal('Gagal', 'Username sudah terdaftar, silahkan coba lagi...',
+                                    'warning');
+                            } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
                                     okay => {
                                         if (okay) {

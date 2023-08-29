@@ -69,7 +69,7 @@
                                 </div>
                                 <h4>{{ $adminEventCount }}</h4>
                                 <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total User</div>
+                                    <div class="card-description" style="color:white">Total Visitor</div>
                                 </a>
                             </div>
                         </div>

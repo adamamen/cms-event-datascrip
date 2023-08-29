@@ -104,10 +104,9 @@ class VisitorEventController extends Controller
 
     public function add(Request $request)
     {
-        $query = DB::table('tbl_visitor_event as A')
-            ->join('tbl_master_event as B', 'A.event_id', '=', 'B.id_event')
-            ->where('A.ticket_no', $request->noTiket)
-            ->where('B.title_url', $request->params)
+        $query = M_VisitorEvent::select('*')
+            ->where('event_id', $request->namaEvent)
+            ->where('ticket_no', $request->noTiket)
             ->get();
 
         if (!$query->isEmpty()) {
@@ -141,6 +140,11 @@ class VisitorEventController extends Controller
         $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
         $userId = $user[0]['id'];
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        if ($page == 'cms') {
+            $event = M_MasterEvent::select('*')->where('status', 'A')->get()->toArray();
+        } else {
+            $event = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        }
 
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.edit-visitor-event', [
@@ -149,7 +153,7 @@ class VisitorEventController extends Controller
                 'masterEvent' => $masterEvent,
                 'data' => $data,
                 'type_menu' => $type_menu,
-                'event' => $masterEvent
+                'event' => $event
             ]);
         } else {
             return abort(404);
@@ -158,44 +162,35 @@ class VisitorEventController extends Controller
 
     public function update(Request $request)
     {
-        $query = DB::table('tbl_visitor_event as A')
-            ->join('tbl_master_event as B', 'A.event_id', '=', 'B.id_event')
-            ->where('A.ticket_no', $request->noTiket)
-            ->where('B.title_url', $request->params)
-            ->get();
-
-        if (!$query->isEmpty()) {
-            return response()->json(['message' => 'failed']);
+        if ($request->namaEvent == 'undefined') {
+            DB::table('tbl_visitor_event')
+                ->where('id', $request->id)
+                ->update([
+                    'ticket_no' => $request->noTiket,
+                    'registration_date' => $request->tanggalRegistrasi,
+                    'full_name' => $request->namaLengkap,
+                    'address' => $request->alamat,
+                    'email' => $request->email,
+                    'mobile' => $request->noHandphone,
+                    'updated_at' => Carbon::now(),
+                    'updated_by' => $request->username,
+                ]);
         } else {
-            if ($request->namaEvent == 'undefined') {
-                DB::table('tbl_visitor_event')
-                    ->where('id', $request->id)
-                    ->update([
-                        'ticket_no' => $request->noTiket,
-                        'registration_date' => $request->tanggalRegistrasi,
-                        'full_name' => $request->namaLengkap,
-                        'address' => $request->alamat,
-                        'email' => $request->email,
-                        'mobile' => $request->noHandphone,
-                        'updated_at' => Carbon::now(),
-                        'updated_by' => $request->username,
-                    ]);
-            } else {
-                DB::table('tbl_visitor_event')
-                    ->where('id', $request->id)
-                    ->update([
-                        'event_id' => $request->namaEvent,
-                        'ticket_no' => $request->noTiket,
-                        'registration_date' => $request->tanggalRegistrasi,
-                        'full_name' => $request->namaLengkap,
-                        'address' => $request->alamat,
-                        'email' => $request->email,
-                        'mobile' => $request->noHandphone,
-                        'updated_at' => Carbon::now(),
-                        'updated_by' => $request->username,
-                    ]);
-            }
+            DB::table('tbl_visitor_event')
+                ->where('id', $request->id)
+                ->update([
+                    'event_id' => $request->namaEvent,
+                    'ticket_no' => $request->noTiket,
+                    'registration_date' => $request->tanggalRegistrasi,
+                    'full_name' => $request->namaLengkap,
+                    'address' => $request->alamat,
+                    'email' => $request->email,
+                    'mobile' => $request->noHandphone,
+                    'updated_at' => Carbon::now(),
+                    'updated_by' => $request->username,
+                ]);
         }
+        // }
 
         return response()->json(['message' => 'success']);
     }

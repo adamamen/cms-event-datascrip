@@ -8,7 +8,9 @@
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap-social/bootstrap-social.css') }}">
@@ -35,72 +37,85 @@
                     <div class="m-3 p-4">
 
                         @if (!empty($masterEvent))
-                        @foreach ($masterEvent as $value)
-                        <img src="{{ asset('images/' . $value['logo']) }}" alt="logo" width="100%" class="center"><br><br>
-                        <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">{{ strtoupper($value['title']) }} Event</span></h4>
-                        @endforeach 
+                            @foreach ($masterEvent as $value)
+                                <img src="{{ asset('images/' . $value['logo']) }}" alt="logo" width="100%"
+                                    class="center"><br><br>
+                                <h4 class="text-dark font-weight-normal">Welcome to <span
+                                        class="font-weight-bold">{{ strtoupper($value['title']) }} Event</span></h4>
+                            @endforeach
                         @else
-                        <img src="{{ asset('img/logo1.png') }}" alt="logo" width="100%" class="center"><br><br>
-                        <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">CMS Event</span></h4>
+                            <img src="{{ asset('img/logo1.png') }}" alt="logo" width="100%"
+                                class="center"><br><br>
+                            <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">CMS
+                                    Event</span></h4>
                         @endif
 
                         <p class="text-muted">
                             Before you get started, you must login or register if you don't already have an account.
                         </p>
-                        <form method="POST" class="needs-validation" novalidate="" action="{{ route('login_action') }}">
+                        <form method="POST" class="needs-validation" novalidate=""
+                            action="{{ route('login_action') }}">
                             @csrf
-                            @if($errors->has('message'))
-                            <div class="alert alert-danger">
-                                {{ $errors->first('message') }}
-                            </div>
+                            @if ($errors->has('message'))
+                                <div class="alert alert-danger">
+                                    {{ $errors->first('message') }}
+                                </div>
                             @endif
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input id="username" type="username" class="form-control" name="username" tabindex="1" required autofocus>
+                                <input id="username" type="username" class="form-control" name="username"
+                                    tabindex="1" required autofocus>
                                 <div class="invalid-feedback">
                                     Please fill in your username
                                 </div>
                             </div>
 
                             @if (!empty($masterEvent))
-                            @foreach ($masterEvent as $value)
-                            <input id="title" name="title" value="{{ strtolower($value['title_url']) }}" hidden>
-                            @endforeach
+                                @foreach ($masterEvent as $value)
+                                    <input id="title" name="title" value="{{ strtolower($value['title_url']) }}"
+                                        hidden>
+                                @endforeach
                             @endif
 
                             <div class="form-group">
                                 <div class="d-block">
                                     <label for="password" class="control-label">Password</label>
                                 </div>
-                                <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
+                                <input id="password" type="password" class="form-control" name="password"
+                                    tabindex="2" required>
                                 <div class="invalid-feedback">
                                     Please fill in your password
                                 </div>
                             </div>
                             <div class="form-group text-right">
-                                <button class="btn btn-primary btn-lg btn-icon icon-right" type="submit" id="btn_submit" name="btn_submit">Login</button>
+                                <button class="btn btn-primary btn-lg btn-icon icon-right" type="submit"
+                                    id="btn_submit" name="btn_submit">Login</button>
                             </div>
 
                             <div class="mt-5 text-center">
                                 @if (empty($masterEvent))
-                                Don't have an account? <a href="{{ route('register', ['page' => 'cms']) }}">Create new one for Admin</a>
+                                    Don't have an account? <a href="{{ route('register', ['page' => 'cms']) }}">Create
+                                        new one for Admin</a>
                                 @endif
                             </div>
                         </form>
 
                         <div class="text-small mt-5 text-center">
-                            Copyright &copy; Datascrip. Made with 💙 by MIS
+                            Copyright &copy; Datascrip. Made with 💙 by MIS Datascrip
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1" data-background="{{ asset('img/unsplash/rinjani-mountain.jpg') }}">
+                <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
+                    data-background="{{ asset('img/unsplash/rinjani-mountain.jpg') }}">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
                                 <h1 class="display-4 font-weight-bold mb-2">Rinjani Mountain</h1>
                                 <h5 class="font-weight-normal text-muted-transparent">West Nusa Tenggara, Indonesia</h5>
                             </div>
-                            Photo by <a class="text-light bb" target="_blank" href="https://unsplash.com/photos/2hwTjleuT64">Eugene Chow</a> on <a class="text-light bb" target="_blank" href="https://unsplash.com">Unsplash</a>
+                            Photo by <a class="text-light bb" target="_blank"
+                                href="https://unsplash.com/photos/2hwTjleuT64">Eugene Chow</a> on <a
+                                class="text-light bb" target="_blank" href="https://unsplash.com">Unsplash</a>
                         </div>
                     </div>
                 </div>

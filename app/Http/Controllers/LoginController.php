@@ -48,9 +48,8 @@ class LoginController extends Controller
         } else {
             $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();
         }
-        // dd($user);
+
         if (!$user->isEmpty()) {
-            // dd('1');
             foreach ($user as $user) {
                 if ($user && password_verify($credentials['password'], $user->password)) {
                     if ($user->event_id == 0 && $title == "cms") {
@@ -80,7 +79,6 @@ class LoginController extends Controller
                 }
             }
         } else {
-            // dd('2');
             if (empty($credentials['username']) && empty($credentials['password'])) {
                 if ($title == "cms") {
                     return redirect()->route('login')->withErrors(['message' => 'Username dan Password tidak boleh kosong, silahkan coba lagi']);

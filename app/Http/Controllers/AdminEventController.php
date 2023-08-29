@@ -99,26 +99,34 @@ class AdminEventController extends Controller
 
     public function add(Request $request)
     {
-        // dd($request->all());
-        DB::table('tbl_user')->insert([
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'full_name' => $request->nama_lengkap,
-            'event_id' => $request->event,
-            'status' => $request->status,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'password_encrypts' => Crypt::encryptString($request->password)
-        ]);
+        $checkUser = M_User::select('*')->where('username', $request->username)->where('event_id', $request->event)->first();
+        $titleUrl = M_MasterEvent::select('*')->where('id_event', $request->event)->first();
 
-        return response()->json(['message' => 'success']);
+        if (str_contains($request->username, ' ')) {
+            return response()->json(['message' => 'failed_space']);
+        } else if (!empty($checkUser)) {
+            return response()->json(['message' => 'failed']);
+        } else {
+            DB::table('tbl_user')->insert([
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'full_name' => $request->nama_lengkap,
+                'event_id' => $request->event,
+                'status' => $request->status,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'password_encrypts' => Crypt::encryptString($request->password),
+                'title_url' => $titleUrl->title_url
+            ]);
+
+            return response()->json(['message' => 'success']);
+        }
     }
 
     public function edit()
     {
         $page = request('page');
         $id = request('id');
-        dd($page);
         $type_menu = 'admin_event';
         $data = M_User::select('*')->where('id', $id)->get();
         $event = M_MasterEvent::select('*')->get();
