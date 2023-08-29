@@ -34,7 +34,11 @@
                     <div class="card-header">
                         <h4>Data Visitor Event</h4>
                         <div class="article-cta">
-                            <a href="{{ route('add_visitor_index', ['page' => 'cms']) }}" class="btn btn-success">Add Visitor</a>
+                            @if ($pages == "cms") 
+                                <a href="{{ route('add_visitor_index', ['page' => 'cms']) }}" class="btn btn-success">Add Visitor</a>
+                            @else 
+                                <a href="{{ route('add_visitor_index', ['page' => $data[0]['title_url']]) }}" class="btn btn-success">Add Visitor</a>
+                            @endif
                         </div>
                     </div>
                     <div class="card-body">
@@ -68,8 +72,11 @@
                                         <td>{{ $value['created_by'] }}</td>
                                         <td>{{ $value['created_at'] }}</td>
                                         <td>
-                                            <form action="{{ route('edit-visitor', ['id' => $value['id']]) }}" method="POST">
+                                            {{-- <form action="{{ route('edit-visitor', ['id' => $value['id']]) }}" method="POST"> --}}
+                                            <form method="POST" action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                                                <input type="hidden" name="page" value="{{ $value['title_url'] }}">
+                                                <input type="hidden" name="id" value="{{ $value['id'] }}">
                                                 <button name="edit" id="edit" class="btn btn-primary">Edit</button>
                                                 <meta name="csrf-token" content="{{ csrf_token() }}">
                                                 <a href="#" class="btn btn-danger" data-id="{{ $value['id'] }}" name="btn_delete" id="btn_delete">Delete</a>
@@ -119,8 +126,6 @@
 <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
 <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 
-
-
 <script>
     $(document).ready(function() {
         $('#tbl_visitor').DataTable({
@@ -136,6 +141,7 @@
 
     $(document).on('click', '#btn_delete', function() {
         var recordId = $(this).data('id');
+        var params = "<?php echo $titleUrl; ?>";
 
         swal({
                 title: 'Apakah kamu yakin?',
@@ -159,7 +165,7 @@
                             if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil di delete...', 'success').then(okay => {
                                     if (okay) {
-                                        window.location.href = "/visitor-event/cms";
+                                        window.location.href = "/visitor-event/" + params;
                                     }
                                 });
                             } else if (alerts == "failed") {

@@ -4,35 +4,47 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\M_MasterEvent;
-use App\Models\M_AdminEvent;
+use App\Models\M_User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 
 class AdminEventController extends Controller
 {
     function index($page)
     {
         $type_menu = 'admin_event';
-        $data = $this->query();
+        $data = $this->query($page);
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $userId = $user[0]['id'];
 
-        if (!empty($masterEvent) || $page == "cms") {
+        if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('admin_event.index', [
+                'id' => $userId,
                 'masterEvent' => $masterEvent,
                 'data' => $data,
-                'type_menu' => $type_menu
+                'type_menu' => $type_menu,
+                'pages' => $page
             ]);
+        } else {
+            return abort(404);
         }
     }
 
-    public function query()
+    public function query($page)
     {
-        $queryAdminEvent = DB::table('tbl_admin_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by admin_id) AS RowNumber'), 'admin_id', 'event_id', 'username', 'password', 'full_name', 'status', 'created_at', 'updated_at', 'password_encrypts')
+        $queryAdminEvent = DB::table('tbl_user')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'username', 'password', 'full_name', 'status', 'created_at', 'updated_at', 'password_encrypts')
+            ->where('event_id', '<>', '0')
             ->get();
-        $queryMasterEvent =  M_MasterEvent::select('*')->get();
+        if ($page == "cms") {
+            $queryMasterEvent =  M_MasterEvent::select('*')->get();
+        } else {
+            $queryMasterEvent =  M_MasterEvent::select('*')->where('title_url', $page)->get();
+        }
 
         if (!empty($queryAdminEvent) && !empty($queryMasterEvent)) {
             foreach ($queryAdminEvent as $admin) {
@@ -40,7 +52,7 @@ class AdminEventController extends Controller
                     if ($admin->event_id == $event->id_event) {
                         $merge[] = [
                             'RowNumber' => $admin->RowNumber,
-                            'admin_id' => $admin->admin_id,
+                            'admin_id' => $admin->id,
                             'event_id' => $admin->event_id,
                             'username' => $admin->username,
                             'password' => $admin->password,
@@ -52,31 +64,43 @@ class AdminEventController extends Controller
                             'updated_at' => $event->updated_at,
                             'created_by' => $event->created_by,
                             'created_at' => $event->created_at,
+                            'title_url' => $event->title_url,
                         ];
                     }
                 }
             }
         }
-        // dd($merge);
         $merge = !empty($merge) ? $merge : [];
 
         return $merge;
     }
 
-    function add_admin_index()
+    function add_admin_index($page)
     {
-        $type_menu = 'dashboard';
-        $data = M_MasterEvent::select('*')->where('status', 'A')->get();
+        $type_menu = 'admin_event';
+        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $userId = $user[0]['id'];
+        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        if ($page == "cms") {
+            $data = M_MasterEvent::select('*')->where('status', 'A')->get();
+        } else {
+            $data = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+        }
 
         return view('admin_event.add-admin-event', [
+            'id' => $userId,
+            'titleUrl' => $titleUrl,
             'data' => $data,
+            'masterEvent' => $masterEvent,
             'type_menu' => $type_menu
         ]);
     }
 
     public function add(Request $request)
     {
-        DB::table('tbl_admin_event')->insert([
+        // dd($request->all());
+        DB::table('tbl_user')->insert([
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'full_name' => $request->nama_lengkap,
@@ -90,15 +114,22 @@ class AdminEventController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    public function edit($id)
+    public function edit()
     {
-        $type_menu = 'dashboard';
-        $data = M_AdminEvent::select('*')->where('admin_id', $id)->get();
+        $page = request('page');
+        $id = request('id');
+        dd($page);
+        $type_menu = 'admin_event';
+        $data = M_User::select('*')->where('id', $id)->get();
         $event = M_MasterEvent::select('*')->get();
+        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $userId = $user[0]['id'];
+        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         foreach ($data as $value) {
             $val[] = [
-                'admin_id' => $value->admin_id,
+                'admin_id' => $value->id,
                 'event_id' => $value->event_id,
                 'username' => $value->username,
                 'password' => $value->password,
@@ -110,18 +141,23 @@ class AdminEventController extends Controller
             ];
         }
 
-        return view('admin_event.edit-admin-event', [
-            'data' => $val,
-            'type_menu' => $type_menu,
-            'event' => $event
-        ]);
+        if (!empty($masterEvent) || $page == "cms") {
+            return view('admin_event.edit-admin-event', [
+                'titleUrl' => $titleUrl,
+                'id' => $userId,
+                'masterEvent' => $masterEvent,
+                'data' => $val,
+                'type_menu' => $type_menu,
+                'event' => $event
+            ]);
+        }
     }
 
     public function update(Request $request)
     {
         if ($request->event == NULL) {
-            DB::table('tbl_admin_event')
-                ->where('admin_id', $request->admin_id)
+            DB::table('tbl_user')
+                ->where('id', $request->admin_id)
                 ->update([
                     'username' => $request->username,
                     'password' => Hash::make($request->password),
@@ -132,8 +168,8 @@ class AdminEventController extends Controller
                     'password_encrypts' => Crypt::encryptString($request->password)
                 ]);
         } else {
-            DB::table('tbl_admin_event')
-                ->where('admin_id', $request->admin_id)
+            DB::table('tbl_user')
+                ->where('id', $request->admin_id)
                 ->update([
                     'event_id' => $request->event,
                     'username' => $request->username,
@@ -151,7 +187,7 @@ class AdminEventController extends Controller
 
     public function delete($id)
     {
-        $data = M_AdminEvent::find($id); // Fetch data based on ID
+        $data = M_User::find($id); // Fetch data based on ID
 
         if ($data) {
             $data->delete();

@@ -121,6 +121,8 @@
 <script>
     $("#btn_progress").hide();
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+        
         $("#btn_cancel").click(function() {
             swal({
                     title: 'Apakah kamu yakin?',
@@ -131,13 +133,15 @@
                 })
                 .then((ok) => {
                     if (ok) {
-                        window.location.href = "/visitor-event/cms";
+                        window.location.href = "/visitor-event/" + params;
                     }
                 });
         });
     });
 
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+
         $("#btn_submit").click(function() {
             $("#btn_progress").show();
             $("#btn_submit").hide();
@@ -161,6 +165,7 @@
             formData.append("tanggalRegistrasi", tanggalRegistrasi);
             formData.append("alamat", alamat);
             formData.append("username", username);
+            formData.append("params", params);
 
             if (namaLengkap == "") {
                 var name = "Nama Lengkap";
@@ -275,10 +280,12 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
 
-                        if (alerts == "success") {
+                        if (alerts == "failed") {
+                            swal('Gagal', 'No Ticket sudah pernah digunakan, silahkan coba lagi...', 'warning');
+                        } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil disimpan...', 'success').then(okay => {
                                 if (okay) {
-                                    window.location.href = "/visitor-event/cms";
+                                    window.location.href = "/visitor-event/" + params;
                                 }
                             });
                         } else {

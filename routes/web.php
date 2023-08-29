@@ -58,7 +58,7 @@ Route::middleware(['auth', NoBackHistory::class])->group(function () {
     Route::get('/visitor-event/{page?}', [VisitorEventController::class, 'index'])->name('visitor_event.index');
     Route::get('/visitor-event/add-visitor-event/{page?}', [VisitorEventController::class, 'add_visitor_index'])->name('add_visitor_index');
     Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
-    Route::post('/edit-visitor/edit/{id}', [VisitorEventController::class, 'edit'])->name('edit-visitor');
+    Route::post('/edit-visitor/edit/{page?}/{id}', [VisitorEventController::class, 'edit'])->name('edit-visitor');
     Route::post('/update-visitor', [VisitorEventController::class, 'update'])->name('update-visitor');
     Route::delete('/delete-visitor/{id}', [VisitorEventController::class, 'delete'])->name('delete-visitor');
 
@@ -66,7 +66,7 @@ Route::middleware(['auth', NoBackHistory::class])->group(function () {
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
     Route::get('/admin-event/add-admin-event/{page?}', [AdminEventController::class, 'add_admin_index'])->name('add_admin_index');
     Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
-    Route::post('/edit-admin/edit/{id}', [AdminEventController::class, 'edit'])->name('edit-admin');
+    Route::post('/edit-admin/edit/{page?}/{id}', [AdminEventController::class, 'edit'])->name('edit-admin');
     Route::post('/update-admin', [AdminEventController::class, 'update'])->name('update-admin');
     Route::delete('/delete-admin/{id}', [AdminEventController::class, 'delete'])->name('delete-admin');
 });

@@ -40,7 +40,7 @@
                                     <select class="form-control select2" name="event" id="event">
                                         <option selected disabled>-- Silahkan Pilih --</option>
                                         @foreach ($event as $event)
-                                        <option value="{{ $value->id_event }}" {{ $event->id_event == $value->event_id ? 'selected' : '' }}>{{ $event->title }}</option>
+                                        <option value="{{ $value->id_event }}" {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}>{{ $event['title'] }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
@@ -127,6 +127,8 @@
 <script>
     $("#btn_progress").hide();
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+
         $("#btn_cancel").click(function() {
             swal({
                     title: 'Apakah kamu yakin?',
@@ -137,13 +139,15 @@
                 })
                 .then((ok) => {
                     if (ok) {
-                        window.location.href = "/visitor-event/cms";
+                        window.location.href = "/visitor-event/" + params;
                     }
                 });
         });
     });
 
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+
         $("#btn_submit").click(function() {
             $("#btn_progress").show();
             $("#btn_submit").hide();
@@ -169,6 +173,7 @@
             formData.append("alamat", alamat);
             formData.append("username", username);
             formData.append("id", id);
+            formData.append("params", params);
 
             $.ajax({
                 url: '{{ route("update-visitor") }}',
@@ -184,10 +189,12 @@
                     $("#btn_progress").hide();
                     $("#btn_submit").show();
 
-                    if (alerts == "success") {
+                    if (alerts == "failed") {
+                        swal('Gagal', 'No Ticket sudah pernah digunakan, silahkan coba lagi...', 'warning');
+                    } else if (alerts == "success") {
                         swal('Sukses', 'Data berhasil diupdate...', 'success').then(okay => {
                             if (okay) {
-                                window.location.href = "/visitor-event/cms";
+                                window.location.href = "/visitor-event/" + params;
                             }
                         });
                     } else {

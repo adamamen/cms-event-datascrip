@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\M_CompanyEvent;
+use App\Models\M_User;
 use App\Models\M_MasterEvent;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CompanyEventController extends Controller
@@ -17,19 +19,24 @@ class CompanyEventController extends Controller
             ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'status', 'name', 'description', 'created_by', 'created_at', 'updated_by', 'updated_at')
             ->get();
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $userId = $user[0]['id'];
 
-        if (!empty($masterEvent) || $page == "cms") {
+        if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('company_event.index', [
+                'id' => $userId,
                 'masterEvent' => $masterEvent,
                 'data' => $data,
                 'type_menu' => $type_menu
             ]);
+        } else {
+            return abort(404);
         }
     }
 
     public function add_company_index($page)
     {
-        $type_menu = 'dashboard';
+        $type_menu = 'company_event';
         $data = M_CompanyEvent::select('*')->get();
 
         if ($page == "cms") {
@@ -57,7 +64,7 @@ class CompanyEventController extends Controller
 
     public function edit($id)
     {
-        $type_menu = 'dashboard';
+        $type_menu = 'company_event';
         $data = M_CompanyEvent::select('*')->where('id', $id)->get();
 
         return view('company_event.edit-company-event', [

@@ -20,6 +20,10 @@ return new class extends Migration
             $table->string('full_name');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
+            $table->text('event_id');
+            $table->string('status');
+            $table->text('password_encrypts');
+            $table->string('title_url');
         });
     }
 

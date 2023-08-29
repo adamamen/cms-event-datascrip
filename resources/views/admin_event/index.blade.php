@@ -1,26 +1,3 @@
-<?php
-function tgl_indo($tanggal)
-{
-    $bulan = [
-        1 => 'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember',
-    ];
-    $pecahkan = explode('-', $tanggal);
-
-    return $pecahkan[2] . ' ' . $bulan[(int) $pecahkan[1]] . ' ' . $pecahkan[0];
-}
-
-?>
 @extends('layouts.app')
 
 @section('title', 'Admin Event')
@@ -50,9 +27,11 @@ function tgl_indo($tanggal)
                         <div class="card-header">
                             <h4>Admin Event</h4>
                             <div class="article-cta">
-                                <!-- <a href="{{ url('/admin-event/add-admin-event') }}" class="btn btn-success">Add Admin</a> -->
-                                <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success">Add
-                                    Admin</a>
+                                @if ($pages == "cms") 
+                                    <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success">Add Admin</a>
+                                @else
+                                    <a href="{{ route('add_admin_index', ['page' => $data[0]['title_url']]) }}" class="btn btn-success">Add Admin</a>
+                                @endif
                             </div>
                         </div>
                         <div class="card-body">
@@ -86,15 +65,18 @@ function tgl_indo($tanggal)
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}"
-                                                        method="POST">
+                                                    {{-- <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST"> --}}
+                                                        @if ($pages == "cms") 
+                                                        <form method="POST" action="{{ route('edit-admin', ['page' => 'cms', 'id' => $value['admin_id']]) }}">
+                                                        @else 
+                                                        <form method="POST" action="{{ route('edit-admin', ['page' => $value['title_url'], 'id' => $value['admin_id']]) }}">
+                                                        @endif 
                                                         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                        <button name="edit" id="edit"
-                                                            class="btn btn-primary">Edit</button>
+                                                        <input type="hidden" name="page" value="{{ $pages == "cms" ? 'cms' : $value['title_url'] }}">
+                                                        <input type="hidden" name="id" value="{{ $value['admin_id'] }}">
+                                                        <button name="edit" id="edit" class="btn btn-primary">Edit</button>
                                                         <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                        <a href="#" class="btn btn-danger"
-                                                            data-id="{{ $value['admin_id'] }}" name="btn_delete"
-                                                            id="btn_delete">Delete</a>
+                                                        <a href="#" class="btn btn-danger" data-id="{{ $value['admin_id'] }}" name="btn_delete" id="btn_delete">Delete</a>
                                                     </form>
                                                 </td>
                                             </tr>

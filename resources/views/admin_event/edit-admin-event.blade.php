@@ -110,6 +110,8 @@
 <script>
     $("#btn_progress").hide();
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+        
         $("#btn_cancel").click(function() {
             swal({
                     title: 'Apakah kamu yakin?',
@@ -120,13 +122,15 @@
                 })
                 .then((ok) => {
                     if (ok) {
-                        window.location.href = "/admin-event/cms";
+                        window.location.href = "/admin-event/" + params;
                     }
                 });
         });
     });
 
     $(document).ready(function() {
+        var params = "<?php echo $titleUrl; ?>";
+
         $("#btn_submit").click(function() {
             $("#btn_progress").show();
             $("#btn_submit").hide();
@@ -164,7 +168,7 @@
                     if (alerts == "success") {
                         swal('Sukses', 'Data berhasil diupdate...', 'success').then(okay => {
                             if (okay) {
-                                window.location.href = "/admin-event/cms";
+                                window.location.href = "/admin-event/" + params;
                             }
                         });
                     } else {

@@ -26,22 +26,9 @@
                                     <div class="card-icon">
                                         <i class="far fa-question-circle"></i>
                                     </div>
-                                    <h4>{{ $divisiEvent }}</h4>
-                                    <a href="{{ route('company_event.index', ['page' => $value['title_url']]) }}">
-                                        <div class="card-description" style="color:white">Total Divisi</div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card card-hero">
-                                <div class="card-header">
-                                    <div class="card-icon">
-                                        <i class="far fa-question-circle"></i>
-                                    </div>
-                                    <h4>{{ $masterEventCount }}</h4>
-                                    <a href="{{ route('index', ['page' => $value['title_url']]) }}">
-                                        <div class="card-description" style="color:white">Total Event</div>
+                                    <h4>{{ $adminEventCount }}</h4>
+                                    <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total Visitor</div>
                                     </a>
                                 </div>
                             </div>

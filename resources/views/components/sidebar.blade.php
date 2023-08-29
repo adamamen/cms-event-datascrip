@@ -2,80 +2,68 @@
     <aside id="sidebar-wrapper">
         <ul class="sidebar-menu">
             @if (!empty($masterEvent))
-                @foreach ($masterEvent as $value)
-                    <div class="sidebar-brand">
-                        <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
-                            <img src="{{ asset('images/' . $value['logo']) }}" height="54">
-                        </a>
-                    </div>
-                    <div class="sidebar-brand sidebar-brand-sm">
-                        <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
-                            <img src="{{ asset('images/' . $value['logo']) }}" height="50">
-                        </a>
-                    </div>
-                    <li class="menu-header">Dashboard</li>
-                    <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-home"></i> <span>Dashboard</span></a>
-                    </li>
-                    <li class="menu-header">Event</li>
-                    {{-- <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ route('company_event.index', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-building"></i> <span>Divisi Event</span></a>
-                    </li>
-                    <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('index', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-calendar"></i> <span>Master Event</span></a>
-                    </li> --}}
-                    <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
-                    </li>
-                    <li class="menu-header">Admin</li>
-                    <li class="{{ Request::is('admin-event') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-user"></i> <span>Admin Event</span></a>
-                    </li>
-                @endforeach
-            @else
-                <div class="sidebar-brand">
-                    <a href="{{ route('dashboard', ['page' => 'cms']) }}">
-                        <img src="{{ asset('img/datascrip-logo.png') }}" height="54">
-                    </a>
-                </div>
-                <div class="sidebar-brand sidebar-brand-sm">
-                    <a href="{{ route('dashboard', ['page' => 'cms']) }}">
-                        <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
-                    </a>
-                </div>
+            @foreach ($masterEvent as $value)
+            <div class="sidebar-brand">
+                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                    <img src="{{ asset('images/' . $value['logo']) }}" height="54">
+                </a>
+            </div>
+            <div class="sidebar-brand sidebar-brand-sm">
+                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                    <img src="{{ asset('images/' . $value['logo']) }}" height="50">
+                </a>
+            </div>
+            @if ($id == Auth::user()->id)
                 <li class="menu-header">Dashboard</li>
                 <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('dashboard', ['page' => 'cms']) }}"><i class="fas fa-home"></i>
-                        <span>Dashboard</span></a>
-                </li>
-                <li class="menu-header">Event</li>
-                <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('company_event.index', ['page' => 'cms']) }}"><i
-                            class="fas fa-building"></i> <span>Divisi Event</span></a>
-                </li>
-                <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('index', ['page' => 'cms']) }}"><i class="fas fa-calendar"></i>
-                        <span>Master Event</span></a>
-                </li>
-                <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('visitor_event.index', ['page' => 'cms']) }}"><i
-                            class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
-                </li>
-                <li class="menu-header">Admin</li>
-                <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i
-                            class="fas fa-user"></i> <span>Admin Event</span></a>
+                    <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
                 </li>
             @endif
+            <li class="menu-header">Event</li>
+            <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
+            </li>
+            @if ($id == Auth::user()->id)
+                <li class="menu-header">Admin</li>
+                <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
+                </li>
+            @endif
+            @endforeach
+            @else
+            <div class="sidebar-brand">
+                <a href="{{ route('dashboard', ['page' => 'cms']) }}">
+                    <img src="{{ asset('img/datascrip-logo.png') }}" height="54">
+                </a>
+            </div>
+            <div class="sidebar-brand sidebar-brand-sm">
+                <a href="{{ route('dashboard', ['page' => 'cms']) }}">
+                    <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
+                </a>
+            </div>
+            <li class="menu-header">Dashboard</li>
+            <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('dashboard', ['page' => 'cms']) }}"><i class="fas fa-home"></i>
+                    <span>Dashboard</span></a>
+            </li>
+            <li class="menu-header">Event</li>
+            <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('company_event.index', ['page' => 'cms']) }}"><i class="fas fa-building"></i> <span>Divisi Event</span></a>
+            </li>
+            <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('index', ['page' => 'cms']) }}"><i class="fas fa-calendar"></i>
+                    <span>Master Event</span></a>
+            </li>
+            <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('visitor_event.index', ['page' => 'cms']) }}"><i class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
+            </li>
+            <li class="menu-header">Admin</li>
+            <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
+            </li>
+            @endif
 
-            <li class="menu-header">Menu</li>
+            {{-- <li class="menu-header">Menu</li>
             <li class="nav-item dropdown {{ $type_menu === 'layout' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i>
                     <span>Layout</span></a>
@@ -222,7 +210,7 @@
                     </li>
                 </ul>
             </li>
-            {{-- <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
                 <a href="#"
                     class="nav-link has-dropdown"><i class="fas fa-map-marker-alt"></i> <span>Google
                         Maps</span></a>
@@ -236,7 +224,7 @@
                     <li><a href="gmaps-route.html">Route</a></li>
                     <li><a href="gmaps-simple.html">Simple</a></li>
                 </ul>
-            </li> --}}
+            </li>
             <li class="nav-item dropdown {{ $type_menu === 'modules' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-plug"></i> <span>Modules</span></a>
                 <ul class="dropdown-menu">
@@ -363,42 +351,13 @@
                 <a class="nav-link" href="{{ url('credits') }}"><i class="fas fa-pencil-ruler">
                     </i> <span>Credits</span>
                 </a>
-            </li>
+            </li> --}}
         </ul>
 
-        <div class="hide-sidebar-mini mt-4 mb-4 p-3">
+        {{-- <div class="hide-sidebar-mini mt-4 mb-4 p-3">
             <a href="https://getstisla.com/docs" class="btn btn-primary btn-lg btn-block btn-icon-split">
                 <i class="fas fa-rocket"></i> Documentation
             </a>
-        </div>
+        </div> --}}
     </aside>
 </div>
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="script.js"></script> -->
-<!-- @push('scripts') -->
-    <!-- <script>
-        $(document).on('click', '#company_event', function() {
-            $.ajax({
-                var username = $('#username').val();
-
-                url: '{{ route('company_event.index', ['page' => 'samsung-galaxy']) }}',
-                // url: '{{ route('add-company') }}',
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(response) {
-                    //
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    $("#btn_progress").hide();
-                    $("#btn_submit").show();
-
-                    console.log(textStatus, errorThrown);
-                }
-            });
-        });
-    </script> -->

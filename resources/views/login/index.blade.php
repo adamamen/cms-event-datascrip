@@ -38,7 +38,7 @@
                         @foreach ($masterEvent as $value)
                         <img src="{{ asset('images/' . $value['logo']) }}" alt="logo" width="100%" class="center"><br><br>
                         <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">{{ strtoupper($value['title']) }} Event</span></h4>
-                        @endforeach
+                        @endforeach 
                         @else
                         <img src="{{ asset('img/logo1.png') }}" alt="logo" width="100%" class="center"><br><br>
                         <h4 class="text-dark font-weight-normal">Welcome to <span class="font-weight-bold">CMS Event</span></h4>
@@ -82,11 +82,7 @@
                             </div>
 
                             <div class="mt-5 text-center">
-                                @if (!empty($masterEvent))
-                                @foreach ($masterEvent as $value)
-                                Don't have an account? <a href="{{ route('register', ['page' => strtolower($value['title_url'])]) }}">Create new one for Admin</a>
-                                @endforeach
-                                @else
+                                @if (empty($masterEvent))
                                 Don't have an account? <a href="{{ route('register', ['page' => 'cms']) }}">Create new one for Admin</a>
                                 @endif
                             </div>

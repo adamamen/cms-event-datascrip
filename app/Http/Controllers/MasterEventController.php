@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use App\Models\M_CompanyEvent;
+use App\Models\M_User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class MasterEventController extends Controller
 {
@@ -15,13 +17,18 @@ class MasterEventController extends Controller
         $data = $this->query();
         $type_menu = 'master_event';
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $userId = $user[0]['id'];
 
-        if (!empty($masterEvent) || $page == "cms") {
+        if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('master_event.index', [
+                'id' => $userId,
                 'masterEvent' => $masterEvent,
                 'data' => !empty($data) ? $data : array(),
                 'type_menu' => $type_menu
             ]);
+        } else {
+            return abort(404);
         }
     }
 
@@ -102,14 +109,15 @@ class MasterEventController extends Controller
                 'createed_by' => $request->username,
                 'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
             ];
-        M_MasterEvent::updateOrCreate(['title' => $request->namaEvent], $array_1);
+        // preg_replace('/\s+/', ' ', $string);
+        M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
         return response()->json(['message' => 'success']);
     }
 
     public function add_index($page)
     {
-        $type_menu = 'dashboard';
+        $type_menu = 'master_event';
         $listDivisi = M_CompanyEvent::select('*')->where('status', 'A')->get();
 
         if ($page == "cms") {
@@ -139,7 +147,7 @@ class MasterEventController extends Controller
             ->where('id_event', $id)
             ->get();
         $listDivisi = M_CompanyEvent::select('*')->where('status', 'A')->get();
-        $type_menu = 'dashboard';
+        $type_menu = 'master_event';
 
         return view(
             'master_event.edit_event',
@@ -162,7 +170,7 @@ class MasterEventController extends Controller
             DB::table('tbl_master_event')
                 ->where('id_event', $request->id_event)
                 ->update([
-                    'title' => $request->namaEvent,
+                    'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
                     'status' => $request->status,
                     'desc' => $request->deskripsi,
                     'company' => $request->divisi,
@@ -179,7 +187,7 @@ class MasterEventController extends Controller
             DB::table('tbl_master_event')
                 ->where('id_event', $request->id_event)
                 ->update([
-                    'title' => $request->namaEvent,
+                    'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
                     'status' => $request->status,
                     'desc' => $request->deskripsi,
                     'company' => $request->divisi,
