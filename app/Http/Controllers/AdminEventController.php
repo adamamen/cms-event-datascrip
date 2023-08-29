@@ -195,7 +195,7 @@ class AdminEventController extends Controller
 
     public function delete($id)
     {
-        $data = M_User::find($id); // Fetch data based on ID
+        $data = M_User::find($id);
 
         if ($data) {
             $data->delete();

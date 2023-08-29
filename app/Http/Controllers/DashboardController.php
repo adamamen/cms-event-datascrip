@@ -15,9 +15,6 @@ class DashboardController extends Controller
     {
         $page = strtolower($page);
         $type_menu = 'dashboard';
-        // $adminEventCount = DB::table('tbl_user as A')
-        //     ->join('tbl_master_event as B', 'A.event_id', '=', 'B.id_event')
-        //     ->get();
         $adminEventCount = $this->query($page);
         $divisiEvent = DB::table('tbl_company_event as A')
             ->join('tbl_master_event as B', 'A.id', '=', 'B.company')

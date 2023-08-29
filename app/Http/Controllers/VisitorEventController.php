@@ -190,14 +190,13 @@ class VisitorEventController extends Controller
                     'updated_by' => $request->username,
                 ]);
         }
-        // }
 
         return response()->json(['message' => 'success']);
     }
 
     public function delete($id)
     {
-        $data = M_VisitorEvent::find($id); // Fetch data based on ID
+        $data = M_VisitorEvent::find($id);
 
         if ($data) {
             $data->delete();

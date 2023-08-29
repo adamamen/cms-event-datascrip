@@ -109,7 +109,6 @@ class MasterEventController extends Controller
                 'createed_by' => $request->username,
                 'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
             ];
-        // preg_replace('/\s+/', ' ', $string);
         M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
         return response()->json(['message' => 'success']);
@@ -130,7 +129,7 @@ class MasterEventController extends Controller
 
     public function delete($id)
     {
-        $data = M_MasterEvent::find($id); // Fetch data based on ID
+        $data = M_MasterEvent::find($id);
 
         if ($data) {
             $data->delete();
