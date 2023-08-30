@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>@yield('title') &mdash; CMS</title>
+    
+    @if(!empty($masterEvent)) 
+        @foreach ($masterEvent as $value)
+            <title>@yield('title') &mdash; {{ $value['title'] . ' Event'}} </title>
+        @endforeach
+    @else 
+        <title>@yield('title') &mdash; CMS</title>
+    @endif 
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">

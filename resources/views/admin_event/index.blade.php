@@ -43,11 +43,11 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
+                                            <th>Status</th>
                                             <th>Username</th>
                                             <th>Password</th>
                                             <th>Nama Lengkap</th>
                                             <th>Nama Event</th>
-                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -55,10 +55,6 @@
                                         @foreach ($data as $value)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $value['username'] }}</td>
-                                                <td>{{ $value['password_encrypts'] }}</td>
-                                                <td>{{ $value['full_name'] }}</td>
-                                                <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     @if ($value['status'] == 'A')
                                                         <span class="badge badge-success">Aktif</span>
@@ -66,6 +62,10 @@
                                                         <span class="badge badge-danger">Tidak Aktif</span>
                                                     @endif
                                                 </td>
+                                                <td>{{ $value['username'] }}</td>
+                                                <td>{{ $value['password_encrypts'] }}</td>
+                                                <td>{{ $value['full_name'] }}</td>
+                                                <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     {{-- <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST"> --}}
                                                     @if ($pages == 'cms')

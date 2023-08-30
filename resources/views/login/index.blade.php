@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Login &mdash; CMS Event</title>
+    
+    @if(!empty($masterEvent)) 
+        @foreach ($masterEvent as $value)
+            <title>Login &mdash; {{ $value['title'] . ' Event' }}</title>
+        @endforeach 
+    @else 
+        <title>Login &mdash; CMS Event</title>
+    @endif 
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -106,15 +113,15 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
-                    data-background="{{ asset('img/unsplash/rinjani-mountain.jpg') }}">
+                    data-background="{{ asset('img/unsplash/ulun-danu-beratan.jpg') }}">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
-                                <h1 class="display-4 font-weight-bold mb-2">Rinjani Mountain</h1>
-                                <h5 class="font-weight-normal text-muted-transparent">West Nusa Tenggara, Indonesia</h5>
+                                <h1 class="display-4 font-weight-bold mb-2">Ulun Danu Beratan</h1>
+                                <h5 class="font-weight-normal text-muted-transparent">Bali, Indonesia</h5>
                             </div>
                             Photo by <a class="text-light bb" target="_blank"
-                                href="https://unsplash.com/photos/2hwTjleuT64">Eugene Chow</a> on <a
+                                href="https://unsplash.com/photos/1kdIG_258bU">Eugene Chow</a> on <a
                                 class="text-light bb" target="_blank" href="https://unsplash.com">Unsplash</a>
                         </div>
                     </div>

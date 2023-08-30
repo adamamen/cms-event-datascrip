@@ -182,7 +182,9 @@
                             success: function(response) {
                                 var alerts = response.message
 
-                                if (alerts == "success") {
+                                if (alerts == "failed") {
+                                    swal('Gagal', 'No Tiket sudah pernah digunakan, silahkan coba lagi...', 'warning');
+                                } else if (alerts == "success") {
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {

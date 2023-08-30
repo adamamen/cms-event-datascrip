@@ -38,11 +38,10 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Nama Event</label>
-                                            <select class="form-control select2" name="event" id="event">
+                                            <select class="form-control select2" name="nama_event" id="nama_event">
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 @foreach ($event as $event)
-                                                    <option value="{{ $value->id_event }}"
-                                                        {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}>
+                                                    <option value="{{ $event['id_event'] }}" {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}> 
                                                         {{ $event['title'] }}
                                                     </option>
                                                 @endforeach
@@ -67,8 +66,8 @@
                                             <label>No Tiket</label>
                                             <input type="text" class="form-control" value="{{ $value->ticket_no }}"
                                                 required="" name="no_tiket" id="no_tiket"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                                readonly>
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
+                                            <input name="no_tiket_before" id="no_tiket_before" value="{{ $value->ticket_no }}" hidden>
                                             <div class="invalid-feedback">
                                                 No Tiket Wajib Diisi
                                             </div>
@@ -169,10 +168,12 @@
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
                 var namaLengkap = $('#nama_lengkap').val();
-                var namaEvent = $('#nama_event').val();
+                // var namaEvent = $('#nama_event').find(":selected").text();
+                var namaEvent = $('#nama_event option:selected').val();
                 var email = $('#email').val();
                 var noHandphone = $('#no_handphone').val();
                 var noTiket = $('#no_tiket').val();
+                var noTiketBefore = $('#no_tiket_before').val();
                 var tanggalRegistrasi = $('#tanggal_registrasi').val();
                 var alamat = $('#alamat').val();
                 var username = $('#username').val();
@@ -184,6 +185,7 @@
                 formData.append("email", email);
                 formData.append("noHandphone", noHandphone);
                 formData.append("noTiket", noTiket);
+                formData.append("noTiketBefore", noTiketBefore);
                 formData.append("tanggalRegistrasi", tanggalRegistrasi);
                 formData.append("alamat", alamat);
                 formData.append("username", username);
@@ -206,7 +208,7 @@
 
                         if (alerts == "failed") {
                             swal('Gagal',
-                                'No Ticket sudah pernah digunakan, silahkan coba lagi...',
+                                'No Tiket sudah pernah digunakan, silahkan coba lagi...',
                                 'warning');
                         } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(

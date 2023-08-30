@@ -162,19 +162,28 @@ class VisitorEventController extends Controller
 
     public function update(Request $request)
     {
-        if ($request->namaEvent == 'undefined') {
-            DB::table('tbl_visitor_event')
-                ->where('id', $request->id)
-                ->update([
-                    'ticket_no' => $request->noTiket,
-                    'registration_date' => $request->tanggalRegistrasi,
-                    'full_name' => $request->namaLengkap,
-                    'address' => $request->alamat,
-                    'email' => $request->email,
-                    'mobile' => $request->noHandphone,
-                    'updated_at' => Carbon::now(),
-                    'updated_by' => $request->username,
-                ]);
+        if ($request->noTiket != $request->noTiketBefore) {
+            $q = M_VisitorEvent::select('*')->where('ticket_no', $request->noTiket)->where('event_id', $request->namaEvent)->get()->toArray();
+
+            if (!empty($q)) {
+                return response()->json(['message' => 'failed']);
+            } else {
+                DB::table('tbl_visitor_event')
+                    ->where('id', $request->id)
+                    ->update([
+                        'event_id' => $request->namaEvent,
+                        'ticket_no' => $request->noTiket,
+                        'registration_date' => $request->tanggalRegistrasi,
+                        'full_name' => $request->namaLengkap,
+                        'address' => $request->alamat,
+                        'email' => $request->email,
+                        'mobile' => $request->noHandphone,
+                        'updated_at' => Carbon::now(),
+                        'updated_by' => $request->username,
+                    ]);
+
+                return response()->json(['message' => 'success']);
+            }
         } else {
             DB::table('tbl_visitor_event')
                 ->where('id', $request->id)
@@ -189,9 +198,9 @@ class VisitorEventController extends Controller
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
                 ]);
-        }
 
-        return response()->json(['message' => 'success']);
+            return response()->json(['message' => 'success']);
+        }
     }
 
     public function delete($id)
