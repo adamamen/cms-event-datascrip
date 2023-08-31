@@ -21,6 +21,9 @@ use App\Http\Middleware\NoBackHistory;
 |
 */
 
+// Register Visitor
+Route::get('/register-visitor/{page}', [VisitorEventController::class, 'index_register'])->name('index_register');
+
 // Login
 Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::get('/{page}', [LoginController::class, 'index_parameter'])->name('login_param');
@@ -29,12 +32,11 @@ Route::post('/login', [LoginController::class, 'login_action'])->name('login_act
 // Logout
 Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Register
+// Register Admin
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
 
-Route::middleware(['auth', NoBackHistory::class])->group(function () {
-
+Route::group(['middleware' => ['auth']], function () {
     // Dashboard
     Route::get('/dashboard/{page?}', [DashboardController::class, 'index'])->name('dashboard');
 

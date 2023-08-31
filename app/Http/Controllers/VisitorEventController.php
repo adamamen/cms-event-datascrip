@@ -214,4 +214,19 @@ class VisitorEventController extends Controller
             return response()->json(['error' => 'failed'], 404);
         }
     }
+
+    public function index_register($page)
+    {
+        $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
+        $data = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get();
+
+        if ($page == $masterEvent[0]['title_url']) {
+            return view('visitor_event.register', [
+                'masterEvent' => $masterEvent,
+                'data' => $data
+            ]);
+        } else {
+            return view('error.error-404');
+        }
+    }
 }

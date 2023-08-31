@@ -34,13 +34,13 @@
                         <div class="card-header">
                             <h4>Data Visitor Event</h4>
                             <div class="article-cta">
-                                @if ($pages == 'cms')
+                                {{-- @if ($pages == 'cms')
                                     <a href="{{ route('add_visitor_index', ['page' => 'cms']) }}"
                                         class="btn btn-success">Add Visitor</a>
                                 @else
                                     <a href="{{ route('add_visitor_index', ['page' => $data[0]['title_url']]) }}"
                                         class="btn btn-success">Add Visitor</a>
-                                @endif
+                                @endif --}}
                             </div>
                         </div>
                         <div class="card-body">
@@ -57,7 +57,7 @@
                                             <th>Email</th>
                                             <th>Tanggal Registrasi</th>
                                             <th>Alamat Domisili</th>
-                                            <th>Created By</th>
+                                            {{-- <th>Created By</th> --}}
                                             <th>Created Date</th>
                                             <th>Action</th>
                                         </tr>
@@ -73,10 +73,9 @@
                                                 <td>{{ $value['email'] }}</td>
                                                 <td>{{ $value['registration_date'] }}</td>
                                                 <td>{{ $value['address'] }}</td>
-                                                <td>{{ $value['created_by'] }}</td>
+                                                {{-- <td>{{ $value['created_by'] }}</td> --}}
                                                 <td>{{ $value['created_at'] }}</td>
                                                 <td>
-                                                    {{-- <form action="{{ route('edit-visitor', ['id' => $value['id']]) }}" method="POST"> --}}
                                                     @if ($pages == 'cms')
                                                         <form method="POST"
                                                             action="{{ route('edit-visitor', ['page' => 'cms', 'id' => $value['id']]) }}">

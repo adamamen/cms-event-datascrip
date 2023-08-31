@@ -3,7 +3,32 @@
         <ul class="sidebar-menu">
             @if (!empty($masterEvent))
                 @foreach ($masterEvent as $value)
-                    @if ($id == Auth::user()->id)
+                    
+                    @if (!empty($id))
+                        @if ($id == Auth::user()->id)
+                            <div class="sidebar-brand">
+                                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                                    <img src="{{ asset('images/' . $value['logo']) }}" height="54">
+                                </a>
+                            </div>
+                            <div class="sidebar-brand sidebar-brand-sm">
+                                <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                                    <img src="{{ asset('images/' . $value['logo']) }}" height="15">
+                                </a>
+                            </div>
+                        @else
+                            <div class="sidebar-brand">
+                                <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
+                                    <img src="{{ asset('images/' . $value['logo']) }}" height="54">
+                                </a>
+                            </div>
+                            <div class="sidebar-brand sidebar-brand-sm">
+                                <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
+                                    <img src="{{ asset('images/' . $value['logo']) }}" height="10">
+                                </a>
+                            </div>
+                        @endif
+                    @else 
                         <div class="sidebar-brand">
                             <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="54">
@@ -14,41 +39,39 @@
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="15">
                             </a>
                         </div>
-                    @else
-                        <div class="sidebar-brand">
-                            <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
-                                <img src="{{ asset('images/' . $value['logo']) }}" height="54">
-                            </a>
-                        </div>
-                        <div class="sidebar-brand sidebar-brand-sm">
-                            <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
-                                <img src="{{ asset('images/' . $value['logo']) }}" height="10">
-                            </a>
-                        </div>
                     @endif
 
-                    @if ($id == Auth::user()->id)
-                        <li class="menu-header">Dashboard</li>
-                        <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
-                            <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
-                                <i class="fas fa-home"></i> <span>Dashboard</span>
-                            </a>
-                        </li>
+                    @if (!empty($id))
+                        @if ($id == Auth::user()->id)
+                            <li class="menu-header">Dashboard</li>
+                            <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                                </a>
+                            </li>
+                        @endif
                     @endif
-                    <li class="menu-header">Event</li>
-                    <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
-                        <a class="nav-link"
-                            href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i
-                                class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
-                    </li>
-                    @if ($id == Auth::user()->id)
-                        <li class="menu-header">Admin</li>
-                        <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
+
+                    @if (!empty(Auth::user()->id))
+                        <li class="menu-header">Event</li>
+                        <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
                             <a class="nav-link"
-                                href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i
-                                    class="fas fa-user"></i> <span>Admin Event</span></a>
+                                href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i
+                                    class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
                         </li>
                     @endif
+
+                    @if (!empty($id))
+                        @if ($id == Auth::user()->id)
+                            <li class="menu-header">Admin</li>
+                            <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
+                                <a class="nav-link"
+                                    href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i
+                                        class="fas fa-user"></i> <span>Admin Event</span></a>
+                            </li>
+                        @endif
+                    @endif
+
                 @endforeach
             @else
                 <div class="sidebar-brand">
@@ -61,6 +84,7 @@
                         <img src="{{ asset('img/datascrip-logo-2.jpeg') }}" height="50">
                     </a>
                 </div>
+                @if (!empty($type_menu))
                 <li class="menu-header">Dashboard</li>
                 <li class="{{ $type_menu == 'dashboard' ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('dashboard', ['page' => 'cms']) }}"><i class="fas fa-home"></i>
@@ -84,6 +108,7 @@
                     <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i
                             class="fas fa-user"></i> <span>Admin Event</span></a>
                 </li>
+                @endif
             @endif
 
             {{-- <li class="menu-header">Menu</li>

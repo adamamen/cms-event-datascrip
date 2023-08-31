@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function index_parameter($page)
     {
         $page = strtolower($page);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->orWhere('title_url', $page)->get()->toArray();
 
         if ($page == "dashboard") {
             return view('login.index', [
@@ -33,7 +33,7 @@ class LoginController extends Controller
                 'masterEvent' => $masterEvent
             ]);
         } else if (empty($masterEvent) && !empty($page)) {
-            return abort(404);
+            return view('error.error-404');
         }
     }
 
@@ -112,7 +112,7 @@ class LoginController extends Controller
         if ($page == "cms") {
             return view('register.index');
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
     }
 
