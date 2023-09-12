@@ -33,15 +33,16 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Data Visitor Event</h4>
-                            <div class="article-cta">
-                                {{-- @if ($pages == 'cms')
-                                    <a href="{{ route('add_visitor_index', ['page' => 'cms']) }}"
-                                        class="btn btn-success">Add Visitor</a>
+
+                            @if (!empty($data))
+                                @if ($pages == 'cms')
+                                    <a href="{{ route('export.excel', ['page' => 'cms']) }}" class="btn btn-primary"><i class="fa-solid fa-file-excel"></i>&emsp; Export Excel</a>
                                 @else
-                                    <a href="{{ route('add_visitor_index', ['page' => $data[0]['title_url']]) }}"
-                                        class="btn btn-success">Add Visitor</a>
-                                @endif --}}
-                            </div>
+                                    <a href="{{ route('export.excel', ['page' => $data[0]['title_url']]) }}" class="btn btn-primary"><i class="fa-solid fa-file-excel"></i>&emsp; Export Excel</a>
+                                @endif
+                            @endif
+
+                            <div class="article-cta"></div>
                         </div>
                         <div class="card-body">
                             <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -52,13 +53,20 @@
                                             <th>No</th>
                                             <th>No Tiket</th>
                                             <th>Nama Event</th>
-                                            <th>Nama Lengkap</th>
-                                            <th>No Handphone</th>
-                                            <th>Email</th>
+                                            <th>Profile</th>
+                                            @if ($jenis_events != "" || $jenis_events == "A")
+                                                <th>No Invoice / SN Product</th>
+                                                <th>Status Pembayaran</th>
+                                                <th>Metode Pembayaran</th>
+                                            @elseif (Auth::user()->username == "admin" || Auth::user()->username == "mis") 
+                                                <th>No Invoice / SN Product</th>
+                                                <th>Status Pembayaran</th>
+                                                <th>Metode Pembayaran</th>
+                                            @endif 
                                             <th>Tanggal Registrasi</th>
-                                            <th>Alamat Domisili</th>
-                                            {{-- <th>Created By</th> --}}
-                                            <th>Created Date</th>
+                                            @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
+                                                <th>Jenis Event</th>
+                                            @endif 
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -68,30 +76,59 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $value['ticket_no'] }}</td>
                                                 <td>{{ $value['title'] }}</td>
-                                                <td>{{ $value['full_name'] }}</td>
-                                                <td>{{ $value['mobile'] }}</td>
-                                                <td>{{ $value['email'] }}</td>
-                                                <td>{{ $value['registration_date'] }}</td>
-                                                <td>{{ $value['address'] }}</td>
-                                                {{-- <td>{{ $value['created_by'] }}</td> --}}
+                                                <td>
+                                                    <i class="fas fa-user"></i> <b>{{ $value['full_name'] }}</b><br>
+                                                    <i class="fas fa-mobile-alt"></i> <b>{{ $value['mobile'] }}</b><br>
+                                                    <i class="fas fa-id-card"></i> <b>{{ $value['email'] }}</b><br>
+                                                    <i class="fas fa-home"></i> <b>{{ $value['address'] }}</b>
+                                                </td>
+                                                @if ($value['jenis_event'] == 'A')
+                                                    <td>
+                                                        <i class="fas fa-newspaper"></i> <b>{{ $value['no_invoice'] }}</b><br>
+                                                        <i class="far fa-newspaper"></i> <b>{{ $value['sn_product'] }}</b>
+                                                    </td>
+                                                    @if ($value['status_pembayaran'] == 'Belum Dibayar')
+                                                        <td><span class="badge badge-warning">{{ $value['status_pembayaran'] }}</span></td>
+                                                    @else 
+                                                        <td><span class="badge badge-success">{{ $value['status_pembayaran'] }}</span></td>
+                                                    @endif
+                                                    <td><center>{{ empty($value['metode_bayar']) || $value['metode_bayar'] == "null" ? '-' : $value['metode_bayar'] }}</center></td>
+                                                @else 
+                                                    @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
+                                                        <td><center>-</center></td>
+                                                        <td><center>-</center></td>
+                                                        <td><center>-</center></td>
+                                                    @endif
+                                                @endif
                                                 <td>{{ $value['created_at'] }}</td>
+                                                @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
+                                                    @if ($value['jenis_event'] == 'A')
+                                                        <td>Berbayar</td>
+                                                    @else 
+                                                        <td>Non Berbayar</td>
+                                                    @endif 
+                                                @endif 
                                                 <td>
                                                     @if ($pages == 'cms')
-                                                        <form method="POST"
-                                                            action="{{ route('edit-visitor', ['page' => 'cms', 'id' => $value['id']]) }}">
-                                                        @else
-                                                            <form method="POST"
-                                                                action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
+                                                        <form method="POST" action="{{ route('edit-visitor', ['page' => 'cms', 'id' => $value['id']]) }}">
+                                                    @else
+                                                        <form method="POST" action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page"
-                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
                                                     <input type="hidden" name="id" value="{{ $value['id'] }}">
-                                                    <button name="edit" id="edit"
-                                                        class="btn btn-primary">Edit</button>
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    <a href="#" class="btn btn-danger" data-id="{{ $value['id'] }}"
-                                                        name="btn_delete" id="btn_delete">Delete</a>
+                                                    {{-- <a href="#" class="btn btn-danger" data-id="{{ $value['id'] }}" name="btn_delete" id="btn_delete">Delete</a> --}}
+                                                    @if ($pages == 'cms')
+                                                        @if ($value['jenis_event'] == 'A')
+                                                            <a href="{{ route('generate.pdf', ['page' => 'cms', 'id' => $value['id']]) }}" class="btn btn-success" target="_blank"><i class="fas fa-print"></i> Cetak Invoice</a>
+                                                        @endif
+                                                    @else 
+                                                        @if ($value['jenis_event'] == 'A')
+                                                            <a href="{{ route('generate.pdf', ['page' => $value['title_url'], 'id' => $value['id']]) }}" class="btn btn-success" target="_blank"><i class="fas fa-print"></i> Cetak Invoice</a>
+                                                        @endif
+                                                    @endif
                                                     </form>
                                                 </td>
                                             </tr>
@@ -152,7 +189,7 @@
                 buttons: [{
                     extend: 'excel',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7]
                     },
                 }],
             });

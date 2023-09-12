@@ -60,9 +60,9 @@
                         <p class="text-muted">
                             Before you get started, you must login or register if you don't already have an account.
                         </p>
-                        <form method="POST" class="needs-validation" novalidate=""
-                            action="{{ route('login_action') }}">
+                        <form method="POST" class="needs-validation" novalidate="" action="{{ route('login_action') }}">
                             @csrf
+                            <input type="hidden" id="tokens" name="tokens">
                             @if ($errors->has('message'))
                                 <div class="alert alert-danger">
                                     {{ $errors->first('message') }}
@@ -113,15 +113,15 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
-                    data-background="{{ asset('img/unsplash/ulun-danu-beratan.jpg') }}">
+                    data-background="{{ asset('img/unsplash/bromo-2.jpg') }}">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
-                                <h1 class="display-4 font-weight-bold mb-2">Ulun Danu Beratan</h1>
+                                <h1 class="display-4 font-weight-bold mb-2">Mount Bromo</h1>
                                 <h5 class="font-weight-normal text-muted-transparent">Bali, Indonesia</h5>
                             </div>
                             Photo by <a class="text-light bb" target="_blank"
-                                href="https://unsplash.com/photos/1kdIG_258bU">Eugene Chow</a> on <a
+                                href="https://unsplash.com/photos/gJegRRpCm1g">Atik sulianami</a> on <a
                                 class="text-light bb" target="_blank" href="https://unsplash.com">Unsplash</a>
                         </div>
                     </div>
@@ -148,6 +148,28 @@
     <!-- Template JS File -->
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q"></script>
+    <script type="text/javascript">
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q', {
+                action: 'homepage_login'
+            }).then(function(token) {
+                // console.log("onload's token : " + token);
+                document.getElementById("tokens").value = token;
+            });
+        });
+
+        setInterval(function() {
+            grecaptcha.ready(function() {
+                grecaptcha.execute("6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q", {
+                    action: "homepage_login_request_call_back"
+                }).then(function(token) {
+                    // console.log("refresh token : " + token);
+                    document.getElementById("tokens").value = token;
+                });
+            });
+        }, 90 * 1000);
+    </script>
 </body>
 
 </html>

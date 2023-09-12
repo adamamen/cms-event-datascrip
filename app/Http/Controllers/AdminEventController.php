@@ -16,9 +16,9 @@ class AdminEventController extends Controller
     function index($page)
     {
         $type_menu = 'admin_event';
-        $data = $this->query($page);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $data = adminEvent($page);
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
@@ -30,56 +30,15 @@ class AdminEventController extends Controller
                 'pages' => $page
             ]);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
-    }
-
-    public function query($page)
-    {
-        $queryAdminEvent = DB::table('tbl_user')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'username', 'password', 'full_name', 'status', 'created_at', 'updated_at', 'password_encrypts')
-            ->where('event_id', '<>', '0')
-            ->get();
-        if ($page == "cms") {
-            $queryMasterEvent =  M_MasterEvent::select('*')->get();
-        } else {
-            $queryMasterEvent =  M_MasterEvent::select('*')->where('title_url', $page)->get();
-        }
-
-        if (!empty($queryAdminEvent) && !empty($queryMasterEvent)) {
-            foreach ($queryAdminEvent as $admin) {
-                foreach ($queryMasterEvent as $event) {
-                    if ($admin->event_id == $event->id_event) {
-                        $merge[] = [
-                            'RowNumber' => $admin->RowNumber,
-                            'admin_id' => $admin->id,
-                            'event_id' => $admin->event_id,
-                            'username' => $admin->username,
-                            'password' => $admin->password,
-                            'full_name' => $admin->full_name,
-                            'status' => $admin->status,
-                            'title' => $event->title,
-                            'password_encrypts' => Crypt::decryptString($admin->password_encrypts),
-                            'updated_by' => $event->updated_by,
-                            'updated_at' => $event->updated_at,
-                            'created_by' => $event->created_by,
-                            'created_at' => $event->created_at,
-                            'title_url' => $event->title_url,
-                        ];
-                    }
-                }
-            }
-        }
-        $merge = !empty($merge) ? $merge : [];
-
-        return $merge;
     }
 
     function add_admin_index($page)
     {
         $type_menu = 'admin_event';
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         if ($page == "cms") {
@@ -129,10 +88,10 @@ class AdminEventController extends Controller
         $id = request('id');
         $type_menu = 'admin_event';
         $data = M_User::select('*')->where('id', $id)->get();
-        $event = M_MasterEvent::select('*')->get();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $event = masterEvent_1();
+        $user = userAdmin();
         $userId = $user[0]['id'];
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $masterEvent = masterEvent($page);
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         foreach ($data as $value) {
@@ -179,7 +138,7 @@ class AdminEventController extends Controller
             DB::table('tbl_user')
                 ->where('id', $request->admin_id)
                 ->update([
-                    'event_id' => $request->event,
+                    'event_id' => $request->username == "admin" || $request->username == "MIS" ? '0' : $request->event,
                     'username' => $request->username,
                     'password' => Hash::make($request->password),
                     'full_name' => $request->nama_lengkap,

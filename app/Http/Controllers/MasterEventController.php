@@ -16,8 +16,8 @@ class MasterEventController extends Controller
     {
         $data = $this->query();
         $type_menu = 'master_event';
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
@@ -28,28 +28,29 @@ class MasterEventController extends Controller
                 'type_menu' => $type_menu
             ]);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
     }
 
     public function query()
     {
         $masterEvent = DB::table('tbl_master_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by', 'jenis_event')
             ->get();
-        $companyEvent = M_CompanyEvent::select('*')->get();
+        $companyEvent = companyEvent();
 
         foreach ($masterEvent as $master) {
             foreach ($companyEvent as $company) {
                 if ($master->company == $company->id) {
                     $merge[] = [
                         'RowNumber' => $master->RowNumber,
+                        'jenis_event' => $master->jenis_event,
                         'status' => $master->status,
                         'title' => $master->title,
                         'desc' => $master->desc,
                         'company' => $master->company,
-                        'start_event' => $this->tgl_indo(date('Y-m-d', strtotime($master->start_event))),
-                        'end_event' => $this->tgl_indo(date('Y-m-d', strtotime($master->end_event))),
+                        'start_event' => tgl_indo(date('Y-m-d', strtotime($master->start_event))),
+                        'end_event' => tgl_indo(date('Y-m-d', strtotime($master->end_event))),
                         'logo' => $master->logo,
                         'location' => $master->location,
                         'id_event' => $master->id_event,
@@ -65,27 +66,6 @@ class MasterEventController extends Controller
 
         $merge = !empty($merge) ? $merge : '';
         return $merge;
-    }
-
-    function tgl_indo($tanggal)
-    {
-        $bulan = array(
-            1 =>   'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember'
-        );
-        $pecahkan = explode('-', $tanggal);
-
-        return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
     }
 
     public function add(Request $request)
@@ -108,6 +88,7 @@ class MasterEventController extends Controller
                 'updated_by' => $request->username,
                 'createed_by' => $request->username,
                 'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                'jenis_event' => $request->jenis_event,
             ];
         M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
@@ -117,7 +98,7 @@ class MasterEventController extends Controller
     public function add_index($page)
     {
         $type_menu = 'master_event';
-        $listDivisi = M_CompanyEvent::select('*')->where('status', 'A')->get();
+        $listDivisi = listDivisi();
 
         if ($page == "cms") {
             return view('master_event.add_event', [
@@ -141,11 +122,12 @@ class MasterEventController extends Controller
 
     public function edit($id)
     {
-        $data = DB::table('tbl_master_event')
-            ->join('tbl_company_event', 'tbl_master_event.company', '=', 'tbl_company_event.id')
-            ->where('id_event', $id)
+        $data = DB::table('tbl_master_event as A')
+            ->select('A.id_event', 'A.status as status_master_event', 'A.title', 'A.desc', 'A.company', 'A.start_event', 'A.end_event', 'A.logo', 'A.location', 'A.title_url', 'A.jenis_event', 'B.id', 'B.status as status_company_event', 'B.name', 'B.description')
+            ->join('tbl_company_event as B', 'A.company', '=', 'B.id')
+            ->where('A.id_event', $id)
             ->get();
-        $listDivisi = M_CompanyEvent::select('*')->where('status', 'A')->get();
+        $listDivisi = listDivisi();
         $type_menu = 'master_event';
 
         return view(
@@ -153,8 +135,7 @@ class MasterEventController extends Controller
             [
                 'data' => $data,
                 'listDivisi' => $listDivisi,
-                'type_menu' => $type_menu,
-                'status' => $data[0]->status
+                'type_menu' => $type_menu
             ]
         );
     }
@@ -179,6 +160,8 @@ class MasterEventController extends Controller
                     'location' => $request->lokasi,
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
+                    'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                    'jenis_event' => $request->jenis_event,
                 ]);
 
             return response()->json(['message' => 'success']);
@@ -195,6 +178,8 @@ class MasterEventController extends Controller
                     'location' => $request->lokasi,
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
+                    'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                    'jenis_event' => $request->jenis_event,
                 ]);
 
             return response()->json(['message' => 'success']);

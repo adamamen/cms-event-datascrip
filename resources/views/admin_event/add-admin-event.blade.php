@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Event')
+@section('title', 'Add Admin')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -74,12 +74,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                    name="btn_submit">Submit</a>
-                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                    name="btn_progress">Submit</a>
-                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                    name="btn_cancel">Cancel</a>
+                                <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
+                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                             </div>
                         </div>
                     </div>

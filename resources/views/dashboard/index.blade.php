@@ -41,7 +41,7 @@
                                 <div class="card-icon">
                                     <i class="far fa-question-circle"></i>
                                 </div>
-                                <h4>{{ $divisiEvent }}</h4>
+                                <h4>{{ $totalDivisi }}</h4>
                                 <a href="{{ route('company_event.index', ['page' => 'cms']) }}">
                                     <div class="card-description" style="color:white">Total Divisi</div>
                                 </a>
@@ -54,7 +54,7 @@
                                 <div class="card-icon">
                                     <i class="far fa-question-circle"></i>
                                 </div>
-                                <h4>{{ $masterEventCount }}</h4>
+                                <h4>{{ $totalEvent }}</h4>
                                 <a href="{{ route('index', ['page' => 'cms']) }}">
                                     <div class="card-description" style="color:white">Total Event</div>
                                 </a>
@@ -67,9 +67,22 @@
                                 <div class="card-icon">
                                     <i class="far fa-question-circle"></i>
                                 </div>
-                                <h4>{{ $adminEventCount }}</h4>
+                                <h4>{{ $totalVisitor }}</h4>
                                 <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
                                     <div class="card-description" style="color:white">Total Visitor</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="far fa-question-circle"></i>
+                                </div>
+                                <h4>{{ $totalAdmin }}</h4>
+                                <a href="{{ route('admin_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total Admin</div>
                                 </a>
                             </div>
                         </div>

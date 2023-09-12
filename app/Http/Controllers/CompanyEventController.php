@@ -18,8 +18,8 @@ class CompanyEventController extends Controller
         $data = DB::table('tbl_company_event')
             ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'status', 'name', 'description', 'created_by', 'created_at', 'updated_by', 'updated_at')
             ->get();
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
@@ -30,18 +30,18 @@ class CompanyEventController extends Controller
                 'type_menu' => $type_menu
             ]);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
     }
 
     public function add_company_index($page)
     {
         $type_menu = 'company_event';
-        $data = M_CompanyEvent::select('*')->get();
+        $companyEvent = companyEvent();
 
         if ($page == "cms") {
             return view('company_event.add-company-event', [
-                'data' => $data,
+                'data' => $companyEvent,
                 'type_menu' => $type_menu
             ]);
         }
@@ -49,17 +49,23 @@ class CompanyEventController extends Controller
 
     public function add(Request $request)
     {
-        DB::table('tbl_company_event')->insert([
-            'status' => $request->status,
-            'name' => $request->name,
-            'description' => $request->deskripsi,
-            'created_by' => $request->username,
-            'created_at' => Carbon::now(),
-            'updated_by' => $request->username,
-            'updated_at' => Carbon::now(),
-        ]);
+        $companyEvent = M_CompanyEvent::select('*')->where('name', trim($request->name))->count();
 
-        return response()->json(['message' => 'success']);
+        if ($companyEvent > 0) {
+            return response()->json(['message' => 'failed']);
+        } else {
+            DB::table('tbl_company_event')->insert([
+                'status' => $request->status,
+                'name' => trim($request->name),
+                'description' => $request->deskripsi,
+                'created_by' => $request->username,
+                'created_at' => Carbon::now(),
+                'updated_by' => $request->username,
+                'updated_at' => Carbon::now(),
+            ]);
+
+            return response()->json(['message' => 'success']);
+        }
     }
 
     public function edit($id)

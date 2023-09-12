@@ -66,8 +66,7 @@
                             <li class="menu-header">Admin</li>
                             <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
                                 <a class="nav-link"
-                                    href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i
-                                        class="fas fa-user"></i> <span>Admin Event</span></a>
+                                    href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
                             </li>
                         @endif
                     @endif
@@ -105,8 +104,7 @@
                 </li>
                 <li class="menu-header">Admin</li>
                 <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i
-                            class="fas fa-user"></i> <span>Admin Event</span></a>
+                    <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i class="fas fa-user"></i> <span>Admin Event</span></a>
                 </li>
                 @endif
             @endif

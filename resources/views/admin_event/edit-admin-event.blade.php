@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Event')
+@section('title', 'Edit Admin Event')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -29,13 +29,9 @@
                                     <div class="row">
                                         <div class="form-group col-md-4 col-12">
                                             <label>Username</label>
-                                            <input type="text" class="form-control" value="{{ $value['username'] }}"
-                                                required="" name="username" id="username">
-                                            <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}"
-                                                required="" name="admin_id" id="admin_id">
-                                            <div class="invalid-feedback">
-                                                Username Wajib Diisi
-                                            </div>
+                                            <input type="text" class="form-control" value="{{ $value['username'] }}" required="" name="username" id="username" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'readonly' : '' }}>
+                                            <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}" required="" name="admin_id" id="admin_id">
+                                            <div class="invalid-feedback"> Username Wajib Diisi </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Password</label>
@@ -56,7 +52,7 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Event</label>
-                                            <select class="form-control select2" name="event" id="event">
+                                            <select class="form-control select2" name="event" id="event" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 @foreach ($event as $event)
                                                     <option value="{{ $value['event_id'] }}"
@@ -70,7 +66,7 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Status</label>
-                                            <select class="form-control select2" name="status" id="status">
+                                            <select class="form-control select2" name="status" id="status" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 <option value="A" {{ $value['status'] == 'A' ? 'selected' : '' }}>
                                                     Aktif</option>
@@ -82,12 +78,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                        name="btn_submit">Submit</a>
-                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                        name="btn_progress">Submit</a>
-                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                        name="btn_cancel">Cancel</a>
+                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
+                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                                 </div>
                             @endforeach
                         </div>

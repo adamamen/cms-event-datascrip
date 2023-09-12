@@ -28,7 +28,7 @@
                         <h4>Master Event</h4>
                         <div class="article-cta">
                             <!-- <a href="{{ url('/master-event/add-event') }}" class="btn btn-success">Add Event</a> -->
-                            <a href="{{ route('add_index', ['page' => 'cms']) }}" class="btn btn-success">Add Event</a>
+                            <a href="{{ route('add_index', ['page' => 'cms']) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Event</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -65,16 +65,7 @@
                                             <center>Lokasi</center>
                                         </th>
                                         <th>
-                                            <center>Created At</center>
-                                        </th>
-                                        <th>
-                                            <center>Created By</center>
-                                        </th>
-                                        <th>
-                                            <center>Updated At</center>
-                                        </th>
-                                        <th>
-                                            <center>Updated By</center>
+                                            <center>Jenis Event</center>
                                         </th>
                                         <th>
                                             <center>Action</center>
@@ -99,17 +90,14 @@
                                         <td>{{ $value['end_event'] }}</td>
                                         <td>{{ $value['desc'] }}</td>
                                         <td>{{ $value['location'] }}</td>
-                                        <td>{{ $value['created_at'] }}</td>
-                                        <td>{{ $value['createed_by'] }}</td>
-                                        <td>{{ $value['updated_at'] }}</td>
-                                        <td>{{ $value['updated_by'] }}</td>
+                                        <td>{{ $value['jenis_event'] == 'A' ? 'Berbayar' : 'Non Berbayar' }}</td>
                                         <td>
                                             <center>
                                                 <form action="{{ route('edit', ['id' => $value['id_event']]) }}" method="POST">
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <button name="edit" id="edit" class="btn btn-primary">Edit</button>
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    <a href="#" class="btn btn-danger" data-id="{{ $value['id_event'] }}" name="btn_delete" id="btn_delete">Delete</a>
+                                                    <a href="#" class="btn btn-danger" data-id="{{ $value['id_event'] }}" name="btn_delete" id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
                                                 </form>
                                             </center>
                                         </td>

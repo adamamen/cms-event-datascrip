@@ -18,8 +18,7 @@
                 <h1>Edit Visitor Event</h1>
             </div>
             <div class="section-body">
-                <h2 class="section-title">Edit Visitor Event</h2>
-                <!-- <p class="section-lead">This article component is based on card and flexbox.</p> -->
+                <h2 class="section-title">Profile</h2>
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
@@ -93,7 +92,7 @@
                                     <div class="row">
                                         <div class="form-group col-md-6 col-12">
                                             <div class="form-group">
-                                                <label>Alamat</label>
+                                                <label>Alamat </label>
                                                 <textarea class="form-control" data-height="150" name="alamat" id="alamat">{{ $value->address }}</textarea>
                                             </div>
                                             <div class="invalid-feedback">
@@ -101,17 +100,85 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                        name="btn_submit">Submit</a>
-                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                        name="btn_progress">Submit</a>
-                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                        name="btn_cancel">Cancel</a>
+                                    @if ($jenisEvent == "D")
+                                        <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                        <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
+                                        <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                    @endif 
                                 </div>
                             @endforeach
                         </div>
                     </div>
                 </div>
+            </div>
+            @if ($jenisEvent == "A")
+                <div class="section-body">
+                    <h2 class="section-title">Payment</h2>
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                                    @foreach ($data as $value)
+                                        <div class="row">
+                                            <div class="form-group col-md-6 col-12">
+                                                <label>Metode Bayar</label>
+                                                <select class="form-control select2" name="metode_bayar" id="metode_bayar">
+                                                    <option selected disabled>-- Silahkan Pilih --</option>
+                                                    @foreach ($metodeBayar as $bayar)
+                                                        <option value="{{ $bayar->metode_bayar }}" {{ $bayar->metode_bayar == $value->metode_bayar ? 'selected' : '' }}>{{ $bayar->metode_bayar }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-6 col-12">
+                                                <label>Status Bayar</label>
+                                                <select class="form-control select2" name="status_bayar" id="status_bayar">
+                                                    <option selected disabled>-- Silahkan Pilih --</option>
+                                                    <option value="Belum Dibayar" {{ $value->status_pembayaran == "Belum Dibayar" ? 'selected' : '' }}>Belum Dibayar</option>
+                                                    <option value="Sudah Dibayar" {{ $value->status_pembayaran == "Sudah Dibayar" ? 'selected' : '' }}>Sudah Dibayar</option>
+                                                </select>
+                                                <p style="color: red">* Pastikan pembayaran telah terverifikasi sebelum melakukan simpan data </p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <h2 class="section-title">Products</h2>
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-12">
+                            <div class="card">
+                                @foreach ($data as $value)
+                                    <div class="card-body">
+                                        <meta name="csrf-token" content="{{ csrf_token() }}">
+                                        <div class="row">
+                                            <div class="form-group col-md-4 col-12">
+                                                <label>SN Product</label>
+                                                <input type="text" class="form-control" value="{{ $value->sn_product }}" required="" name="sn_product" id="sn_product">
+                                                <p style="color: red">* Pastikan posisi cursor aktif sebelum scan SN </p>
+                                            </div>
+                                            <div class="form-group col-md-4 col-12">
+                                                <label>No Invoice</label>
+                                                <input type="text" class="form-control" value="{{ $value->no_invoice }}" name="no_invoice" id="no_invoice" required readonly>
+                                            </div>
+                                            <div class="form-group col-md-4 col-12">
+                                                <label>Tgl. Terakhir Diupdate</label>
+                                                <input type="text" class="form-control" value="{{ $value->updated_at }}" name="tgl_terakhir_diupdate" id="tgl_terakhir_diupdate" required readonly>
+                                            </div>
+                                        </div>
+                                        <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                        <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
+                                        <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif 
         </section>
     </div>
 @endsection
@@ -178,6 +245,9 @@
                 var alamat = $('#alamat').val();
                 var username = $('#username').val();
                 var id = $('#id').val();
+                var metode_bayar = $('#metode_bayar').val();
+                var status_bayar = $('#status_bayar').val();
+                var sn_product = $('#sn_product').val();
 
                 var formData = new FormData();
                 formData.append("namaLengkap", namaLengkap);
@@ -191,6 +261,9 @@
                 formData.append("username", username);
                 formData.append("id", id);
                 formData.append("params", params);
+                formData.append("metode_bayar", metode_bayar);
+                formData.append("status_bayar", status_bayar);
+                formData.append("sn_product", sn_product);
 
                 $.ajax({
                     url: '{{ route('update-visitor') }}',
@@ -207,9 +280,7 @@
                         $("#btn_submit").show();
 
                         if (alerts == "failed") {
-                            swal('Gagal',
-                                'No Tiket sudah pernah digunakan, silahkan coba lagi...',
-                                'warning');
+                            swal('Gagal', 'No Tiket sudah pernah digunakan, silahkan coba lagi...', 'warning');
                         } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
                                 okay => {

@@ -28,29 +28,35 @@
                                     <meta name="csrf-token" content="{{ csrf_token() }}">
                                     <div class="row">
                                         <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
-                                        <div class="form-group col-md-4 col-12">
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Nama Event</label>
-                                            <input type="text" class="form-control" value="{{ $value->title }}"
-                                                required="" name="nama_event" id="nama_event">
-                                            <input type="hidden" class="form-control" value="{{ $value->id_event }}"
-                                                required="" name="id_event" id="id_event">
-                                            <div class="invalid-feedback">
-                                                Nama Event Wajib Diisi
-                                            </div>
+                                            <input type="text" class="form-control" value="{{ $value->title }}" required="" name="nama_event" id="nama_event">
+                                            <input type="hidden" class="form-control" value="{{ $value->id_event }}" required="" name="id_event" id="id_event">
+                                            <div class="invalid-feedback"> Nama Event Wajib Diisi </div>
                                         </div>
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>Status</label>
+                                        <div class="form-group col-md-3 col-12">
+                                            <label>Status </label>
                                             <select class="form-control select2" name="status" id="status">
-                                                <option value="A" {{ $value->status == 'A' ? 'selected' : '' }}>
-                                                    Aktif</option>
-                                                <option value="D" {{ $value->status == 'D' ? 'selected' : '' }}>
-                                                    Tidak Aktif</option>
+                                                <option value="A" {{ $value->status_master_event == 'A' ? 'selected' : '' }}> Aktif</option>
+                                                <option value="D" {{ $value->status_master_event == 'D' ? 'selected' : '' }}> Tidak Aktif</option>
                                             </select>
                                             <div class="invalid-feedback">
                                                 Status Wajib Diisi
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4 col-12">
+                                        <div class="form-group col-md-3 col-12">
+                                            <label>Jenis Event</label>
+                                            <select class="form-control select2" name="jenis_event" id="jenis_event">
+                                                <option value="A" {{ $value->jenis_event == 'A' ? 'selected' : '' }}>
+                                                    Berbayar</option>
+                                                <option value="D" {{ $value->jenis_event == 'D' ? 'selected' : '' }}>
+                                                    Non Berbayar</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Jenis Event Wajib Diisi
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Logo</label>
                                             <div class="custom-file">
                                                 <input type="file" class="custom-file-input"
@@ -117,12 +123,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                        name="btn_submit">Submit</a>
-                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                        name="btn_progress">Submit</a>
-                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                        name="btn_cancel">Cancel</a>
+                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
+                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                                 </div>
                             @endforeach
                         </div>
@@ -189,6 +192,7 @@
                 var lokasi = $('#lokasi').val();
                 var username = $('#username').val();
                 var divisi = $('#divisi').val();
+                var jenis_event = $('#jenis_event').val();
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
@@ -201,6 +205,7 @@
                 formData.append("id_event", id_event);
                 formData.append("username", username);
                 formData.append("divisi", divisi);
+                formData.append("jenis_event", jenis_event);
 
                 $.ajax({
                     url: '{{ route('update') }}',

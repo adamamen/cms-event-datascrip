@@ -28,7 +28,7 @@
                         <h4>Divisi Event</h4>
                         <div class="article-cta">
                             <!-- <a href="{{ url('/company-event/add-company-event') }}" class="btn btn-success">Add Divisi</a> -->
-                            <a href="{{ route('add_company_index', ['page' => 'cms']) }}" class="btn btn-success">Add Divisi</a>
+                            <a href="{{ route('add_company_index', ['page' => 'cms']) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Divisi</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -68,9 +68,9 @@
                                         <td>
                                             <form action="{{ route('edit-company', ['id' => $value->id]) }}" method="POST">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                <button name="edit" id="edit" class="btn btn-primary">Edit</button>
+                                                <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
                                                 <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                <a href="#" class="btn btn-danger" data-id="{{ $value->id }}" name="btn_delete" id="btn_delete">Delete</a>
+                                                <a href="#" class="btn btn-danger" data-id="{{ $value->id }}" name="btn_delete" id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
                                             </form>
                                         </td>
                                     </tr>

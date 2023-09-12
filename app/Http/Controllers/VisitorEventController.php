@@ -2,24 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportExcel;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
+use App\Models\M_MetodeBayar;
 use App\Models\M_User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use Mockery\Undefined;
+use PDF as DomPDF;
+
 
 class VisitorEventController extends Controller
 {
     function index($page)
     {
         $type_menu = 'visitor_event';
-        $data = $this->query($page);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $data = visitorEventandMasterEvent($page);
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
@@ -31,66 +36,27 @@ class VisitorEventController extends Controller
                 'type_menu' => $type_menu,
                 'titleUrl' => $titleUrl,
                 'pages' => $page,
+                'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
+        } else if ($page == "cetak-invoice") {
+            $this->generate_pdf($page, $userId);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
-    }
-
-    public function query($page)
-    {
-        $queryVisitorEvent = DB::table('tbl_visitor_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at')
-            ->get();
-        if ($page == "cms") {
-            $queryMasterEvent =  M_MasterEvent::select('*')->get();
-        } else {
-            $queryMasterEvent =  M_MasterEvent::select('*')->where('title_url', $page)->get();
-        }
-
-        if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
-            foreach ($queryVisitorEvent as $visitor) {
-                foreach ($queryMasterEvent as $event) {
-                    if ($visitor->event_id == $event->id_event) {
-                        $merge[] = [
-                            'id' => $visitor->id,
-                            'event_id' => $visitor->event_id,
-                            'RowNumber' => $visitor->RowNumber,
-                            'title' => $event->title,
-                            'full_name' => $visitor->full_name,
-                            'mobile' => $visitor->mobile,
-                            'ticket_no' => $visitor->ticket_no,
-                            'email' => $visitor->email,
-                            'registration_date' => $visitor->registration_date,
-                            'address' => $visitor->address,
-                            'created_by' => $visitor->created_by,
-                            'created_at' => $visitor->created_at,
-                            'updated_by' => $visitor->updated_by,
-                            'updated_at' => $visitor->updated_at,
-                            'title_url' => $event->title_url,
-                        ];
-                    }
-                }
-            }
-        }
-
-        $merge = !empty($merge) ? $merge : [];
-
-        return $merge;
     }
 
     public function add_visitor_index($page)
     {
         $type_menu = 'visitor_event';
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         if ($page == "cms") {
-            $data = M_MasterEvent::select('*')->where('status', 'A')->get();
+            $data = masterEvent_3();
         } else {
-            $data = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get();
+            $data = masterEvent_4($page);
         }
 
         return view('visitor_event.add-visitor-event', [
@@ -102,12 +68,28 @@ class VisitorEventController extends Controller
         ]);
     }
 
+
+    function initials($str)
+    {
+        $ret = '';
+        foreach (explode('-', $str) as $word)
+            $ret .= strtoupper($word[0]);
+        return $ret;
+    }
+
     public function add(Request $request)
     {
+        // dd($request->all());
         $query = M_VisitorEvent::select('*')
             ->where('event_id', $request->namaEvent)
             ->where('ticket_no', $request->noTiket)
             ->get();
+        $masterEvent = M_MasterEvent::select('*')->where('id_event', $request->namaEvent)->where('jenis_event', 'A')->first();
+        if ($masterEvent != null) {
+            $noInvoice = 'INV' . date("y") . '/' . $this->initials($masterEvent->title_url) . date("md") . '/' . str_repeat("0", (5 - strlen($request->noTiket))) . $request->noTiket;
+        } else {
+            $noInvoice = '';
+        }
 
         if (!$query->isEmpty()) {
             return response()->json(['message' => 'failed']);
@@ -124,6 +106,9 @@ class VisitorEventController extends Controller
                 'created_by' => $request->username,
                 'updated_at' => Carbon::now(),
                 'updated_by' => $request->username,
+                'jenis_event' => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
+                'no_invoice' => $noInvoice,
+                'status_pembayaran' => 'Belum Dibayar',
             ]);
 
             return response()->json(['message' => 'success']);
@@ -136,14 +121,16 @@ class VisitorEventController extends Controller
         $id = request('id');
         $type_menu = 'visitor_event';
         $data = M_VisitorEvent::select('*')->where('id', $id)->get();
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $masterEvent = masterEvent($page);
+        $user = userAdmin();
         $userId = $user[0]['id'];
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $metodeBayar = M_MetodeBayar::select('*')->get();
+
         if ($page == 'cms') {
             $event = M_MasterEvent::select('*')->where('status', 'A')->get()->toArray();
         } else {
-            $event = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+            $event = masterEvent($page);
         }
 
         if (!empty($masterEvent) || $page == "cms") {
@@ -153,15 +140,18 @@ class VisitorEventController extends Controller
                 'masterEvent' => $masterEvent,
                 'data' => $data,
                 'type_menu' => $type_menu,
-                'event' => $event
+                'event' => $event,
+                'metodeBayar' => $metodeBayar,
+                'jenisEvent' => $event[0]['jenis_event']
             ]);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
     }
 
     public function update(Request $request)
     {
+        // dd($request->all());
         if ($request->noTiket != $request->noTiketBefore) {
             $q = M_VisitorEvent::select('*')->where('ticket_no', $request->noTiket)->where('event_id', $request->namaEvent)->get()->toArray();
 
@@ -180,6 +170,9 @@ class VisitorEventController extends Controller
                         'mobile' => $request->noHandphone,
                         'updated_at' => Carbon::now(),
                         'updated_by' => $request->username,
+                        'metode_bayar' => $request->metode_bayar,
+                        'status_pembayaran' => $request->status_bayar,
+                        'sn_product' => $request->sn_product,
                     ]);
 
                 return response()->json(['message' => 'success']);
@@ -197,6 +190,9 @@ class VisitorEventController extends Controller
                     'mobile' => $request->noHandphone,
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
+                    'metode_bayar' => $request->metode_bayar,
+                    'status_pembayaran' => $request->status_bayar,
+                    'sn_product' => $request->sn_product,
                 ]);
 
             return response()->json(['message' => 'success']);
@@ -218,15 +214,57 @@ class VisitorEventController extends Controller
     public function index_register($page)
     {
         $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
-        $data = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get();
+        $data = masterEvent_4($page);
 
-        if ($page == $masterEvent[0]['title_url']) {
-            return view('visitor_event.register', [
-                'masterEvent' => $masterEvent,
-                'data' => $data
-            ]);
+        if (!empty($masterEvent)) {
+            if ($page == $masterEvent[0]['title_url']) {
+                return view('visitor_event.register', [
+                    'masterEvent' => $masterEvent,
+                    'data' => $data
+                ]);
+            } else {
+                return view('error.error-404');
+            }
         } else {
             return view('error.error-404');
         }
+    }
+
+    public function generate_pdf($page, $id)
+    {
+        $data = $this->query($page);
+        foreach ($data as $value) {
+            if ($value['id'] == $id) {
+                $val['id'] = $value['id'];
+                $val['product_invoice_no'] = $value['no_invoice'];
+                $val['visitor_que_no'] = $value['no_ticket'];
+                $val['visitor_fullname'] = $value['full_name'];
+                $val['visitor_mobile'] = $value['mobile'];
+                $val['visitor_address'] = $value['metode_bayar'];
+                $val['visitor_payment_method'] = $value['metode_bayar'];
+                $val['product_serial_no'] = $value['sn_product'];
+                $val['updated_by'] = $value['updated_by'];
+            }
+        }
+
+        return view('visitor_event.cetak-invoice', ['val' => $val]);
+    }
+
+    public function export_excel($page)
+    {
+        $query = visitorEventandMasterEvent($page);
+
+        if (!empty($query)) {
+            if ($page == "cms") {
+                $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'No Invoice', 'SN Product', 'Status Pembayaran', 'Metode Pembayaran', 'Tanggal Registrasi', 'Jenis Event'];
+            } else if ($query[0]['jenis_event'] == "A") {
+                $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'No Invoice', 'SN Product', 'Status Pembayaran', 'Metode Pembayaran', 'Tanggal Registrasi'];
+            } else {
+                $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'Tanggal Registrasi'];
+            }
+        }
+
+        $filename = 'Data Visitor Event - ' . ucfirst($page) . '.xlsx';
+        return Excel::download(new ExportExcel($page, $customHeadings), $filename);
     }
 }

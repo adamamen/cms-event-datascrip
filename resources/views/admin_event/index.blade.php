@@ -28,11 +28,9 @@
                             <h4>Admin Event</h4>
                             <div class="article-cta">
                                 @if ($pages == 'cms')
-                                    <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success">Add
-                                        Admin</a>
+                                    <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
                                 @else
-                                    <a href="{{ route('add_admin_index', ['page' => $data[0]['title_url']]) }}"
-                                        class="btn btn-success">Add Admin</a>
+                                    <a href="{{ route('add_admin_index', ['page' => $data[0]['title_url']]) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
                                 @endif
                             </div>
                         </div>
@@ -65,7 +63,7 @@
                                                 <td>{{ $value['username'] }}</td>
                                                 <td>{{ $value['password_encrypts'] }}</td>
                                                 <td>{{ $value['full_name'] }}</td>
-                                                <td>{{ $value['title'] }}</td>
+                                                <td>{{ !empty($value['title']) ? $value['title'] : '-' }}</td>
                                                 <td>
                                                     {{-- <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST"> --}}
                                                     @if ($pages == 'cms')
@@ -76,16 +74,15 @@
                                                                 action="{{ route('edit-admin', ['page' => $value['title_url'], 'id' => $value['admin_id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page"
-                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
                                                     <input type="hidden" name="id" value="{{ $value['admin_id'] }}">
                                                     <button name="edit" id="edit"
-                                                        class="btn btn-primary">Edit</button>
+                                                        class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    <a href="#" class="btn btn-danger"
-                                                        data-id="{{ $value['admin_id'] }}" name="btn_delete"
-                                                        id="btn_delete">Delete</a>
-                                                    </form>
+                                                    @if ($value['event_id'] != "0")  
+                                                        <a href="#" class="btn btn-danger" data-id="{{ $value['admin_id'] }}" name="btn_delete" id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
+                                                    @endif 
+                                                </form>
                                                 </td>
                                             </tr>
                                         @endforeach

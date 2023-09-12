@@ -27,7 +27,7 @@
                                 <meta name="csrf-token" content="{{ csrf_token() }}">
                                 <div class="row">
                                     <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Nama Event</label>
                                         <input type="text" class="form-control" value="" required=""
                                             name="nama_event" id="nama_event">
@@ -35,7 +35,18 @@
                                             Nama Event Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
+                                        <label>Jenis Event</label>
+                                        <select class="form-control select2" name="jenis_event" id="jenis_event">
+                                            <option selected disabled>-- Silahkan Pilih --</option>
+                                            <option value="A">Berbayar</option>
+                                            <option value="D">Non Berbayar</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Jenis Event Wajib Diisi
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status">
                                             <option selected disabled>-- Silahkan Pilih --</option>
@@ -46,7 +57,7 @@
                                             Status Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Logo</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input"
@@ -109,11 +120,11 @@
                                     </div>
                                 </div>
                                 <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                    name="btn_submit">Submit</a>
+                                    name="btn_submit"><i class="fas fa-check"></i> Submit</a>
                                 <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
                                     name="btn_progress">Submit</a>
                                 <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                    name="btn_cancel">Cancel</a>
+                                    name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -184,6 +195,7 @@
                 var deskripsi = $('#deskripsi').val();
                 var lokasi = $('#lokasi').val();
                 var username = $('#username').val();
+                var jenis_event = $('#jenis_event').val();
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
@@ -195,9 +207,25 @@
                 formData.append("lokasi", lokasi);
                 formData.append("username", username);
                 formData.append("divisi", divisi);
+                formData.append("jenis_event", jenis_event);
 
                 if (namaEvent == "") {
                     var name = "Nama Event";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(okay => {
+                        if (okay) {
+                            $("#btn_progress").hide();
+                            $("#btn_submit").show();
+                        }
+                    });
+                } else if (jenis_event == null) {
+                    var name = "Jenis Event";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> tidak boleh kosong, silahkan coba lagi...';

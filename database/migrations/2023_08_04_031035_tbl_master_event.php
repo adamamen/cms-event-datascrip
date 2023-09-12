@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('updated_by');
             $table->string('createed_by');
             $table->string('title_url');
+            $table->string('jenis_event');
         });
     }
 

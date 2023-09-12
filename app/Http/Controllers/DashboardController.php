@@ -15,17 +15,15 @@ class DashboardController extends Controller
     {
         $page = strtolower($page);
         $type_menu = 'dashboard';
-        $adminEventCount = $this->query($page);
-        $divisiEvent = DB::table('tbl_company_event as A')
-            ->join('tbl_master_event as B', 'A.id', '=', 'B.company')
-            ->where('title_url', $page)
-            ->get();
+        $totalVisitor = $this->query($page);
+        $divisiEvent = $this->divisiEvent($page);
         $divisiEventCms = M_CompanyEvent::count();
-        $divisiEventCount = $page == "cms" ? $divisiEventCms : count($divisiEvent);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get()->toArray();
+        $totalDivisi = $page == "cms" ? $divisiEventCms : count($divisiEvent);
+        $masterEvent = masterEvent($page);
         $masterEventCms = M_MasterEvent::count();
-        $masterEventCount = $page == "cms" ? $masterEventCms : count($masterEvent);
-        $user = M_User::select('*')->where('event_id', '0')->get()->toArray();
+        $totalEvent = $page == "cms" ? $masterEventCms : count($masterEvent);
+        $user = userAdmin();
+        $totalAdmin = count(adminEvent($page));
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
@@ -33,24 +31,33 @@ class DashboardController extends Controller
                 'id' => $userId,
                 'masterEvent' => empty($masterEvent) ? '' : $masterEvent,
                 'type_menu' => $type_menu,
-                'masterEventCount' => $masterEventCount,
-                'divisiEvent' => $divisiEventCount,
-                'adminEventCount' => count($adminEventCount)
+                'totalEvent' => $totalEvent,
+                'totalDivisi' => $totalDivisi,
+                'totalVisitor' => count($totalVisitor),
+                'totalAdmin' => $totalAdmin
             ]);
         } else {
-            return abort(404);
+            return view('error.error-404');
         }
+    }
+
+    public function divisiEvent($page)
+    {
+        $q = DB::table('tbl_company_event as A')
+            ->join('tbl_master_event as B', 'A.id', '=', 'B.company')
+            ->where('title_url', $page)
+            ->get();
+
+        return $q;
     }
 
     public function query($page)
     {
-        $queryVisitorEvent = DB::table('tbl_visitor_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at')
-            ->get();
+        $queryVisitorEvent = visitorEvent();
         if ($page == "cms") {
-            $queryMasterEvent =  M_MasterEvent::select('*')->get();
+            $queryMasterEvent = masterEvent_1();
         } else {
-            $queryMasterEvent =  M_MasterEvent::select('*')->where('title_url', $page)->get();
+            $queryMasterEvent =  masterEvent_2($page);
         }
 
         if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
