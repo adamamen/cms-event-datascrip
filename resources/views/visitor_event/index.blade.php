@@ -36,9 +36,12 @@
 
                             @if (!empty($data))
                                 @if ($pages == 'cms')
-                                    <a href="{{ route('export.excel', ['page' => 'cms']) }}" class="btn btn-primary"><i class="fa-solid fa-file-excel"></i>&emsp; Export Excel</a>
+                                    <a href="{{ route('export.excel', ['page' => 'cms']) }}" class="btn btn-primary"><i
+                                            class="fa-solid fa-file-excel"></i>&emsp; Export Excel</a>
                                 @else
-                                    <a href="{{ route('export.excel', ['page' => $data[0]['title_url']]) }}" class="btn btn-primary"><i class="fa-solid fa-file-excel"></i>&emsp; Export Excel</a>
+                                    <a href="{{ route('export.excel', ['page' => $data[0]['title_url']]) }}"
+                                        class="btn btn-primary"><i class="fa-solid fa-file-excel"></i>&emsp; Export
+                                        Excel</a>
                                 @endif
                             @endif
 
@@ -54,19 +57,19 @@
                                             <th>No Tiket</th>
                                             <th>Nama Event</th>
                                             <th>Profile</th>
-                                            @if ($jenis_events != "" || $jenis_events == "A")
+                                            @if ($jenis_events != '' || $jenis_events == 'A')
                                                 <th>No Invoice / SN Product</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Metode Pembayaran</th>
-                                            @elseif (Auth::user()->username == "admin" || Auth::user()->username == "mis") 
+                                            @elseif (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
                                                 <th>No Invoice / SN Product</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Metode Pembayaran</th>
-                                            @endif 
+                                            @endif
                                             <th>Tanggal Registrasi</th>
-                                            @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
+                                            @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
                                                 <th>Jenis Event</th>
-                                            @endif 
+                                            @endif
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -84,49 +87,72 @@
                                                 </td>
                                                 @if ($value['jenis_event'] == 'A')
                                                     <td>
-                                                        <i class="fas fa-newspaper"></i> <b>{{ $value['no_invoice'] }}</b><br>
+                                                        <i class="fas fa-newspaper"></i>
+                                                        <b>{{ $value['no_invoice'] }}</b><br>
                                                         <i class="far fa-newspaper"></i> <b>{{ $value['sn_product'] }}</b>
                                                     </td>
                                                     @if ($value['status_pembayaran'] == 'Belum Dibayar')
-                                                        <td><span class="badge badge-warning">{{ $value['status_pembayaran'] }}</span></td>
-                                                    @else 
-                                                        <td><span class="badge badge-success">{{ $value['status_pembayaran'] }}</span></td>
+                                                        <td><span
+                                                                class="badge badge-warning">{{ $value['status_pembayaran'] }}</span>
+                                                        </td>
+                                                    @else
+                                                        <td><span
+                                                                class="badge badge-success">{{ $value['status_pembayaran'] }}</span>
+                                                        </td>
                                                     @endif
-                                                    <td><center>{{ empty($value['metode_bayar']) || $value['metode_bayar'] == "null" ? '-' : $value['metode_bayar'] }}</center></td>
-                                                @else 
-                                                    @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
-                                                        <td><center>-</center></td>
-                                                        <td><center>-</center></td>
-                                                        <td><center>-</center></td>
+                                                    <td>
+                                                        <center>
+                                                            {{ empty($value['metode_bayar']) || $value['metode_bayar'] == 'null' ? '-' : $value['metode_bayar'] }}
+                                                        </center>
+                                                    </td>
+                                                @else
+                                                    @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
                                                     @endif
                                                 @endif
                                                 <td>{{ $value['created_at'] }}</td>
-                                                @if (Auth::user()->username == "admin" || Auth::user()->username == "mis")
+                                                @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
                                                     @if ($value['jenis_event'] == 'A')
                                                         <td>Berbayar</td>
-                                                    @else 
+                                                    @else
                                                         <td>Non Berbayar</td>
-                                                    @endif 
-                                                @endif 
+                                                    @endif
+                                                @endif
                                                 <td>
                                                     @if ($pages == 'cms')
-                                                        <form method="POST" action="{{ route('edit-visitor', ['page' => 'cms', 'id' => $value['id']]) }}">
-                                                    @else
-                                                        <form method="POST" action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
+                                                        <form method="POST"
+                                                            action="{{ route('edit-visitor', ['page' => 'cms', 'id' => $value['id']]) }}">
+                                                        @else
+                                                            <form method="POST"
+                                                                action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page"
+                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
                                                     <input type="hidden" name="id" value="{{ $value['id'] }}">
-                                                    <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i
+                                                            class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
                                                     {{-- <a href="#" class="btn btn-danger" data-id="{{ $value['id'] }}" name="btn_delete" id="btn_delete">Delete</a> --}}
                                                     @if ($pages == 'cms')
                                                         @if ($value['jenis_event'] == 'A')
-                                                            <a href="{{ route('generate.pdf', ['page' => 'cms', 'id' => $value['id']]) }}" class="btn btn-success" target="_blank"><i class="fas fa-print"></i> Cetak Invoice</a>
+                                                            <a href="{{ route('generate.pdf', ['page' => 'cms', 'id' => $value['id']]) }}"
+                                                                class="btn btn-success" target="_blank"><i
+                                                                    class="fas fa-print"></i> Cetak Invoice</a>
                                                         @endif
-                                                    @else 
+                                                    @else
                                                         @if ($value['jenis_event'] == 'A')
-                                                            <a href="{{ route('generate.pdf', ['page' => $value['title_url'], 'id' => $value['id']]) }}" class="btn btn-success" target="_blank"><i class="fas fa-print"></i> Cetak Invoice</a>
+                                                            <a href="{{ route('generate.pdf', ['page' => $value['title_url'], 'id' => $value['id']]) }}"
+                                                                class="btn btn-success" target="_blank"><i
+                                                                    class="fas fa-print"></i> Cetak Invoice</a>
                                                         @endif
                                                     @endif
                                                     </form>
@@ -163,7 +189,7 @@
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
     <!-- <script src="assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
-                        <script src="assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script> -->
+                                    <script src="assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script> -->
 
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.4.1/css/buttons.dataTables.min.css">
     <!-- <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
@@ -185,13 +211,13 @@
     <script>
         $(document).ready(function() {
             $('#tbl_visitor').DataTable({
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'excel',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7]
-                    },
-                }],
+                // dom: 'Bfrtip',
+                // buttons: [{
+                //     extend: 'excel',
+                //     exportOptions: {
+                //         columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                //     },
+                // }],
             });
         });
 
@@ -219,7 +245,9 @@
                                 var alerts = response.message
 
                                 if (alerts == "failed") {
-                                    swal('Gagal', 'No Tiket sudah pernah digunakan, silahkan coba lagi...', 'warning');
+                                    swal('Gagal',
+                                        'No Tiket sudah pernah digunakan, silahkan coba lagi...',
+                                        'warning');
                                 } else if (alerts == "success") {
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
