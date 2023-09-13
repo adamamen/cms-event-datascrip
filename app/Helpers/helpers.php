@@ -161,7 +161,7 @@ if (!function_exists('adminEvent')) {
     function adminEvent($page)
     {
         $queryAdminEvent = DB::table('tbl_user')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'username', 'password', 'full_name', 'status', 'created_at', 'updated_at', 'password_encrypts')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'username', 'password', 'full_name', 'status', 'created_at', 'updated_at', 'password_encrypts', 'title_url')
             // ->where('event_id', '<>', '0')
             ->get();
         if ($page == "cms") {
@@ -169,7 +169,7 @@ if (!function_exists('adminEvent')) {
         } else {
             $queryMasterEvent = masterEvent_2($page);
         }
-
+        
         if (!empty($queryAdminEvent) && !empty($queryMasterEvent)) {
             foreach ($queryAdminEvent as $admin) {
                 if ($admin->event_id == '0') {
@@ -183,6 +183,7 @@ if (!function_exists('adminEvent')) {
                             'full_name' => $admin->full_name,
                             'status' => $admin->status,
                             'password_encrypts' => Crypt::decryptString($admin->password_encrypts),
+                            'title_url' => $admin->title_url,
                         ];
                 }
                 foreach ($queryMasterEvent as $event) {

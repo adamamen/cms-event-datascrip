@@ -25,13 +25,9 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Admin Event</h4>
+                            <h4>Admin Event </h4>
                             <div class="article-cta">
-                                @if ($pages == 'cms')
-                                    <a href="{{ route('add_admin_index', ['page' => 'cms']) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
-                                @else
-                                    <a href="{{ route('add_admin_index', ['page' => $data[0]['title_url']]) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
-                                @endif
+                                <a href="{{ route('add_admin_index', ['page' => $pages]) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -67,17 +63,16 @@
                                                 <td>
                                                     {{-- <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST"> --}}
                                                     @if ($pages == 'cms')
-                                                        <form method="POST"
-                                                            action="{{ route('edit-admin', ['page' => 'cms', 'id' => $value['admin_id']]) }}">
-                                                        @else
-                                                            <form method="POST"
-                                                                action="{{ route('edit-admin', ['page' => $value['title_url'], 'id' => $value['admin_id']]) }}">
+                                                        <form method="POST" action="{{ route('edit-admin', ['page' => 'cms', 'id' => $value['admin_id']]) }}">
+                                                    @else
+                                                        {{-- <form method="POST" action="{{ route('edit-admin', ['page' => $value['title_url'], 'id' => $value['admin_id']]) }}"> --}}
+                                                        <form method="POST" action="{{ route('edit-admin', ['page' => $pages, 'id' => $value['admin_id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    {{-- <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}"> --}}
+                                                    <input type="hidden" name="page" value="{{ $pages }}">
                                                     <input type="hidden" name="id" value="{{ $value['admin_id'] }}">
-                                                    <button name="edit" id="edit"
-                                                        class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
                                                     @if ($value['event_id'] != "0")  
                                                         <a href="#" class="btn btn-danger" data-id="{{ $value['admin_id'] }}" name="btn_delete" id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
@@ -118,6 +113,7 @@
     <script>
         $(document).on('click', '#btn_delete', function() {
             var recordId = $(this).data('id');
+            var params = "<?php echo $pages; ?>";
 
             swal({
                     title: 'Apakah kamu yakin?',
@@ -142,7 +138,7 @@
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {
-                                                window.location.href = "/admin-event/cms";
+                                                window.location.href = "/admin-event/" + params;
                                             }
                                         });
                                 } else if (alerts == "failed") {

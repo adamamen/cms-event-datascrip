@@ -1,3 +1,6 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 @extends('layouts_registrasi_visitor.app')
 
 @section('title', 'Add Visitor Event')
@@ -140,8 +143,8 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            location.reload()
-                            // window.location.href = "/visitor-event/" + params;
+                            location.reload(true)
+                            // window.location.href = "/visitor-event/" + params;\
                         }
                     });
             });
@@ -302,7 +305,7 @@
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
                                     okay => {
                                         if (okay) {
-                                            location.reload()
+                                            location.reload(true)
                                             // window.location.href = "/visitor-event/" + params;
                                         }
                                     });

@@ -26,6 +26,11 @@ return new class extends Migration
             $table->string('created_by');
             $table->timestamp('updated_at')->nullable();
             $table->string('updated_by');
+            $table->string('no_invoice');
+            $table->string('jenis_event');
+            $table->string('status_pembayaran');
+            $table->string('metode_bayar');
+            $table->string('sn_product');
         });
     }
 

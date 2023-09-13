@@ -46,7 +46,7 @@ class DashboardController extends Controller
         $q = DB::table('tbl_company_event as A')
             ->join('tbl_master_event as B', 'A.id', '=', 'B.company')
             ->where('title_url', $page)
-            ->get();
+            ->get()->toArray();
 
         return $q;
     }

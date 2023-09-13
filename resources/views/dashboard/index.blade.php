@@ -26,9 +26,22 @@
                                     <div class="card-icon">
                                         <i class="far fa-question-circle"></i>
                                     </div>
-                                    <h4>{{ $adminEventCount }}</h4>
+                                    <h4>{{ !empty($totalVisitor) ? $totalVisitor : '0' }}</h4>
                                     <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
                                         <div class="card-description" style="color:white">Total Visitor</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="far fa-question-circle"></i>
+                                    </div>
+                                    <h4>{{ $totalAdmin }}</h4>
+                                    <a href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total Admin</div>
                                     </a>
                                 </div>
                             </div>

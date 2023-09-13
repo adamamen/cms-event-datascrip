@@ -34,7 +34,7 @@
                                             <div class="invalid-feedback"> Username Wajib Diisi </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Password</label>
+                                            <label>Password </label>
                                             <input type="password" class="form-control"
                                                 value="{{ $value['password_encrypts'] }}" required="" name="password"
                                                 id="password">

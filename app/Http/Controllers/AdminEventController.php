@@ -20,7 +20,7 @@ class AdminEventController extends Controller
         $masterEvent = masterEvent($page);
         $user = userAdmin();
         $userId = $user[0]['id'];
-
+        // dd($data);
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('admin_event.index', [
                 'id' => $userId,
@@ -92,7 +92,6 @@ class AdminEventController extends Controller
         $user = userAdmin();
         $userId = $user[0]['id'];
         $masterEvent = masterEvent($page);
-        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         foreach ($data as $value) {
             $val[] = [
@@ -108,15 +107,17 @@ class AdminEventController extends Controller
             ];
         }
 
-        if (!empty($masterEvent) || $page == "cms") {
+        if (!empty($masterEvent)) {
             return view('admin_event.edit-admin-event', [
-                'titleUrl' => $titleUrl,
+                'titleUrl' => $page,
                 'id' => $userId,
                 'masterEvent' => $masterEvent,
                 'data' => $val,
                 'type_menu' => $type_menu,
                 'event' => $event
             ]);
+        } else {
+            return view('error.error-404');
         }
     }
 
