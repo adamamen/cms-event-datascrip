@@ -220,7 +220,8 @@ class VisitorEventController extends Controller
             if ($page == $masterEvent[0]['title_url']) {
                 return view('visitor_event.register', [
                     'masterEvent' => $masterEvent,
-                    'data' => $data
+                    'data' => $data,
+                    'page' => $page
                 ]);
             } else {
                 return view('error.error-404');

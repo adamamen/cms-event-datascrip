@@ -5,12 +5,12 @@
                 @foreach ($masterEvent as $value)
                     
                         <div class="sidebar-brand">
-                            <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <a href="#">
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="54">
                             </a>
                         </div>
                         <div class="sidebar-brand sidebar-brand-sm">
-                            <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <a href="#">
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="15">
                             </a>
                         </div>

@@ -36,6 +36,9 @@ Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout'
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
 
+// Add Visitor
+Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
+
 Route::group(['middleware' => ['auth']], function () {
     // Dashboard
     Route::get('/dashboard/{page?}', [DashboardController::class, 'index'])->name('dashboard');
@@ -59,7 +62,6 @@ Route::group(['middleware' => ['auth']], function () {
     // Visitor Event
     Route::get('/visitor-event/{page?}', [VisitorEventController::class, 'index'])->name('visitor_event.index');
     Route::get('/visitor-event/add-visitor-event/{page?}', [VisitorEventController::class, 'add_visitor_index'])->name('add_visitor_index');
-    Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
     Route::post('/edit-visitor/edit/{page?}/{id}', [VisitorEventController::class, 'edit'])->name('edit-visitor');
     Route::post('/update-visitor', [VisitorEventController::class, 'update'])->name('update-visitor');
     Route::delete('/delete-visitor/{id}', [VisitorEventController::class, 'delete'])->name('delete-visitor');
