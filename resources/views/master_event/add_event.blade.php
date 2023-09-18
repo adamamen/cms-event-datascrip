@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Start Event</label>
                                         <input type="text" class="form-control datepicker" value="" required=""
                                             name="start_event" id="start_event">
@@ -78,7 +78,7 @@
                                             Start Event Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
                                         <label>End Event</label>
                                         <input type="text" class="form-control datepicker" value="" required=""
                                             name="end_event" id="end_event">
@@ -86,7 +86,15 @@
                                             End Event Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-4 col-12">
+                                    <div class="form-group col-md-3 col-12">
+                                        <label>Tanggal Terakhir Aplikasi</label>
+                                        <input type="text" class="form-control datepicker" value="" required=""
+                                            name="end_event_application" id="end_event_application">
+                                        <div class="invalid-feedback">
+                                            Tanggal Terakhir Aplikasi Wajib Diisi
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Divisi</label>
                                         <select class="form-control select2" name="divisi" id="divisi">
                                             <option selected disabled>-- Silahkan Pilih --</option>
@@ -174,6 +182,12 @@
             });
         });
 
+        // Date picker + 1 day
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 1);
+        const formattedDate = currentDate.toISOString().slice(0, 10);
+        document.getElementById("end_event_application").value = formattedDate;
+
         // Show File Name Upload
         $('input[type="file"]').change(function(e) {
             var fileName = e.target.files[0].name;
@@ -196,6 +210,7 @@
                 var lokasi = $('#lokasi').val();
                 var username = $('#username').val();
                 var jenis_event = $('#jenis_event').val();
+                var end_event_application = $('#end_event_application').val();
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
@@ -208,6 +223,7 @@
                 formData.append("username", username);
                 formData.append("divisi", divisi);
                 formData.append("jenis_event", jenis_event);
+                formData.append("end_event_application", end_event_application);
 
                 if (namaEvent == "") {
                     var name = "Nama Event";

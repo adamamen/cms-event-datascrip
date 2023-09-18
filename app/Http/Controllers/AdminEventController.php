@@ -7,7 +7,6 @@ use App\Models\M_MasterEvent;
 use App\Models\M_User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 
@@ -107,18 +106,14 @@ class AdminEventController extends Controller
             ];
         }
 
-        if (!empty($masterEvent)) {
-            return view('admin_event.edit-admin-event', [
-                'titleUrl' => $page,
-                'id' => $userId,
-                'masterEvent' => $masterEvent,
-                'data' => $val,
-                'type_menu' => $type_menu,
-                'event' => $event
-            ]);
-        } else {
-            return view('error.error-404');
-        }
+        return view('admin_event.edit-admin-event', [
+            'titleUrl' => $page,
+            'id' => $userId,
+            'masterEvent' => $masterEvent,
+            'data' => $val,
+            'type_menu' => $type_menu,
+            'event' => $event
+        ]);
     }
 
     public function update(Request $request)
@@ -139,7 +134,7 @@ class AdminEventController extends Controller
             DB::table('tbl_user')
                 ->where('id', $request->admin_id)
                 ->update([
-                    'event_id' => $request->username == "admin" || $request->username == "MIS" ? '0' : $request->event,
+                    'event_id' => $request->events_id == "0" ? '0' : $request->event,
                     'username' => $request->username,
                     'password' => Hash::make($request->password),
                     'full_name' => $request->nama_lengkap,

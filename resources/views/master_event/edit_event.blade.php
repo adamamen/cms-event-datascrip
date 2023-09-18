@@ -30,15 +30,21 @@
                                         <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                         <div class="form-group col-md-3 col-12">
                                             <label>Nama Event</label>
-                                            <input type="text" class="form-control" value="{{ $value->title }}" required="" name="nama_event" id="nama_event">
-                                            <input type="hidden" class="form-control" value="{{ $value->id_event }}" required="" name="id_event" id="id_event">
+                                            <input type="text" class="form-control" value="{{ $value->title }}"
+                                                required="" name="nama_event" id="nama_event">
+                                            <input type="hidden" class="form-control" value="{{ $value->id_event }}"
+                                                required="" name="id_event" id="id_event">
                                             <div class="invalid-feedback"> Nama Event Wajib Diisi </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
                                             <label>Status </label>
                                             <select class="form-control select2" name="status" id="status">
-                                                <option value="A" {{ $value->status_master_event == 'A' ? 'selected' : '' }}> Aktif</option>
-                                                <option value="D" {{ $value->status_master_event == 'D' ? 'selected' : '' }}> Tidak Aktif</option>
+                                                <option value="A"
+                                                    {{ $value->status_master_event == 'A' ? 'selected' : '' }}> Aktif
+                                                </option>
+                                                <option value="D"
+                                                    {{ $value->status_master_event == 'D' ? 'selected' : '' }}> Tidak Aktif
+                                                </option>
                                             </select>
                                             <div class="invalid-feedback">
                                                 Status Wajib Diisi
@@ -70,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="form-group col-md-4 col-12">
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Start Event</label>
                                             <input type="text" class="form-control datepicker"
                                                 value="{{ $value->start_event }}" required="" name="start_event"
@@ -79,7 +85,7 @@
                                                 Start Event Wajib Diisi
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4 col-12">
+                                        <div class="form-group col-md-3 col-12">
                                             <label>End Event</label>
                                             <input type="text" class="form-control datepicker"
                                                 value="{{ $value->end_event }}" required="" name="end_event"
@@ -88,7 +94,16 @@
                                                 End Event Wajib Diisi
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4 col-12">
+                                        <div class="form-group col-md-3 col-12">
+                                            <label>Tanggal Terakhir Aplikasi</label>
+                                            <input type="text" class="form-control datepicker"
+                                                value="{{ $value->end_event }}" required="" name="end_event_application"
+                                                id="end_event_application">
+                                            <div class="invalid-feedback">
+                                                Tanggal Terakhir Aplikasi Wajib Diisi
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Divisi</label>
                                             <select class="form-control select2" name="divisi" id="divisi">
                                                 <option selected disabled>-- Silahkan Pilih --</option>
@@ -123,9 +138,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
-                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
+                                        name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                        name="btn_progress">Submit</a>
+                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                        name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                                 </div>
                             @endforeach
                         </div>
@@ -176,6 +194,12 @@
             });
         });
 
+        // Date picker + 1 day
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 1);
+        const formattedDate = currentDate.toISOString().slice(0, 10);
+        document.getElementById("end_event_application").value = formattedDate;
+
         $(document).ready(function() {
             $("#btn_submit").click(function() {
                 $("#btn_progress").show();
@@ -193,6 +217,7 @@
                 var username = $('#username').val();
                 var divisi = $('#divisi').val();
                 var jenis_event = $('#jenis_event').val();
+                var end_event_application = $('#end_event_application').val();
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
@@ -206,6 +231,7 @@
                 formData.append("username", username);
                 formData.append("divisi", divisi);
                 formData.append("jenis_event", jenis_event);
+                formData.append("end_event_application", end_event_application);
 
                 $.ajax({
                     url: '{{ route('update') }}',

@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
-use App\Models\M_CompanyEvent;
-use App\Models\M_User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,7 +33,7 @@ class MasterEventController extends Controller
     public function query()
     {
         $masterEvent = DB::table('tbl_master_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by', 'jenis_event')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by', 'jenis_event', 'tanggal_terakhir_aplikasi', 'title_url')
             ->get();
         $companyEvent = companyEvent();
 
@@ -45,6 +43,8 @@ class MasterEventController extends Controller
                     $merge[] = [
                         'RowNumber' => $master->RowNumber,
                         'jenis_event' => $master->jenis_event,
+                        'title_url' => $master->title_url,
+                        'tanggal_terakhir_aplikasi' => tgl_indo(date('Y-m-d', strtotime($master->tanggal_terakhir_aplikasi))),
                         'status' => $master->status,
                         'title' => $master->title,
                         'desc' => $master->desc,
@@ -89,6 +89,7 @@ class MasterEventController extends Controller
                 'createed_by' => $request->username,
                 'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
                 'jenis_event' => $request->jenis_event,
+                'tanggal_terakhir_aplikasi' => $request->end_event_application,
             ];
         M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
@@ -162,6 +163,7 @@ class MasterEventController extends Controller
                     'updated_by' => $request->username,
                     'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
                     'jenis_event' => $request->jenis_event,
+                    'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
 
             return response()->json(['message' => 'success']);
@@ -180,6 +182,7 @@ class MasterEventController extends Controller
                     'updated_by' => $request->username,
                     'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
                     'jenis_event' => $request->jenis_event,
+                    'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
 
             return response()->json(['message' => 'success']);

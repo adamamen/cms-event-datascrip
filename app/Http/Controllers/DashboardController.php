@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\M_MasterEvent;
 use App\Models\M_CompanyEvent;
-use App\Models\M_User;
 
 class DashboardController extends Controller
 {

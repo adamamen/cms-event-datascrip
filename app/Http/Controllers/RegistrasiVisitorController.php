@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\M_MasterEvent;
-use Illuminate\Http\Request;
 
 class RegistrasiVisitorController extends Controller
 {

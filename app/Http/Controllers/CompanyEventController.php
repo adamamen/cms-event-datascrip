@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\M_CompanyEvent;
-use App\Models\M_User;
-use App\Models\M_MasterEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

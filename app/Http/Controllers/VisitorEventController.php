@@ -8,13 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
 use App\Models\M_MetodeBayar;
-use App\Models\M_User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Session;
-use Mockery\Undefined;
-use PDF as DomPDF;
 
 
 class VisitorEventController extends Controller
@@ -132,7 +127,7 @@ class VisitorEventController extends Controller
         } else {
             $event = masterEvent($page);
         }
-
+        // dd($event[0]['jenis_event']);
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.edit-visitor-event', [
                 'titleUrl' => $titleUrl,
@@ -142,7 +137,8 @@ class VisitorEventController extends Controller
                 'type_menu' => $type_menu,
                 'event' => $event,
                 'metodeBayar' => $metodeBayar,
-                'jenisEvent' => $event[0]['jenis_event']
+                // 'jenisEvent' => $event[0]['jenis_event']
+                'jenisEvent ' => $event[0]['jenis_event']
             ]);
         } else {
             return view('error.error-404');
@@ -213,8 +209,11 @@ class VisitorEventController extends Controller
 
     public function index_register($page)
     {
-        $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
+        $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
         $data = masterEvent_4($page);
+        if (strtotime(!empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? $tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi : '') > strtotime(date('Y-m-d H:i:s'))) {
+            $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
+        }
 
         if (!empty($masterEvent)) {
             if ($page == $masterEvent[0]['title_url']) {
@@ -233,7 +232,8 @@ class VisitorEventController extends Controller
 
     public function generate_pdf($page, $id)
     {
-        $data = $this->query($page);
+        // $data = $this->query($page);
+        $data = visitorEventandMasterEvent($page);
         foreach ($data as $value) {
             if ($value['id'] == $id) {
                 $val['id'] = $value['id'];

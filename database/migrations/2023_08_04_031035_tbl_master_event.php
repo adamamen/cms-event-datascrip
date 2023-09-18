@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('createed_by');
             $table->string('title_url');
             $table->string('jenis_event');
+            $table->timestamp('tanggal_terakhir_aplikasi');
         });
     }
 

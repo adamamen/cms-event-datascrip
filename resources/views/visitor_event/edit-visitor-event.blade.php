@@ -40,7 +40,8 @@
                                             <select class="form-control select2" name="nama_event" id="nama_event">
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 @foreach ($event as $event)
-                                                    <option value="{{ $event['id_event'] }}" {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}> 
+                                                    <option value="{{ $event['id_event'] }}"
+                                                        {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}>
                                                         {{ $event['title'] }}
                                                     </option>
                                                 @endforeach
@@ -66,7 +67,8 @@
                                             <input type="text" class="form-control" value="{{ $value->ticket_no }}"
                                                 required="" name="no_tiket" id="no_tiket"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
-                                            <input name="no_tiket_before" id="no_tiket_before" value="{{ $value->ticket_no }}" hidden>
+                                            <input name="no_tiket_before" id="no_tiket_before"
+                                                value="{{ $value->ticket_no }}" hidden>
                                             <div class="invalid-feedback">
                                                 No Tiket Wajib Diisi
                                             </div>
@@ -100,85 +102,110 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if ($jenisEvent == "D")
-                                        <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                        <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
-                                        <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
-                                    @endif 
+                                    @if ($jenisEvent == 'D')
+                                        <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
+                                            name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                        <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                            name="btn_progress">Submit</a>
+                                        <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                            name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
                     </div>
                 </div>
             </div>
-            @if ($jenisEvent == "A")
-                <div class="section-body">
-                    <h2 class="section-title">Payment</h2>
-                    <div class="row">
-                        <div class="col-12 col-md-12 col-lg-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+            @foreach ($event as $events)
+                @if ($events['jenis_event'] == 'A')
+                    <div class="section-body">
+                        <h2 class="section-title">Payment {{ $jenisEvent }}</h2>
+                        <div class="row">
+                            <div class="col-12 col-md-12 col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <meta name="csrf-token" content="{{ csrf_token() }}">
+                                        @foreach ($data as $value)
+                                            <div class="row">
+                                                <div class="form-group col-md-6 col-12">
+                                                    <label>Metode Bayar</label>
+                                                    <select class="form-control select2" name="metode_bayar"
+                                                        id="metode_bayar">
+                                                        <option selected disabled>-- Silahkan Pilih --</option>
+                                                        @foreach ($metodeBayar as $bayar)
+                                                            <option value="{{ $bayar->metode_bayar }}"
+                                                                {{ $bayar->metode_bayar == $value->metode_bayar ? 'selected' : '' }}>
+                                                                {{ $bayar->metode_bayar }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-6 col-12">
+                                                    <label>Status Bayar</label>
+                                                    <select class="form-control select2" name="status_bayar"
+                                                        id="status_bayar">
+                                                        <option selected disabled>-- Silahkan Pilih --</option>
+                                                        <option value="Belum Dibayar"
+                                                            {{ $value->status_pembayaran == 'Belum Dibayar' ? 'selected' : '' }}>
+                                                            Belum Dibayar</option>
+                                                        <option value="Sudah Dibayar"
+                                                            {{ $value->status_pembayaran == 'Sudah Dibayar' ? 'selected' : '' }}>
+                                                            Sudah Dibayar</option>
+                                                    </select>
+                                                    <p style="color: red">* Pastikan pembayaran telah terverifikasi sebelum
+                                                        melakukan simpan data </p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <h2 class="section-title">Products</h2>
+                        <div class="row">
+                            <div class="col-12 col-md-12 col-lg-12">
+                                <div class="card">
                                     @foreach ($data as $value)
-                                        <div class="row">
-                                            <div class="form-group col-md-6 col-12">
-                                                <label>Metode Bayar</label>
-                                                <select class="form-control select2" name="metode_bayar" id="metode_bayar">
-                                                    <option selected disabled>-- Silahkan Pilih --</option>
-                                                    @foreach ($metodeBayar as $bayar)
-                                                        <option value="{{ $bayar->metode_bayar }}" {{ $bayar->metode_bayar == $value->metode_bayar ? 'selected' : '' }}>{{ $bayar->metode_bayar }}</option>
-                                                    @endforeach
-                                                </select>
+                                        <div class="card-body">
+                                            <meta name="csrf-token" content="{{ csrf_token() }}">
+                                            <div class="row">
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>SN Product</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $value->sn_product }}" required=""
+                                                        name="sn_product" id="sn_product">
+                                                    <p style="color: red">* Pastikan posisi cursor aktif sebelum scan SN
+                                                    </p>
+                                                </div>
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>No Invoice</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $value->no_invoice }}" name="no_invoice"
+                                                        id="no_invoice" required readonly>
+                                                </div>
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>Tgl. Terakhir Diupdate</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $value->updated_at }}" name="tgl_terakhir_diupdate"
+                                                        id="tgl_terakhir_diupdate" required readonly>
+                                                </div>
                                             </div>
-                                            <div class="form-group col-md-6 col-12">
-                                                <label>Status Bayar</label>
-                                                <select class="form-control select2" name="status_bayar" id="status_bayar">
-                                                    <option selected disabled>-- Silahkan Pilih --</option>
-                                                    <option value="Belum Dibayar" {{ $value->status_pembayaran == "Belum Dibayar" ? 'selected' : '' }}>Belum Dibayar</option>
-                                                    <option value="Sudah Dibayar" {{ $value->status_pembayaran == "Sudah Dibayar" ? 'selected' : '' }}>Sudah Dibayar</option>
-                                                </select>
-                                                <p style="color: red">* Pastikan pembayaran telah terverifikasi sebelum melakukan simpan data </p>
-                                            </div>
+                                            <a href="#" class="btn btn-primary mr-1" type="submit"
+                                                id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                            <a href="#" class="btn disabled btn-primary btn-progress"
+                                                id="btn_progress" name="btn_progress">Submit</a>
+                                            <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                                name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="section-body">
-                    <h2 class="section-title">Products</h2>
-                    <div class="row">
-                        <div class="col-12 col-md-12 col-lg-12">
-                            <div class="card">
-                                @foreach ($data as $value)
-                                    <div class="card-body">
-                                        <meta name="csrf-token" content="{{ csrf_token() }}">
-                                        <div class="row">
-                                            <div class="form-group col-md-4 col-12">
-                                                <label>SN Product</label>
-                                                <input type="text" class="form-control" value="{{ $value->sn_product }}" required="" name="sn_product" id="sn_product">
-                                                <p style="color: red">* Pastikan posisi cursor aktif sebelum scan SN </p>
-                                            </div>
-                                            <div class="form-group col-md-4 col-12">
-                                                <label>No Invoice</label>
-                                                <input type="text" class="form-control" value="{{ $value->no_invoice }}" name="no_invoice" id="no_invoice" required readonly>
-                                            </div>
-                                            <div class="form-group col-md-4 col-12">
-                                                <label>Tgl. Terakhir Diupdate</label>
-                                                <input type="text" class="form-control" value="{{ $value->updated_at }}" name="tgl_terakhir_diupdate" id="tgl_terakhir_diupdate" required readonly>
-                                            </div>
-                                        </div>
-                                        <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                        <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
-                                        <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif 
+                @endif
+            @endforeach
         </section>
     </div>
 @endsection
@@ -280,7 +307,9 @@
                         $("#btn_submit").show();
 
                         if (alerts == "failed") {
-                            swal('Gagal', 'No Tiket sudah pernah digunakan, silahkan coba lagi...', 'warning');
+                            swal('Gagal',
+                                'No Tiket sudah pernah digunakan, silahkan coba lagi...',
+                                'warning');
                         } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
                                 okay => {

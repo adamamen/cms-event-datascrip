@@ -20,7 +20,14 @@ class LoginController extends Controller
     public function index_parameter($page)
     {
         $page = strtolower($page);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->orWhere('title_url', $page)->get()->toArray();
+        // $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->orWhere('title_url', $page)->get()->toArray();
+        $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
+        if (strtotime(!empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? $tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi : '') > strtotime(date('Y-m-d H:i:s'))) {
+            $masterEvent = M_MasterEvent::select('*')
+                ->where('status', 'A')
+                ->where('title_url', $page)
+                ->get()->toArray();
+        }
 
         if ($page == "dashboard") {
             return view('login.index', [
@@ -43,9 +50,10 @@ class LoginController extends Controller
         $title = $request->title == null ? 'cms' : $request->title;
         $selectedPage = $request->query('selected_page', $title);
         $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $selectedPage)->get();
+        $idEvent = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->first();
         $response = validRecaptcaV3();
 
-        if ($credentials['username'] == "admin" || $credentials['username'] == "mis") {
+        if (!empty($idEvent->event_id) ? $idEvent->event_id : '' == '0') {
             $user = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->get();
         } else {
             $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();

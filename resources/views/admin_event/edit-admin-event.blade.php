@@ -29,8 +29,14 @@
                                     <div class="row">
                                         <div class="form-group col-md-4 col-12">
                                             <label>Username</label>
-                                            <input type="text" class="form-control" value="{{ $value['username'] }}" required="" name="username" id="username" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'readonly' : '' }}>
-                                            <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}" required="" name="admin_id" id="admin_id">
+                                            <input name="events_id" id="events_id" value="{{ $value['event_id'] }}" hidden>
+                                            <input type="text" class="form-control" value="{{ $value['username'] }}"
+                                                required="" name="username" id="username"
+                                                {{ $value['event_id'] == '0' ? 'readonly' : '' }}>
+
+                                            <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}"
+                                                required="" name="admin_id" id="admin_id">
+
                                             <div class="invalid-feedback"> Username Wajib Diisi </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
@@ -52,7 +58,8 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Event</label>
-                                            <select class="form-control select2" name="event" id="event" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'disabled' : '' }}>
+                                            <select class="form-control select2" name="event" id="event"
+                                                {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 @foreach ($event as $event)
                                                     <option value="{{ $value['event_id'] }}"
@@ -66,7 +73,8 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Status</label>
-                                            <select class="form-control select2" name="status" id="status" {{ $value['username'] == "admin" || $value['username'] == "mis" ? 'disabled' : '' }}>
+                                            <select class="form-control select2" name="status" id="status"
+                                                {{ $value['username'] == 'admin' || $value['username'] == 'mis' ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 <option value="A" {{ $value['status'] == 'A' ? 'selected' : '' }}>
                                                     Aktif</option>
@@ -78,9 +86,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
-                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                    <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
+                                        name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                        name="btn_progress">Submit</a>
+                                    <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                        name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                                 </div>
                             @endforeach
                         </div>
@@ -147,6 +158,7 @@
                 var password = $('#password').val();
                 var nama_lengkap = $('#nama_lengkap').val();
                 var status = $('#status').val();
+                var events_id = $('#events_id').val();
 
                 var formData = new FormData();
                 formData.append("admin_id", admin_id);
@@ -155,6 +167,7 @@
                 formData.append("password", password);
                 formData.append("nama_lengkap", nama_lengkap);
                 formData.append("status", status);
+                formData.append("events_id", events_id);
 
                 $.ajax({
                     url: '{{ route('update-admin') }}',
@@ -172,11 +185,11 @@
 
                         if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
-                            okay => {
-                                if (okay) {
-                                    window.location.href = "/admin-event/" + params;
-                                }
-                            });
+                                okay => {
+                                    if (okay) {
+                                        window.location.href = "/admin-event/" + params;
+                                    }
+                                });
                         } else {
                             swal('Gagal', 'Data gagal diupdate...', 'warning');
                         }
