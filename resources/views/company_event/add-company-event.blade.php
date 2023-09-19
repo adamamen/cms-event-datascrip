@@ -27,10 +27,10 @@
                             <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                             <div class="row">
                                 <div class="form-group col-md-6 col-12">
-                                    <label>Name</label>
+                                    <label>Nama Divisi</label>
                                     <input type="text" class="form-control" value="" required="" name="name" id="name">
                                     <div class="invalid-feedback">
-                                        Name Wajib Diisi
+                                        Nama Divisi Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6 col-12">
@@ -124,7 +124,7 @@
             formData.append("deskripsi", deskripsi);
 
             if (name == "") {
-                var name = "Name";
+                var name = "Nama Divisi";
                 var content = document.createElement('div');
                 content.innerHTML = '<strong>' + name + '</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({

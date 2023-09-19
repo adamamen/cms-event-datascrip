@@ -113,6 +113,7 @@ class VisitorEventController extends Controller
     public function edit()
     {
         $page = request('page');
+        $page_1 = request('page_1');
         $id = request('id');
         $type_menu = 'visitor_event';
         $data = M_VisitorEvent::select('*')->where('id', $id)->get();
@@ -123,11 +124,11 @@ class VisitorEventController extends Controller
         $metodeBayar = M_MetodeBayar::select('*')->get();
 
         if ($page == 'cms') {
-            $event = M_MasterEvent::select('*')->where('status', 'A')->get()->toArray();
+            $event = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page_1)->get()->toArray();
         } else {
             $event = masterEvent($page);
         }
-        // dd($event[0]['jenis_event']);
+
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.edit-visitor-event', [
                 'titleUrl' => $titleUrl,
@@ -137,8 +138,9 @@ class VisitorEventController extends Controller
                 'type_menu' => $type_menu,
                 'event' => $event,
                 'metodeBayar' => $metodeBayar,
+                'event_1' => $event,
+                'event_2' => $event,
                 // 'jenisEvent' => $event[0]['jenis_event']
-                'jenisEvent ' => $event[0]['jenis_event']
             ]);
         } else {
             return view('error.error-404');

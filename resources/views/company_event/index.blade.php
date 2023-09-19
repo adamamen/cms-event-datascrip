@@ -38,7 +38,7 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Name</th>
+                                        <th>Nama Divisi</th>
                                         <th>Status</th>
                                         <th>Description</th>
                                         <th>Created By</th>

@@ -118,7 +118,7 @@
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
                                 <h1 class="display-4 font-weight-bold mb-2">Mount Bromo</h1>
-                                <h5 class="font-weight-normal text-muted-transparent">Bali, Indonesia</h5>
+                                <h5 class="font-weight-normal text-muted-transparent">Malang, Indonesia</h5>
                             </div>
                             Photo by <a class="text-light bb" target="_blank"
                                 href="https://unsplash.com/photos/gJegRRpCm1g">Atik sulianami</a> on <a

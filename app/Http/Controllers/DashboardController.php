@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\M_MasterEvent;
 use App\Models\M_CompanyEvent;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -25,6 +26,7 @@ class DashboardController extends Controller
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
+            Log::info('User berada di menu Dashboard', ['username' => Auth::user()->username]);
             return view('dashboard.index', [
                 'id' => $userId,
                 'masterEvent' => empty($masterEvent) ? '' : $masterEvent,

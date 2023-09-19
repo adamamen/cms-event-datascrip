@@ -74,7 +74,7 @@
                                         <div class="form-group col-md-4 col-12">
                                             <label>Status</label>
                                             <select class="form-control select2" name="status" id="status"
-                                                {{ $value['username'] == 'admin' || $value['username'] == 'mis' ? 'disabled' : '' }}>
+                                                {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 <option value="A" {{ $value['status'] == 'A' ? 'selected' : '' }}>
                                                     Aktif</option>

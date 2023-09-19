@@ -28,12 +28,12 @@
                             <meta name="csrf-token" content="{{ csrf_token() }}">
                             <div class="row">
                                 <div class="form-group col-md-6 col-12">
-                                    <label>Name</label>
+                                    <label>Nama Divisi</label>
                                     <input type="text" class="form-control" value="{{ $value->name }}" required="" name="name" id="name">
                                     <input type="hidden" class="form-control" value="{{ $value->id }}" required="" name="id" id="id">
                                     <input type="hidden" value="{{ Auth::user()->username }}" id="username" name="username">
                                     <div class="invalid-feedback">
-                                        Name Wajib Diisi
+                                        Nama Divisi Wajib Diisi
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6 col-12">

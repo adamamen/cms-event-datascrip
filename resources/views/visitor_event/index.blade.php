@@ -56,18 +56,18 @@
                                             <th>No</th>
                                             <th>No Tiket</th>
                                             <th>Nama Event</th>
-                                            <th>Profile</th>
+                                            <th>Profile </th>
                                             @if ($jenis_events != '' || $jenis_events == 'A')
                                                 <th>No Invoice / SN Product</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Metode Pembayaran</th>
-                                            @elseif (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
+                                            @elseif (Auth::user()->event_id == '0')
                                                 <th>No Invoice / SN Product</th>
                                                 <th>Status Pembayaran</th>
                                                 <th>Metode Pembayaran</th>
                                             @endif
                                             <th>Tanggal Registrasi</th>
-                                            @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
+                                            @if (Auth::user()->event_id == '0')
                                                 <th>Jenis Event</th>
                                             @endif
                                             <th>Action</th>
@@ -106,7 +106,7 @@
                                                         </center>
                                                     </td>
                                                 @else
-                                                    @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
+                                                    @if (Auth::user()->event_id == '0')
                                                         <td>
                                                             <center>-</center>
                                                         </td>
@@ -119,7 +119,7 @@
                                                     @endif
                                                 @endif
                                                 <td>{{ $value['created_at'] }}</td>
-                                                @if (Auth::user()->username == 'admin' || Auth::user()->username == 'mis')
+                                                @if (Auth::user()->event_id == '0')
                                                     @if ($value['jenis_event'] == 'A')
                                                         <td>Berbayar</td>
                                                     @else
@@ -135,8 +135,8 @@
                                                                 action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page"
-                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page_1" value="{{ $value['title_url'] }}">
                                                     <input type="hidden" name="id" value="{{ $value['id'] }}">
                                                     <button name="edit" id="edit" class="btn btn-primary"><i
                                                             class="fas fa-edit"></i> Edit</button>

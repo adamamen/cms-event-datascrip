@@ -7,8 +7,6 @@ use App\Http\Controllers\MasterEventController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\CompanyEventController;
 use App\Http\Controllers\VisitorEventController;
-use App\Http\Controllers\SidebarController;
-use App\Http\Middleware\NoBackHistory;
 
 /*
 |--------------------------------------------------------------------------

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MasterEventController extends Controller
 {
@@ -19,6 +20,8 @@ class MasterEventController extends Controller
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
+            Log::info('User ada di menu Master Event', ['username' => Auth::user()->username]);
+
             return view('master_event.index', [
                 'id' => $userId,
                 'masterEvent' => $masterEvent,
@@ -70,12 +73,38 @@ class MasterEventController extends Controller
 
     public function add(Request $request)
     {
-        $logo = $request->file('logo');
-        $imageName = time() . '.' . $logo->getClientOriginalExtension();
-        $logo->move(public_path('images'), $imageName);
+        $checkTitle = M_MasterEvent::select('*')->where('title_url', $request->title_url)->get()->toArray();
 
-        $array_1 =
-            [
+        if (!empty($checkTitle)) {
+            Log::info('User Gagal save data di Add Master Event', ['username' => Auth::user()->username]);
+
+            return response()->json(['message' => 'failed']);
+        } else {
+            $logo = $request->file('logo');
+            $imageName = time() . '.' . $logo->getClientOriginalExtension();
+            $logo->move(public_path('images'), $imageName);
+
+            $array_1 =
+                [
+                    'status' => $request->status,
+                    'desc' => $request->deskripsi,
+                    'company' => $request->divisi,
+                    'start_event' => $request->startEvent,
+                    'end_event' => $request->endEvent,
+                    'logo' => $imageName,
+                    'location' => $request->lokasi,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                    'updated_by' => $request->username,
+                    'createed_by' => $request->username,
+                    'title_url' => $request->title_url,
+                    'jenis_event' => $request->jenis_event,
+                    'tanggal_terakhir_aplikasi' => $request->end_event_application,
+                ];
+            M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
+
+            Log::info('User Berhasil save data di Add Master Event', [
+                'username' => Auth::user()->username,
                 'status' => $request->status,
                 'desc' => $request->deskripsi,
                 'company' => $request->divisi,
@@ -87,13 +116,13 @@ class MasterEventController extends Controller
                 'updated_at' => Carbon::now(),
                 'updated_by' => $request->username,
                 'createed_by' => $request->username,
-                'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                'title_url' => $request->title_url,
                 'jenis_event' => $request->jenis_event,
                 'tanggal_terakhir_aplikasi' => $request->end_event_application,
-            ];
-        M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
+            ]);
 
-        return response()->json(['message' => 'success']);
+            return response()->json(['message' => 'success']);
+        }
     }
 
     public function add_index($page)
@@ -102,6 +131,8 @@ class MasterEventController extends Controller
         $listDivisi = listDivisi();
 
         if ($page == "cms") {
+            Log::info('User klik Add Master Event', ['username' => Auth::user()->username]);
+
             return view('master_event.add_event', [
                 'type_menu' => $type_menu,
                 'listDivisi' => !empty($listDivisi) ? $listDivisi : '',
@@ -114,9 +145,11 @@ class MasterEventController extends Controller
         $data = M_MasterEvent::find($id);
 
         if ($data) {
+            Log::info('User Berhasil Delete di Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             $data->delete();
             return response()->json(['message' => 'success']);
         } else {
+            Log::info('User Gagal Delete di Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['error' => 'failed'], 404);
         }
     }
@@ -130,6 +163,8 @@ class MasterEventController extends Controller
             ->get();
         $listDivisi = listDivisi();
         $type_menu = 'master_event';
+
+        Log::info('User klik action Edit di Master Event', ['username' => Auth::user()->username]);
 
         return view(
             'master_event.edit_event',
@@ -161,10 +196,27 @@ class MasterEventController extends Controller
                     'location' => $request->lokasi,
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
-                    'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                    'title_url' => $request->title_url,
                     'jenis_event' => $request->jenis_event,
                     'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
+
+            Log::info('User Berhasil Edit di Master Event', [
+                'username' => Auth::user()->username,
+                'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
+                'status' => $request->status,
+                'desc' => $request->deskripsi,
+                'company' => $request->divisi,
+                'start_event' => $request->startEvent,
+                'end_event' => $request->endEvent,
+                'logo' => $imageName != "undefined" ? $imageName : '',
+                'location' => $request->lokasi,
+                'updated_at' => Carbon::now(),
+                'updated_by' => $request->username,
+                'title_url' => $request->title_url,
+                'jenis_event' => $request->jenis_event,
+                'tanggal_terakhir_aplikasi' => $request->end_event_application,
+            ]);
 
             return response()->json(['message' => 'success']);
         } else {
@@ -180,10 +232,26 @@ class MasterEventController extends Controller
                     'location' => $request->lokasi,
                     'updated_at' => Carbon::now(),
                     'updated_by' => $request->username,
-                    'title_url' => preg_replace('/\s+/', '-', strtolower($request->namaEvent)),
+                    'title_url' => $request->title_url,
                     'jenis_event' => $request->jenis_event,
                     'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
+
+            Log::info('User Berhasil Edit di Master Event', [
+                'username' => Auth::user()->username,
+                'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
+                'status' => $request->status,
+                'desc' => $request->deskripsi,
+                'company' => $request->divisi,
+                'start_event' => $request->startEvent,
+                'end_event' => $request->endEvent,
+                'location' => $request->lokasi,
+                'updated_at' => Carbon::now(),
+                'updated_by' => $request->username,
+                'title_url' => $request->title_url,
+                'jenis_event' => $request->jenis_event,
+                'tanggal_terakhir_aplikasi' => $request->end_event_application,
+            ]);
 
             return response()->json(['message' => 'success']);
         }

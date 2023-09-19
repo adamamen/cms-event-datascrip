@@ -27,7 +27,7 @@
                                 <meta name="csrf-token" content="{{ csrf_token() }}">
                                 <div class="row">
                                     <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
-                                    <div class="form-group col-md-3 col-12">
+                                    <div class="form-group col-md-4 col-12">
                                         <label>Nama Event</label>
                                         <input type="text" class="form-control" value="" required=""
                                             name="nama_event" id="nama_event">
@@ -35,7 +35,15 @@
                                             Nama Event Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-3 col-12">
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Title Url</label>
+                                        <input type="text" class="form-control" value="" required=""
+                                            name="title_url" id="title_url">
+                                        <div class="invalid-feedback">
+                                            Title Url Wajib Diisi
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4 col-12">
                                         <label>Jenis Event</label>
                                         <select class="form-control select2" name="jenis_event" id="jenis_event">
                                             <option selected disabled>-- Silahkan Pilih --</option>
@@ -46,7 +54,9 @@
                                             Jenis Event Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-3 col-12">
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6 col-12">
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status">
                                             <option selected disabled>-- Silahkan Pilih --</option>
@@ -57,7 +67,7 @@
                                             Status Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-3 col-12">
+                                    <div class="form-group col-md-6 col-12">
                                         <label>Logo</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input"
@@ -188,6 +198,29 @@
         const formattedDate = currentDate.toISOString().slice(0, 10);
         document.getElementById("end_event_application").value = formattedDate;
 
+        // Ketika Nama Event Diisi maka title url pun juga terisi 
+        $(document).ready(function() {
+
+            var namaEvent = $('#nama_event');
+            var titleUrl = $('#title_url');
+
+            titleUrl.prop('disabled', true);
+
+            titleUrl.on('input', function() {
+                if (titleUrl.val().trim() === '' && namaEvent.val().trim() === '') {
+                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...', 'warning');
+                }
+            });
+
+            namaEvent.on('input', function() {
+                var namaEventValue = $(this).val();
+                var titleUrlValue = namaEventValue.replace(/\s+/g, '-').toLowerCase();
+                titleUrl.val(titleUrlValue);
+
+                titleUrl.prop('disabled', namaEventValue.trim() === '');
+            });
+        });
+
         // Show File Name Upload
         $('input[type="file"]').change(function(e) {
             var fileName = e.target.files[0].name;
@@ -201,6 +234,7 @@
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
                 var namaEvent = $('#nama_event').val();
+                var title_url = $('#title_url').val();
                 var status = $('#status').val();
                 var divisi = $('#divisi').val();
                 var logo = $("#logo")[0].files[0];
@@ -214,6 +248,7 @@
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
+                formData.append("title_url", title_url);
                 formData.append("status", status);
                 formData.append("logo", logo);
                 formData.append("startEvent", startEvent);
@@ -382,6 +417,8 @@
                                             window.location.href = "/master-event/cms";
                                         }
                                     });
+                            } else if (alerts == "failed") {    
+                                swal('Gagal', 'Title Url sudah pernah ada, silahkan coba lagi...', 'warning');
                             } else {
                                 swal('Gagal', 'Data gagal disimpan...', 'warning');
                             }

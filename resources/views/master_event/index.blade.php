@@ -86,11 +86,10 @@
                                                 <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     @if ($value['status'] == 'A')
-                                                        @if (strtotime($value['tanggal_terakhir_aplikasi']) > strtotime(date('Y-m-d H:i:s')))
+                                                        @if (strtotime(date('Y-m-d', strtotime($value['tanggal_terakhir_aplikasi'] . "+1 days"))) > strtotime(date('Y-m-d')))
                                                             <center><span class="badge badge-success">Aktif</span></center>
                                                         @else
-                                                            <center><span class="badge badge-danger">Tidak Aktif</span>
-                                                            </center>
+                                                            <center><span class="badge badge-danger">Tidak Aktif</span></center>
                                                         @endif
                                                     @else
                                                         <center><span class="badge badge-danger">Tidak Aktif</span></center>
