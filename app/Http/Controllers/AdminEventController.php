@@ -22,7 +22,7 @@ class AdminEventController extends Controller
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
-            Log::info('User ada di menu Admin Event', ['username' => Auth::user()->username]);
+            Log::info('User ada di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
 
             return view('admin_event.index', [
                 'id' => $userId,
@@ -32,7 +32,7 @@ class AdminEventController extends Controller
                 'pages' => $page
             ]);
         } else {
-            Log::info('User gagal akses ke menu Admin Event', ['username' => Auth::user()->username]);
+            Log::info('User gagal akses ke menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
 
             return view('error.error-404');
         }
@@ -52,7 +52,7 @@ class AdminEventController extends Controller
             $data = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
         }
 
-        Log::info('User klik Add Admin', ['username' => Auth::user()->username]);
+        Log::info('User klik Add Admin di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
         return view('admin_event.add-admin-event', [
             'id' => $userId,
             'titleUrl' => $titleUrl,
@@ -84,7 +84,7 @@ class AdminEventController extends Controller
                 'title_url' => $titleUrl->title_url
             ]);
 
-            Log::info('User Berhasil Add Admin', [
+            Log::info('User Berhasil Add Admin di menu Admin Event', [
                 'username' => Auth::user()->username,
                 'username' => $request->username,
                 'password' => Hash::make($request->password),
@@ -126,7 +126,7 @@ class AdminEventController extends Controller
             ];
         }
 
-        Log::info('User klik action Edit di Admin Event', ['username' => Auth::user()->username]);
+        Log::info('User klik action Edit di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
         return view('admin_event.edit-admin-event', [
             'titleUrl' => $page,
             'id' => $userId,
@@ -152,7 +152,7 @@ class AdminEventController extends Controller
                     'password_encrypts' => Crypt::encryptString($request->password)
                 ]);
 
-            Log::info('User berhasil Edit di Admin Event', [
+            Log::info('User berhasil Edit di menu Admin Event', [
                 'username_update' => Auth::user()->username,
                 'username' => $request->username,
                 'password' => Hash::make($request->password),
@@ -176,7 +176,7 @@ class AdminEventController extends Controller
                     'password_encrypts' => Crypt::encryptString($request->password)
                 ]);
 
-            Log::info('User berhasil Edit di Admin Event', [
+            Log::info('User berhasil Edit di menu Admin Event', [
                 'username_update' => Auth::user()->username,
                 'event_id' => $request->events_id == "0" ? '0' : $request->event,
                 'username' => $request->username,

@@ -26,7 +26,7 @@ class DashboardController extends Controller
         $userId = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
-            Log::info('User berada di menu Dashboard', ['username' => Auth::user()->username]);
+            Log::info('User berada di menu Dashboard ' . strtoupper($page), ['username' => Auth::user()->username]);
             return view('dashboard.index', [
                 'id' => $userId,
                 'masterEvent' => empty($masterEvent) ? '' : $masterEvent,

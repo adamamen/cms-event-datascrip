@@ -21,6 +21,7 @@ use App\Http\Controllers\VisitorEventController;
 
 // Register Visitor
 Route::get('/register-visitor/{page}', [VisitorEventController::class, 'index_register'])->name('index_register');
+Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
 
 // Login
 Route::get('/', [LoginController::class, 'index'])->name('login');
@@ -33,9 +34,6 @@ Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout'
 // Register Admin
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
-
-// Add Visitor
-Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
 
 Route::group(['middleware' => ['auth']], function () {
     // Dashboard

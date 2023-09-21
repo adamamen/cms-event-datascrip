@@ -43,7 +43,7 @@ class CompanyEventController extends Controller
         $companyEvent = companyEvent();
 
         if ($page == "cms") {
-            Log::info('User klik Add Divisi', ['username' => Auth::user()->username]);
+            Log::info('User klik Add Divisi di menu Divisi Event', ['username' => Auth::user()->username]);
 
             return view('company_event.add-company-event', [
                 'data' => $companyEvent,
@@ -57,7 +57,7 @@ class CompanyEventController extends Controller
         $companyEvent = M_CompanyEvent::select('*')->where('name', trim($request->name))->count();
 
         if ($companyEvent > 0) {
-            Log::info('Add Divisi Gagal Disimpan', ['username' => Auth::user()->username]);
+            Log::info('Add Divisi Gagal Disimpan di menu Divisi Event', ['username' => Auth::user()->username]);
             return response()->json(['message' => 'failed']);
         } else {
             DB::table('tbl_company_event')->insert([
@@ -70,7 +70,7 @@ class CompanyEventController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
 
-            Log::info('Berhasil Save Divisi', [
+            Log::info('Berhasil Save Divisi di menu Divisi Event', [
                 'username' => Auth::user()->username,
                 'status' => $request->status,
                 'name' => trim($request->name),
@@ -90,7 +90,7 @@ class CompanyEventController extends Controller
         $type_menu = 'company_event';
         $data = M_CompanyEvent::select('*')->where('id', $id)->get();
 
-        Log::info('User klik action Edit', ['username' => Auth::user()->username]);
+        Log::info('User klik action Edit di menu Divisi Event', ['username' => Auth::user()->username]);
 
         return view('company_event.edit-company-event', [
             'data' => $data,
@@ -111,7 +111,7 @@ class CompanyEventController extends Controller
                 'updated_by' => $request->username,
             ]);
 
-        Log::info('Data berhasil di update', [
+        Log::info('Data berhasil di update di menu Divisi Event', [
             'id' => $request->id,
             'username' => Auth::user()->username,
             'name' => $request->name,
@@ -131,7 +131,7 @@ class CompanyEventController extends Controller
 
         if ($data) {
             $data->delete();
-            Log::info('User Delete Divisi Event', ['username' => Auth::user()->username, 'data' => $data]);
+            Log::info('User Delete Data di menu Divisi Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['message' => 'success']);
         } else {
             return response()->json(['error' => 'failed'], 404);

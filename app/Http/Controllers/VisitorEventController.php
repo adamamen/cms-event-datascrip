@@ -10,7 +10,8 @@ use App\Models\M_VisitorEvent;
 use App\Models\M_MetodeBayar;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class VisitorEventController extends Controller
 {
@@ -24,6 +25,7 @@ class VisitorEventController extends Controller
         $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         if (!empty($masterEvent) || $page == "cms") {
+            Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             return view('visitor_event.index', [
                 'id' => $userId,
                 'masterEvent' => $masterEvent,
@@ -34,6 +36,7 @@ class VisitorEventController extends Controller
                 'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
+            Log::info('User cetak Excel di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             $this->generate_pdf($page, $userId);
         } else {
             return view('error.error-404');
@@ -74,7 +77,6 @@ class VisitorEventController extends Controller
 
     public function add(Request $request)
     {
-        // dd($request->all());
         $query = M_VisitorEvent::select('*')
             ->where('event_id', $request->namaEvent)
             ->where('ticket_no', $request->noTiket)
@@ -90,6 +92,23 @@ class VisitorEventController extends Controller
             return response()->json(['message' => 'failed']);
         } else {
             DB::table('tbl_visitor_event')->insert([
+                'event_id' => $request->namaEvent,
+                'ticket_no' => $request->noTiket,
+                'registration_date' => $request->tanggalRegistrasi,
+                'full_name' => $request->namaLengkap,
+                'address' => $request->alamat,
+                'email' => $request->email,
+                'mobile' => $request->noHandphone,
+                'created_at' => Carbon::now(),
+                'created_by' => $request->username,
+                'updated_at' => Carbon::now(),
+                'updated_by' => $request->username,
+                'jenis_event' => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
+                'no_invoice' => $noInvoice,
+                'status_pembayaran' => 'Belum Dibayar',
+            ]);
+
+            Log::info('User berhasil add Data di menu Data Visitor Event ', [
                 'event_id' => $request->namaEvent,
                 'ticket_no' => $request->noTiket,
                 'registration_date' => $request->tanggalRegistrasi,
@@ -130,6 +149,8 @@ class VisitorEventController extends Controller
         }
 
         if (!empty($masterEvent) || $page == "cms") {
+            Log::info('User klik Edit di menu Data Visitor Event', ['username' => Auth::user()->username]);
+
             return view('visitor_event.edit-visitor-event', [
                 'titleUrl' => $titleUrl,
                 'id' => $userId,
@@ -140,7 +161,6 @@ class VisitorEventController extends Controller
                 'metodeBayar' => $metodeBayar,
                 'event_1' => $event,
                 'event_2' => $event,
-                // 'jenisEvent' => $event[0]['jenis_event']
             ]);
         } else {
             return view('error.error-404');
@@ -149,7 +169,6 @@ class VisitorEventController extends Controller
 
     public function update(Request $request)
     {
-        // dd($request->all());
         if ($request->noTiket != $request->noTiketBefore) {
             $q = M_VisitorEvent::select('*')->where('ticket_no', $request->noTiket)->where('event_id', $request->namaEvent)->get()->toArray();
 
@@ -173,6 +192,22 @@ class VisitorEventController extends Controller
                         'sn_product' => $request->sn_product,
                     ]);
 
+                Log::info('User berhasil update di menu Data Visitor Event', [
+                    'username' => Auth::user()->username,
+                    'event_id' => $request->namaEvent,
+                    'ticket_no' => $request->noTiket,
+                    'registration_date' => $request->tanggalRegistrasi,
+                    'full_name' => $request->namaLengkap,
+                    'address' => $request->alamat,
+                    'email' => $request->email,
+                    'mobile' => $request->noHandphone,
+                    'updated_at' => Carbon::now(),
+                    'updated_by' => $request->username,
+                    'metode_bayar' => $request->metode_bayar,
+                    'status_pembayaran' => $request->status_bayar,
+                    'sn_product' => $request->sn_product,
+                ]);
+
                 return response()->json(['message' => 'success']);
             }
         } else {
@@ -193,6 +228,22 @@ class VisitorEventController extends Controller
                     'sn_product' => $request->sn_product,
                 ]);
 
+            Log::info('User berhasil update di menu Data Visitor Event', [
+                'username' => Auth::user()->username,
+                'event_id' => $request->namaEvent,
+                'ticket_no' => $request->noTiket,
+                'registration_date' => $request->tanggalRegistrasi,
+                'full_name' => $request->namaLengkap,
+                'address' => $request->alamat,
+                'email' => $request->email,
+                'mobile' => $request->noHandphone,
+                'updated_at' => Carbon::now(),
+                'updated_by' => $request->username,
+                'metode_bayar' => $request->metode_bayar,
+                'status_pembayaran' => $request->status_bayar,
+                'sn_product' => $request->sn_product,
+            ]);
+
             return response()->json(['message' => 'success']);
         }
     }
@@ -203,6 +254,7 @@ class VisitorEventController extends Controller
 
         if ($data) {
             $data->delete();
+            Log::info('Data Berhasil di Delete di menu Data Visitor Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['message' => 'success']);
         } else {
             return response()->json(['error' => 'failed'], 404);
@@ -234,7 +286,6 @@ class VisitorEventController extends Controller
 
     public function generate_pdf($page, $id)
     {
-        // $data = $this->query($page);
         $data = visitorEventandMasterEvent($page);
         foreach ($data as $value) {
             if ($value['id'] == $id) {
@@ -249,6 +300,8 @@ class VisitorEventController extends Controller
                 $val['updated_by'] = $value['updated_by'];
             }
         }
+
+        Log::info('User Cetak Invoice di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
 
         return view('visitor_event.cetak-invoice', ['val' => $val]);
     }

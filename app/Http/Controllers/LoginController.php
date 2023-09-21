@@ -56,7 +56,7 @@ class LoginController extends Controller
         $idEvent = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->first();
         $response = validRecaptcaV3();
 
-        if (!empty($idEvent->event_id) ? $idEvent->event_id : '' == '0') {
+        if ($idEvent->event_id == '0') {
             $user = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->get();
         } else {
             $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();
@@ -183,12 +183,15 @@ class LoginController extends Controller
 
     public function logout(Request $request, $page)
     {
+        $username = Auth::user()->username;
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         if ($page == "cms") {
+            Log::info('User telah logout', ['user' => $username]);
             return redirect('/');
         } else {
+            Log::info('User telah logout', ['user' => $username]);
             return redirect()->route('login_param', ['page' => $page]);
         }
     }

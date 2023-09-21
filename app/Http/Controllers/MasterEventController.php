@@ -76,7 +76,7 @@ class MasterEventController extends Controller
         $checkTitle = M_MasterEvent::select('*')->where('title_url', $request->title_url)->get()->toArray();
 
         if (!empty($checkTitle)) {
-            Log::info('User Gagal save data di Add Master Event', ['username' => Auth::user()->username]);
+            Log::info('User Gagal save data di Add Master Event di menu Master Event', ['username' => Auth::user()->username]);
 
             return response()->json(['message' => 'failed']);
         } else {
@@ -103,7 +103,7 @@ class MasterEventController extends Controller
                 ];
             M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
-            Log::info('User Berhasil save data di Add Master Event', [
+            Log::info('User Berhasil save data di Add Master Event di menu Master Event', [
                 'username' => Auth::user()->username,
                 'status' => $request->status,
                 'desc' => $request->deskripsi,
@@ -131,7 +131,7 @@ class MasterEventController extends Controller
         $listDivisi = listDivisi();
 
         if ($page == "cms") {
-            Log::info('User klik Add Master Event', ['username' => Auth::user()->username]);
+            Log::info('User klik Add Master Event di menu Master Event', ['username' => Auth::user()->username]);
 
             return view('master_event.add_event', [
                 'type_menu' => $type_menu,
@@ -145,11 +145,11 @@ class MasterEventController extends Controller
         $data = M_MasterEvent::find($id);
 
         if ($data) {
-            Log::info('User Berhasil Delete di Master Event', ['username' => Auth::user()->username, 'data' => $data]);
+            Log::info('User Berhasil Delete Data di menu Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             $data->delete();
             return response()->json(['message' => 'success']);
         } else {
-            Log::info('User Gagal Delete di Master Event', ['username' => Auth::user()->username, 'data' => $data]);
+            Log::info('User Gagal Delete Data di menu Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['error' => 'failed'], 404);
         }
     }
@@ -164,7 +164,7 @@ class MasterEventController extends Controller
         $listDivisi = listDivisi();
         $type_menu = 'master_event';
 
-        Log::info('User klik action Edit di Master Event', ['username' => Auth::user()->username]);
+        Log::info('User klik action Edit di menu Master Event', ['username' => Auth::user()->username]);
 
         return view(
             'master_event.edit_event',
@@ -201,7 +201,7 @@ class MasterEventController extends Controller
                     'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
 
-            Log::info('User Berhasil Edit di Master Event', [
+            Log::info('User Berhasil Edit Data di menu Master Event', [
                 'username' => Auth::user()->username,
                 'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
                 'status' => $request->status,
@@ -237,7 +237,7 @@ class MasterEventController extends Controller
                     'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ]);
 
-            Log::info('User Berhasil Edit di Master Event', [
+            Log::info('User Berhasil Edit Data di menu Master Event', [
                 'username' => Auth::user()->username,
                 'title' => preg_replace('/\s+/', ' ', $request->namaEvent),
                 'status' => $request->status,
