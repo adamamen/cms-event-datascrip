@@ -35,23 +35,24 @@ Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout'
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
+
     // Dashboard
     Route::get('/dashboard/{page?}', [DashboardController::class, 'index'])->name('dashboard');
 
     // Divisi Event
     Route::get('/company-event/{page?}', [CompanyEventController::class, 'index'])->name('company_event.index');
     Route::get('/company-event/add-company-event/{page?}', [CompanyEventController::class, 'add_company_index'])->name('add_company_index');
-    Route::post('/add-company', [CompanyEventController::class, 'add'])->name('add-company');
     Route::post('/edit-company/edit/{id}', [CompanyEventController::class, 'edit'])->name('edit-company');
+    Route::post('/add-company', [CompanyEventController::class, 'add'])->name('add-company');
     Route::post('/update-company', [CompanyEventController::class, 'update'])->name('update-company');
     Route::delete('/delete-company/{id}', [CompanyEventController::class, 'delete'])->name('delete-company');
 
     // Master Event
     Route::get('/master-event/{page?}', [MasterEventController::class, 'index'])->name('index');
     Route::get('/master-event/add-event/{page?}', [MasterEventController::class, 'add_index'])->name('add_index');
-    Route::post('/add', [MasterEventController::class, 'add'])->name('add');
     Route::post('/master-event/edit/{id}', [MasterEventController::class, 'edit'])->name('edit');
+    Route::post('/add', [MasterEventController::class, 'add'])->name('add');
     Route::post('/update', [MasterEventController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [MasterEventController::class, 'delete'])->name('delete');
 
@@ -67,8 +68,8 @@ Route::group(['middleware' => ['auth']], function () {
     // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
     Route::get('/admin-event/add-admin-event/{page?}', [AdminEventController::class, 'add_admin_index'])->name('add_admin_index');
-    Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
     Route::post('/edit-admin/edit/{page?}/{id}', [AdminEventController::class, 'edit'])->name('edit-admin');
+    Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
     Route::post('/update-admin', [AdminEventController::class, 'update'])->name('update-admin');
     Route::delete('/delete-admin/{id}', [AdminEventController::class, 'delete'])->name('delete-admin');
 });

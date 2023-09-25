@@ -106,8 +106,8 @@
                                         @if ($event_1['jenis_event'] == 'D')
                                             <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
                                                 name="btn_submit"><i class="fas fa-check"></i> Submit </a>
-                                            <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                                name="btn_progress">Submit</a>
+                                            <a href="#" class="btn disabled btn-primary btn-progress"
+                                                id="btn_progress" name="btn_progress">Submit</a>
                                             <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
                                                 name="btn_cancel"><i class="fas fa-xmark"></i> Cancel </a>
                                         @endif
