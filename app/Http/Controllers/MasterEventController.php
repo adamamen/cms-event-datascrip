@@ -75,8 +75,12 @@ class MasterEventController extends Controller
     {
         // $checkTitle = M_MasterEvent::select('*')->where('title_url', $request->title_url)->get()->toArray();
         $checkTitle = checkTitleUrl($request->title_url);
+        $lastCharacter = substr($request->title_url, -1);
+        $symbols = array("!", "@", "#", "$", "%", "&", "*", "+", "=", "?", "-", "_");
 
-        if (!empty($checkTitle)) {
+        if (in_array($lastCharacter, $symbols)) {
+            return response()->json(['message' => 'failed last character']);
+        } else if (!empty($checkTitle)) {
             Log::info('User Gagal save data di Add Master Event di menu Master Event', ['username' => Auth::user()->username]);
 
             return response()->json(['message' => 'failed']);
@@ -181,7 +185,6 @@ class MasterEventController extends Controller
 
     public function update(Request $request)
     {
-        // dd(substr($request->title_url, -1));
         $checkTitle = checkTitleUrl($request->title_url);
 
         foreach ($checkTitle as $value) {
@@ -189,8 +192,10 @@ class MasterEventController extends Controller
         }
 
         $title_ = !empty($title['title_url']) ? $title['title_url'] : '';
+        $lastCharacter = substr($request->title_url, -1);
+        $symbols = array("!", "@", "#", "$", "%", "&", "*", "+", "=", "?", "-", "_");
 
-        if (substr($request->title_url, -1) == "-") {
+        if (in_array($lastCharacter, $symbols)) {
             return response()->json(['message' => 'failed last character']);
         } else if (($request->title_url_before == $title_) || empty($title['title_url'])) {
             if ($request->file('logo') != null) {

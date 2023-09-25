@@ -195,7 +195,6 @@
             var currentValue = inputElement.value;
 
             // Convert to lowercase, remove spaces, and consecutive hyphens, and update the input field value
-            // var cleanedValue = currentValue.toLowerCase().replace(/ /g, '').replace(/-+/g, '-');
             var cleanedValue = currentValue.toLowerCase().replace(/ /g, '').replace(/-+/g, '-');
             inputElement.value = cleanedValue;
         });
@@ -301,7 +300,7 @@
 
                         if (alerts == "failed last character") {
                             swal('Gagal',
-                                'Title Url Tidak boleh diakhiri dengan simbol "-", silahkan coba lagi...',
+                                'Title Url Tidak boleh diakhiri dengan simbol, silahkan coba lagi...',
                                 'warning');
                         } else if (title_url == "") {
                             swal('Gagal', 'Title Url harus diisi, silahkan coba lagi...',

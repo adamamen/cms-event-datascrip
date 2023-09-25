@@ -422,7 +422,11 @@
                             $("#btn_progress").hide();
                             $("#btn_submit").show();
 
-                            if (alerts == "success") {
+                            if (alerts == "failed last character") {
+                                swal('Gagal',
+                                    'Title Url Tidak boleh diakhiri dengan simbol, silahkan coba lagi...',
+                                    'warning');
+                            } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
                                     okay => {
                                         if (okay) {
