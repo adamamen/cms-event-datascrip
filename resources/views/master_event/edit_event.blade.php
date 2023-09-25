@@ -38,8 +38,10 @@
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Title Url</label>
-                                            <input type="text" class="form-control" value="{{ $value->title_url }}" required=""
-                                                name="title_url" id="title_url">
+                                            <input type="text" class="form-control" value="{{ $value->title_url }}"
+                                                required="" name="title_url" id="title_url">
+                                            <input type="text" class="form-control" value="{{ $value->title_url }}"
+                                                required="" name="title_url_before" id="title_url_before" hidden>
                                             <div class="invalid-feedback">
                                                 Title Url Wajib Diisi
                                             </div>
@@ -107,8 +109,8 @@
                                         <div class="form-group col-md-3 col-12">
                                             <label>Tanggal Terakhir Aplikasi</label>
                                             <input type="text" class="form-control datepicker"
-                                                value="{{ $value->end_event }}" required="" name="end_event_application"
-                                                id="end_event_application">
+                                                value="{{ $value->end_event }}" required=""
+                                                name="end_event_application" id="end_event_application">
                                             <div class="invalid-feedback">
                                                 Tanggal Terakhir Aplikasi Wajib Diisi
                                             </div>
@@ -186,6 +188,18 @@
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
 
     <script>
+        // Antisipasi ketika "-" lebih dari 1, dan tidak bisa uppercase
+        var inputElement = document.getElementById("title_url");
+
+        inputElement.addEventListener("input", function() {
+            var currentValue = inputElement.value;
+
+            // Convert to lowercase, remove spaces, and consecutive hyphens, and update the input field value
+            // var cleanedValue = currentValue.toLowerCase().replace(/ /g, '').replace(/-+/g, '-');
+            var cleanedValue = currentValue.toLowerCase().replace(/ /g, '').replace(/-+/g, '-');
+            inputElement.value = cleanedValue;
+        });
+
         $("#btn_progress").hide();
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
@@ -220,7 +234,8 @@
 
             titleUrl.on('input', function() {
                 if (titleUrl.val().trim() === '' && namaEvent.val().trim() === '') {
-                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...', 'warning');
+                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...',
+                        'warning');
                 }
             });
 
@@ -242,6 +257,7 @@
                 var id_event = $('#id_event').val();
                 var namaEvent = $('#nama_event').val();
                 var title_url = $('#title_url').val();
+                var title_url_before = $('#title_url_before').val();
                 var status = $('#status').val();
                 var logo = $("#logo")[0].files[0];
                 var startEvent = $('#start_event').val();
@@ -256,6 +272,7 @@
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
                 formData.append("title_url", title_url);
+                formData.append("title_url_before", title_url_before);
                 formData.append("status", status);
                 formData.append("logo", logo);
                 formData.append("startEvent", startEvent);
@@ -282,7 +299,18 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
 
-                        if (alerts == "success") {
+                        if (alerts == "failed last character") {
+                            swal('Gagal',
+                                'Title Url Tidak boleh diakhiri dengan simbol "-", silahkan coba lagi...',
+                                'warning');
+                        } else if (title_url == "") {
+                            swal('Gagal', 'Title Url harus diisi, silahkan coba lagi...',
+                                'warning');
+                        } else if (alerts == "url has been input") {
+                            swal('Gagal',
+                                'Title Url sudah pernah di input, silahkan coba lagi...',
+                                'warning');
+                        } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
                                 okay => {
                                     if (okay) {

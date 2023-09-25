@@ -174,6 +174,17 @@
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
 
     <script>
+        // Antisipasi ketika "-" lebih dari 1, dan tidak bisa uppercase
+        var inputElement = document.getElementById("title_url");
+
+        inputElement.addEventListener("input", function() {
+            var currentValue = inputElement.value;
+
+            // Convert to lowercase, remove spaces, and consecutive hyphens, and update the input field value
+            var cleanedValue = currentValue.toLowerCase().replace(/ /g, '').replace(/-+/g, '-');
+            inputElement.value = cleanedValue;
+        });
+
         $("#btn_progress").hide();
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
@@ -208,7 +219,8 @@
 
             titleUrl.on('input', function() {
                 if (titleUrl.val().trim() === '' && namaEvent.val().trim() === '') {
-                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...', 'warning');
+                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...',
+                        'warning');
                 }
             });
 
@@ -417,8 +429,10 @@
                                             window.location.href = "/master-event/cms";
                                         }
                                     });
-                            } else if (alerts == "failed") {    
-                                swal('Gagal', 'Title Url sudah pernah ada, silahkan coba lagi...', 'warning');
+                            } else if (alerts == "failed") {
+                                swal('Gagal',
+                                    'Title Url sudah pernah ada, silahkan coba lagi...',
+                                    'warning');
                             } else {
                                 swal('Gagal', 'Data gagal disimpan...', 'warning');
                             }

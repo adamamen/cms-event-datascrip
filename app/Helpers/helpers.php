@@ -118,6 +118,14 @@ if (!function_exists('listDivisi')) {
     }
 }
 
+if (!function_exists('checkTitleUrl')) {
+    function checkTitleUrl($title_url)
+    {
+        $q = M_MasterEvent::select('*')->where('title_url', $title_url)->get()->toArray();
+        return $q;
+    }
+}
+
 if (!function_exists('validRecaptcaV3')) {
     function validRecaptcaV3()
     {
@@ -169,7 +177,7 @@ if (!function_exists('adminEvent')) {
         } else {
             $queryMasterEvent = masterEvent_2($page);
         }
-        
+
         if (!empty($queryAdminEvent) && !empty($queryMasterEvent)) {
             foreach ($queryAdminEvent as $admin) {
                 if ($admin->event_id == '0') {

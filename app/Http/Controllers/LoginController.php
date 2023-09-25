@@ -56,13 +56,52 @@ class LoginController extends Controller
         $idEvent = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->first();
         $response = validRecaptcaV3();
 
-        if ($idEvent->event_id == '0') {
-            $user = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->get();
+        if ($idEvent != null) {
+            if ($idEvent->event_id == '0') {
+                $user = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->get();
+            } else {
+                $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();
+            }
         } else {
-            $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();
+            $user = '';
         }
 
-        if (!$user->isEmpty()) {
+        // if (!$user->isEmpty()) {
+        if ($user == "") {
+            if ($response['success']) {
+                if (empty($credentials['username']) && empty($credentials['password'])) {
+                    if ($title == "cms") {
+                        return redirect()->route('login')->withErrors(['message' => 'Username dan Password tidak boleh kosong, silahkan coba lagi']);
+                    } else {
+                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username dan Password tidak boleh kosong, silahkan coba lagi']);
+                    }
+                } else if (empty($credentials['username'])) {
+                    if ($title == "cms") {
+                        Log::info('Username tidak boleh kosong, silahkan coba lagi');
+                        return redirect()->route('login')->withErrors(['message' => 'Username tidak boleh kosong, silahkan coba lagi']);
+                    } else {
+                        Log::info('Username tidak boleh kosong, silahkan coba lagi');
+                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak boleh kosong, silahkan coba lagi']);
+                    }
+                } else if (empty($credentials['password'])) {
+                    if ($title == "cms") {
+                        Log::info('Password tidak boleh kosong, silahkan coba lagi', ['username' => $credentials['username']]);
+                        return redirect()->route('login')->withErrors(['message' => 'Password tidak boleh kosong, silahkan coba lagi']);
+                    } else {
+                        Log::info('Password tidak boleh kosong, silahkan coba lagi', ['username' => $credentials['username']]);
+                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Password tidak boleh kosong, silahkan coba lagi']);
+                    }
+                } else {
+                    if ($title == "cms") {
+                        Log::info('Username tidak ditemukan, silahkan coba lagi', ['username' => $credentials['username']]);
+                        return redirect()->route('login')->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
+                    } else {
+                        Log::info('Username tidak ditemukan, silahkan coba lagi', ['username' => $credentials['username']]);
+                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
+                    }
+                }
+            }
+        } else {
             foreach ($user as $user) {
                 if ($user && password_verify($credentials['password'], $user->password)) {
                     if ($user->event_id == 0 && $title == "cms") {
@@ -95,40 +134,6 @@ class LoginController extends Controller
                     } else {
                         Log::info('Password anda salah, silahkan coba lagi', ['username' => $credentials['username']]);
                         return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Password anda salah, silahkan coba lagi']);
-                    }
-                }
-            }
-        } else {
-            if ($response['success']) {
-                if (empty($credentials['username']) && empty($credentials['password'])) {
-                    if ($title == "cms") {
-                        return redirect()->route('login')->withErrors(['message' => 'Username dan Password tidak boleh kosong, silahkan coba lagi']);
-                    } else {
-                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username dan Password tidak boleh kosong, silahkan coba lagi']);
-                    }
-                } else if (empty($credentials['username'])) {
-                    if ($title == "cms") {
-                        Log::info('Username tidak boleh kosong, silahkan coba lagi');
-                        return redirect()->route('login')->withErrors(['message' => 'Username tidak boleh kosong, silahkan coba lagi']);
-                    } else {
-                        Log::info('Username tidak boleh kosong, silahkan coba lagi');
-                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak boleh kosong, silahkan coba lagi']);
-                    }
-                } else if (empty($credentials['password'])) {
-                    if ($title == "cms") {
-                        Log::info('Password tidak boleh kosong, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login')->withErrors(['message' => 'Password tidak boleh kosong, silahkan coba lagi']);
-                    } else {
-                        Log::info('Password tidak boleh kosong, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Password tidak boleh kosong, silahkan coba lagi']);
-                    }
-                } else {
-                    if ($title == "cms") {
-                        Log::info('Username tidak ditemukan, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login')->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
-                    } else {
-                        Log::info('Username tidak ditemukan, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
                     }
                 }
             }
