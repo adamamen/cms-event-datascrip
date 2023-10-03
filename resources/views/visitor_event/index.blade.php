@@ -7,13 +7,6 @@
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
-
-    <link rel="stylesheet" href="assets/modules/datatables/datatables.min.css">
-    <link rel="stylesheet" href="assets/modules/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css">
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
     <style>
         .image-thumbnail {
             max-width: 250px;
@@ -50,7 +43,7 @@
                         <div class="card-body">
                             <meta name="csrf-token" content="{{ csrf_token() }}">
                             <div class="table-responsive">
-                                <table class="table-striped table" id="tbl_visitor">
+                                <table class="table-striped table" id="table-1">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -135,7 +128,8 @@
                                                                 action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page"
+                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
                                                     <input type="hidden" name="page_1" value="{{ $value['title_url'] }}">
                                                     <input type="hidden" name="id" value="{{ $value['id'] }}">
                                                     <button name="edit" id="edit" class="btn btn-primary"><i
@@ -182,45 +176,13 @@
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
-    <!-- <script src="assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
-                                    <script src="assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script> -->
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.4.1/css/buttons.dataTables.min.css">
-    <!-- <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#tbl_visitor').DataTable({
-                // dom: 'Bfrtip',
-                // buttons: [{
-                //     extend: 'excel',
-                //     exportOptions: {
-                //         columns: [0, 1, 2, 3, 4, 5, 6, 7]
-                //     },
-                // }],
-            });
-        });
-
         $(document).on('click', '#btn_delete', function() {
             var recordId = $(this).data('id');
             var params = "<?php echo $titleUrl; ?>";

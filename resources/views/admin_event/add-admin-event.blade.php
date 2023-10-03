@@ -19,7 +19,6 @@
             </div>
             <div class="section-body">
                 <h2 class="section-title">Add Admin</h2>
-                <!-- <p class="section-lead">This article component is based on card and flexbox.</p> -->
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
@@ -102,7 +101,6 @@
     <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <!-- JS Libraies -->
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>

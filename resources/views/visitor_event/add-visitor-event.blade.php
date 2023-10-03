@@ -98,8 +98,8 @@
                                     name="btn_submit"><i class="fas fa-check"></i> Submit</a>
                                 <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
                                     name="btn_progress">Submit</a>
-                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                    name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i
+                                        class="fas fa-xmark"></i> Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -122,7 +122,6 @@
     <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <!-- JS Libraies -->
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>

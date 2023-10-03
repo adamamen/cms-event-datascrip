@@ -226,7 +226,6 @@
     <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <!-- JS Libraies -->
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>

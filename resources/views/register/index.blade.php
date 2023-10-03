@@ -35,7 +35,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <!-- <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button> -->
                     <meta name="csrf-token" content="{{ csrf_token() }}">
                     <a href="#" class="btn btn-primary btn-lg btn-block" type="submit" id="btn_register"
                         name="btn_register">Register</a>

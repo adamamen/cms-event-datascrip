@@ -27,7 +27,8 @@
                         <div class="card-header">
                             <h4>Admin Event </h4>
                             <div class="article-cta">
-                                <a href="{{ route('add_admin_index', ['page' => $pages]) }}" class="btn btn-success"><i class="fas fa-plus"></i> Add Admin</a>
+                                <a href="{{ route('add_admin_index', ['page' => $pages]) }}" class="btn btn-success"><i
+                                        class="fas fa-plus"></i> Add Admin</a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -61,23 +62,25 @@
                                                 <td>{{ $value['full_name'] }}</td>
                                                 <td>{{ !empty($value['title']) ? $value['title'] : '-' }}</td>
                                                 <td>
-                                                    {{-- <form action="{{ route('edit-admin', ['id' => $value['admin_id']]) }}" method="POST"> --}}
                                                     @if ($pages == 'cms')
-                                                        <form method="POST" action="{{ route('edit-admin', ['page' => 'cms', 'id' => $value['admin_id']]) }}">
-                                                    @else
-                                                        {{-- <form method="POST" action="{{ route('edit-admin', ['page' => $value['title_url'], 'id' => $value['admin_id']]) }}"> --}}
-                                                        <form method="POST" action="{{ route('edit-admin', ['page' => $pages, 'id' => $value['admin_id']]) }}">
+                                                        <form method="POST"
+                                                            action="{{ route('edit-admin', ['page' => 'cms', 'id' => $value['admin_id']]) }}">
+                                                        @else
+                                                            <form method="POST"
+                                                                action="{{ route('edit-admin', ['page' => $pages, 'id' => $value['admin_id']]) }}">
                                                     @endif
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    {{-- <input type="hidden" name="page" value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}"> --}}
                                                     <input type="hidden" name="page" value="{{ $pages }}">
                                                     <input type="hidden" name="id" value="{{ $value['admin_id'] }}">
-                                                    <button name="edit" id="edit" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i
+                                                            class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    @if ($value['event_id'] != "0")  
-                                                        <a href="#" class="btn btn-danger" data-id="{{ $value['admin_id'] }}" name="btn_delete" id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
-                                                    @endif 
-                                                </form>
+                                                    @if ($value['event_id'] != '0')
+                                                        <a href="#" class="btn btn-danger"
+                                                            data-id="{{ $value['admin_id'] }}" name="btn_delete"
+                                                            id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
+                                                    @endif
+                                                    </form>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -104,7 +107,6 @@
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
 

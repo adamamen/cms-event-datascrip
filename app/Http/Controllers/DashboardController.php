@@ -54,6 +54,7 @@ class DashboardController extends Controller
     public function query($page)
     {
         $queryVisitorEvent = visitorEvent();
+
         if ($page == "cms") {
             $queryMasterEvent = masterEvent_1();
         } else {

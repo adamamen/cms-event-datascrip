@@ -5,8 +5,8 @@
 
 @section('title', 'Add Visitor Event')
 
-@push('style') 
-<!-- CSS Libraries -->
+@push('style')
+    <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
@@ -59,7 +59,6 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    {{-- <input value="{{ Auth::user()->username }}" id="username" name="username" hidden> --}}
                                     <div class="form-group col-md-4 col-12">
                                         <label>No Tiket</label>
                                         <input type="text" class="form-control" value="" required=""
@@ -97,9 +96,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress" name="btn_progress">Submit</a>
-                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                                <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
+                                    name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                    name="btn_progress">Submit</a>
+                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i
+                                        class="fas fa-xmark"></i> Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -109,7 +111,7 @@
 @endsection
 
 @push('scripts')
-<!-- JS Libraies -->
+    <!-- JS Libraies -->
     <script src="{{ asset('library/simpleweather/jquery.simpleWeather.min.js') }}"></script>
     <script src="{{ asset('library/chart.js/dist/Chart.min.js') }}"></script>
     <script src="{{ asset('library/jqvmap/dist/jquery.vmap.min.js') }}"></script>
@@ -122,7 +124,6 @@
     <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <!-- JS Libraies -->
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
@@ -144,7 +145,6 @@
                     .then((ok) => {
                         if (ok) {
                             location.reload(true)
-                            // window.location.href = "/visitor-event/" + params;\
                         }
                     });
             });
@@ -175,7 +175,6 @@
                 formData.append("tanggalRegistrasi", tanggalRegistrasi);
                 formData.append("alamat", alamat);
                 formData.append("username", username);
-                // formData.append("params", params);
 
                 if (namaLengkap == "") {
                     var name = "Nama Lengkap";
@@ -306,7 +305,6 @@
                                     okay => {
                                         if (okay) {
                                             location.reload(true)
-                                            // window.location.href = "/visitor-event/" + params;
                                         }
                                     });
                             } else {

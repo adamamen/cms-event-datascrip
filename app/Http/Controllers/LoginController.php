@@ -44,6 +44,8 @@ class LoginController extends Controller
             ]);
         } else if (empty($masterEvent) && !empty($page)) {
             return view('error.error-404');
+        } else {
+            return view('error.error-404');
         }
     }
 
@@ -66,7 +68,6 @@ class LoginController extends Controller
             $user = '';
         }
 
-        // if (!$user->isEmpty()) {
         if ($user == "") {
             if ($response['success']) {
                 if (empty($credentials['username']) && empty($credentials['password'])) {

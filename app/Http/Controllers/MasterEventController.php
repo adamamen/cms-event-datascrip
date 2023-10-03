@@ -47,7 +47,8 @@ class MasterEventController extends Controller
                         'RowNumber' => $master->RowNumber,
                         'jenis_event' => $master->jenis_event,
                         'title_url' => $master->title_url,
-                        'tanggal_terakhir_aplikasi' => tgl_indo(date('Y-m-d', strtotime($master->tanggal_terakhir_aplikasi))),
+                        'tanggal_terakhir_aplikasi' => $master->tanggal_terakhir_aplikasi,
+                        'tanggal_terakhir_aplikasi_indo' => tgl_indo(date('Y-m-d', strtotime($master->tanggal_terakhir_aplikasi))),
                         'status' => $master->status,
                         'title' => $master->title,
                         'desc' => $master->desc,
@@ -73,7 +74,6 @@ class MasterEventController extends Controller
 
     public function add(Request $request)
     {
-        // $checkTitle = M_MasterEvent::select('*')->where('title_url', $request->title_url)->get()->toArray();
         $checkTitle = checkTitleUrl($request->title_url);
         $lastCharacter = substr($request->title_url, -1);
         $symbols = array("!", "@", "#", "$", "%", "&", "*", "+", "=", "?", "-", "_");
@@ -108,7 +108,6 @@ class MasterEventController extends Controller
                     'tanggal_terakhir_aplikasi' => $request->end_event_application,
                 ];
             DB::table('tbl_master_event')->insert([$array_1]);
-            // M_MasterEvent::updateOrCreate(['title' => preg_replace('/\s+/', ' ', $request->namaEvent)], $array_1);
 
             Log::info('User Berhasil save data di Add Master Event di menu Master Event', [
                 'username' => Auth::user()->username,
@@ -173,14 +172,7 @@ class MasterEventController extends Controller
 
         Log::info('User klik action Edit di menu Master Event', ['username' => Auth::user()->username]);
 
-        return view(
-            'master_event.edit_event',
-            [
-                'data' => $data,
-                'listDivisi' => $listDivisi,
-                'type_menu' => $type_menu
-            ]
-        );
+        return view('master_event.edit_event', ['data' => $data, 'listDivisi' => $listDivisi, 'type_menu' => $type_menu]);
     }
 
     public function update(Request $request)

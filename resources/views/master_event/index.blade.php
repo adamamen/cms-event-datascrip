@@ -27,7 +27,6 @@
                         <div class="card-header">
                             <h4>Master Event</h4>
                             <div class="article-cta">
-                                <!-- <a href="{{ url('/master-event/add-event') }}" class="btn btn-success">Add Event</a> -->
                                 <a href="{{ route('add_index', ['page' => 'cms']) }}" class="btn btn-success"><i
                                         class="fas fa-plus"></i> Add Event</a>
                             </div>
@@ -86,10 +85,16 @@
                                                 <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     @if ($value['status'] == 'A')
-                                                        @if (strtotime(date('Y-m-d', strtotime($value['tanggal_terakhir_aplikasi'] . "+1 days"))) > strtotime(date('Y-m-d')))
+                                                        @php
+                                                            $tgl_1 = strtotime(date('Y-m-d', strtotime($value['tanggal_terakhir_aplikasi'] . '+1 days')));
+                                                            $tgl_2 = strtotime(date('Y-m-d'));
+                                                        @endphp
+
+                                                        @if ($tgl_1 > $tgl_2)
                                                             <center><span class="badge badge-success">Aktif</span></center>
                                                         @else
-                                                            <center><span class="badge badge-danger">Tidak Aktif</span></center>
+                                                            <center><span class="badge badge-danger">Tidak Aktif</span>
+                                                            </center>
                                                         @endif
                                                     @else
                                                         <center><span class="badge badge-danger">Tidak Aktif</span></center>
@@ -104,7 +109,7 @@
                                                 <td>{{ $value['location'] }}</td>
                                                 <td>{{ $value['jenis_event'] == 'A' ? 'Berbayar' : 'Non Berbayar' }}</td>
                                                 <td>{{ $value['title_url'] }}</td>
-                                                <td>{{ $value['tanggal_terakhir_aplikasi'] }}</td>
+                                                <td>{{ $value['tanggal_terakhir_aplikasi_indo'] }}</td>
                                                 <td>
                                                     <center>
                                                         <form action="{{ route('edit', ['id' => $value['id_event']]) }}"
@@ -145,7 +150,6 @@
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <!-- <script src="{{ asset('js/page/index-0.js') }}"></script> -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
     <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
 
