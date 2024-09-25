@@ -24,6 +24,7 @@ class VisitorEventController extends Controller
         $user        = userAdmin();
         $userId      = $user[0]['id'];
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        dd($data);
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);

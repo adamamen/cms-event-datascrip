@@ -139,7 +139,9 @@ class AdminEventController extends Controller
 
     public function update(Request $request)
     {
+        dd($request->all());
         if ($request->event == NULL) {
+            dd('1');
             DB::table('tbl_user')
                 ->where('id', $request->admin_id)
                 ->update([
@@ -163,6 +165,8 @@ class AdminEventController extends Controller
                 'password_encrypts' => Crypt::encryptString($request->password)
             ]);
         } else {
+            // dd('2');
+            $titleUrl = $request->event;
             DB::table('tbl_user')
                 ->where('id', $request->admin_id)
                 ->update([

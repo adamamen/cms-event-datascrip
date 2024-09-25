@@ -62,11 +62,14 @@ class LoginController extends Controller
             if ($idEvent->event_id == '0') {
                 $user = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->get();
             } else {
+                dd($credentials['username']);
                 $user = M_User::select('*')->where('username', $credentials['username'])->where('title_url', $selectedPage)->where('status', 'A')->get();
             }
         } else {
             $user = '';
         }
+
+        // dd($user);
 
         if ($user == "") {
             if ($response['success']) {

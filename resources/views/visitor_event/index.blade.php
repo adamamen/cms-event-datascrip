@@ -86,7 +86,7 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>No Tiket</th>
+                                            <th hidden>No Tiket</th>
                                             <th>Nama Event</th>
                                             <th>Profile </th>
                                             @if ($jenis_events != '' || $jenis_events == 'A')
@@ -109,7 +109,7 @@
                                         @foreach ($data as $value)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $value['ticket_no'] }}</td>
+                                                <td hidden>{{ $value['ticket_no'] }}</td>
                                                 <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     <i class="fas fa-user"></i> <b>{{ $value['full_name'] }}</b><br>
