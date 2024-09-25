@@ -20,10 +20,10 @@ class LoginController extends Controller
 
     public function index_parameter($page)
     {
-        $page = strtolower($page);
+        $page                      = strtolower($page);
         $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
-        $tgl_1 = !empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? strtotime(date('Y-m-d', strtotime($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi . "+1 days"))) : '';
-        $tgl_2 = strtotime(date('Y-m-d'));
+        $tgl_1                     = !empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? strtotime(date('Y-m-d', strtotime($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi . "+1 days"))) : '';
+        $tgl_2                     = strtotime(date('Y-m-d'));
 
         if ($tgl_1 > $tgl_2) {
             $masterEvent = M_MasterEvent::select('*')
@@ -34,12 +34,12 @@ class LoginController extends Controller
 
         if ($page == "dashboard") {
             return view('login.index', [
-                'page' => $page,
+                'page'        => $page,
                 'masterEvent' => $masterEvent
             ]);
         } else if (!empty($masterEvent)) {
             return view('login.index', [
-                'page' => $page,
+                'page'        => $page,
                 'masterEvent' => $masterEvent
             ]);
         } else if (empty($masterEvent) && !empty($page)) {
@@ -51,12 +51,12 @@ class LoginController extends Controller
 
     public function login_action(Request $request)
     {
-        $credentials = $request->only('username', 'password');
-        $title = $request->title == null ? 'cms' : $request->title;
+        $credentials  = $request->only('username', 'password');
+        $title        = $request->title == null ? 'cms' : $request->title;
         $selectedPage = $request->query('selected_page', $title);
-        $masterEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $selectedPage)->get();
-        $idEvent = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->first();
-        $response = validRecaptcaV3();
+        $masterEvent  = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $selectedPage)->get();
+        $idEvent      = M_User::select('*')->where('username', $credentials['username'])->where('status', 'A')->first();
+        $response     = validRecaptcaV3();
 
         if ($idEvent != null) {
             if ($idEvent->event_id == '0') {
@@ -103,40 +103,44 @@ class LoginController extends Controller
                 }
             }
         } else {
-            foreach ($user as $user) {
-                if ($user && password_verify($credentials['password'], $user->password)) {
-                    if ($user->event_id == 0 && $title == "cms") {
-                        Auth::login($user);
-                        Log::info('User berhasil login', ['data_user' => json_decode($user)]);
-                        return redirect()->route('dashboard', ['page' => $selectedPage]);
-                    } else if ($user->event_id > 0 && $title == "cms") {
-                        Log::info('Hanya user Admin yang berhak untuk login', ['user' => $credentials['username']]);
-                        return redirect()->route('login')->withErrors(['message' => 'Hanya user Admin yang berhak untuk login']);
-                    } else if ($user->event_id > 0 && $title != "cms") {
-                        foreach ($masterEvent as $value) {
-                            if ($value->id_event == $user->event_id) {
-                                Auth::login($user);
-                                Log::info('User berhasil login', ['data_user' => json_decode($user)]);
-                                return redirect()->route('visitor_event.index', ['page' => $selectedPage]);
-                            } else {
-                                Log::info('Username tidak ditemukan', ['username' => $credentials['username']]);
-                                return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
+            if (!empty($user->toArray())) {
+                foreach ($user as $user) {
+                    if ($user && password_verify($credentials['password'], $user->password)) {
+                        if ($user->event_id == 0 && $title == "cms") {
+                            Auth::login($user);
+                            Log::info('User berhasil login', ['data_user' => json_decode($user)]);
+                            return redirect()->route('dashboard', ['page' => $selectedPage]);
+                        } else if ($user->event_id > 0 && $title == "cms") {
+                            Log::info('Hanya user Admin yang berhak untuk login', ['user' => $credentials['username']]);
+                            return redirect()->route('login')->withErrors(['message' => 'Hanya user Admin yang berhak untuk login']);
+                        } else if ($user->event_id > 0 && $title != "cms") {
+                            foreach ($masterEvent as $value) {
+                                if ($value->id_event == $user->event_id) {
+                                    Auth::login($user);
+                                    Log::info('User berhasil login', ['data_user' => json_decode($user)]);
+                                    return redirect()->route('visitor_event.index', ['page' => $selectedPage]);
+                                } else {
+                                    Log::info('Username tidak ditemukan', ['username' => $credentials['username']]);
+                                    return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username tidak ditemukan, silahkan coba lagi']);
+                                }
                             }
+                        } else {
+                            Auth::login($user);
+                            Log::info('User berhasil login', ['data_user' => json_decode($user)]);
+                            return redirect()->route('dashboard', ['page' => $selectedPage]);
                         }
                     } else {
-                        Auth::login($user);
-                        Log::info('User berhasil login', ['data_user' => json_decode($user)]);
-                        return redirect()->route('dashboard', ['page' => $selectedPage]);
-                    }
-                } else {
-                    if ($title == "cms") {
-                        Log::info('Password anda salah, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login')->withErrors(['message' => 'Password anda salah, silahkan coba lagi']);
-                    } else {
-                        Log::info('Password anda salah, silahkan coba lagi', ['username' => $credentials['username']]);
-                        return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Password anda salah, silahkan coba lagi']);
+                        if ($title == "cms") {
+                            Log::info('Password anda salah, silahkan coba lagi', ['username' => $credentials['username']]);
+                            return redirect()->route('login')->withErrors(['message' => 'Password anda salah, silahkan coba lagi']);
+                        } else {
+                            Log::info('Password anda salah, silahkan coba lagi', ['username' => $credentials['username']]);
+                            return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Password anda salah, silahkan coba lagi']);
+                        }
                     }
                 }
+            } else {
+                return redirect()->route('login')->withErrors(['message' => 'Username anda tidak berhak untuk login, silahkan coba lagi']);
             }
         }
     }
@@ -152,8 +156,8 @@ class LoginController extends Controller
 
     public function register_action(Request $request)
     {
-        $checkUser = M_User::where('event_id', '=', '0')->first();
-        $checkUsers = $checkUser == null ? '' : $checkUser->username;
+        $checkUser      = M_User::where('event_id', '=', '0')->first();
+        $checkUsers     = $checkUser == null ? '' : $checkUser->username;
         $passwordLength = strlen($request->password);
 
         if ($checkUsers != "") {
@@ -172,15 +176,15 @@ class LoginController extends Controller
             return response()->json(['message' => 'password doesnt same']);
         } else {
             DB::table('tbl_user')->insert([
-                'event_id' => '0',
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'full_name' => $request->full_name,
-                'status' => 'A',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'event_id'          => '0',
+                'username'          => $request->username,
+                'password'          => Hash::make($request->password),
+                'full_name'         => $request->full_name,
+                'status'            => 'A',
+                'created_at'        => now(),
+                'updated_at'        => now(),
                 'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url' => 'cms',
+                'title_url'         => 'cms',
             ]);
 
             return response()->json(['message' => 'success']);

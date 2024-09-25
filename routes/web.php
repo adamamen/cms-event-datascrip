@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::delete('/delete-visitor/{id}', [VisitorEventController::class, 'delete'])->name('delete-visitor');
     Route::get('/visitor-event/cetak-invoice/{page?}/{id}', [VisitorEventController::class, 'generate_pdf'])->name('generate.pdf');
     Route::get('/visitor-event/export-excel/{page?}', [VisitorEventController::class, 'export_excel'])->name('export.excel');
+    Route::post('/visitor-event/import-excel/{page?}', [VisitorEventController::class, 'import_excel'])->name('import.excel');
 
     // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
@@ -72,6 +73,9 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
     Route::post('/update-admin', [AdminEventController::class, 'update'])->name('update-admin');
     Route::delete('/delete-admin/{id}', [AdminEventController::class, 'delete'])->name('delete-admin');
+
+    // Template Excel
+    Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
 });
 
 // // Dashboard

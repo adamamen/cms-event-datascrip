@@ -8,31 +8,32 @@ use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
 use App\Models\M_MetodeBayar;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class VisitorEventController extends Controller
 {
     function index($page)
     {
-        $type_menu = 'visitor_event';
-        $data = visitorEventandMasterEvent($page);
+        $type_menu   = 'visitor_event';
+        $data        = visitorEventandMasterEvent($page);
         $masterEvent = masterEvent($page);
-        $user = userAdmin();
-        $userId = $user[0]['id'];
-        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
+        $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             return view('visitor_event.index', [
-                'id' => $userId,
-                'masterEvent' => $masterEvent,
-                'data' => $data,
-                'type_menu' => $type_menu,
-                'titleUrl' => $titleUrl,
-                'pages' => $page,
+                'id'           => $userId,
+                'masterEvent'  => $masterEvent,
+                'data'         => $data,
+                'type_menu'    => $type_menu,
+                'titleUrl'     => $titleUrl,
+                'pages'        => $page,
                 'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
@@ -45,11 +46,11 @@ class VisitorEventController extends Controller
 
     public function add_visitor_index($page)
     {
-        $type_menu = 'visitor_event';
+        $type_menu   = 'visitor_event';
         $masterEvent = masterEvent($page);
-        $user = userAdmin();
-        $userId = $user[0]['id'];
-        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
+        $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
         if ($page == "cms") {
             $data = masterEvent_3();
@@ -58,11 +59,11 @@ class VisitorEventController extends Controller
         }
 
         return view('visitor_event.add-visitor-event', [
-            'id' => $userId,
-            'titleUrl' => $titleUrl,
+            'id'          => $userId,
+            'titleUrl'    => $titleUrl,
             'masterEvent' => $masterEvent,
-            'data' => $data,
-            'type_menu' => $type_menu
+            'data'        => $data,
+            'type_menu'   => $type_menu
         ]);
     }
 
@@ -92,36 +93,36 @@ class VisitorEventController extends Controller
             return response()->json(['message' => 'failed']);
         } else {
             DB::table('tbl_visitor_event')->insert([
-                'event_id' => $request->namaEvent,
-                'ticket_no' => $request->noTiket,
+                'event_id'          => $request->namaEvent,
+                'ticket_no'         => $request->noTiket,
                 'registration_date' => $request->tanggalRegistrasi,
-                'full_name' => $request->namaLengkap,
-                'address' => $request->alamat,
-                'email' => $request->email,
-                'mobile' => $request->noHandphone,
-                'created_at' => Carbon::now(),
-                'created_by' => $request->username,
-                'updated_at' => Carbon::now(),
-                'updated_by' => $request->username,
-                'jenis_event' => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
-                'no_invoice' => $noInvoice,
+                'full_name'         => $request->namaLengkap,
+                'address'           => $request->alamat,
+                'email'             => $request->email,
+                'mobile'            => $request->noHandphone,
+                'created_at'        => Carbon::now(),
+                'created_by'        => $request->username,
+                'updated_at'        => Carbon::now(),
+                'updated_by'        => $request->username,
+                'jenis_event'       => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
+                'no_invoice'        => $noInvoice,
                 'status_pembayaran' => 'Belum Dibayar',
             ]);
 
             Log::info('User berhasil add Data di menu Data Visitor Event ', [
-                'event_id' => $request->namaEvent,
-                'ticket_no' => $request->noTiket,
+                'event_id'          => $request->namaEvent,
+                'ticket_no'         => $request->noTiket,
                 'registration_date' => $request->tanggalRegistrasi,
-                'full_name' => $request->namaLengkap,
-                'address' => $request->alamat,
-                'email' => $request->email,
-                'mobile' => $request->noHandphone,
-                'created_at' => Carbon::now(),
-                'created_by' => $request->username,
-                'updated_at' => Carbon::now(),
-                'updated_by' => $request->username,
-                'jenis_event' => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
-                'no_invoice' => $noInvoice,
+                'full_name'         => $request->namaLengkap,
+                'address'           => $request->alamat,
+                'email'             => $request->email,
+                'mobile'            => $request->noHandphone,
+                'created_at'        => Carbon::now(),
+                'created_by'        => $request->username,
+                'updated_at'        => Carbon::now(),
+                'updated_by'        => $request->username,
+                'jenis_event'       => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
+                'no_invoice'        => $noInvoice,
                 'status_pembayaran' => 'Belum Dibayar',
             ]);
 
@@ -131,15 +132,15 @@ class VisitorEventController extends Controller
 
     public function edit()
     {
-        $page = request('page');
-        $page_1 = request('page_1');
-        $id = request('id');
-        $type_menu = 'visitor_event';
-        $data = M_VisitorEvent::select('*')->where('id', $id)->get();
+        $page        = request('page');
+        $page_1      = request('page_1');
+        $id          = request('id');
+        $type_menu   = 'visitor_event';
+        $data        = M_VisitorEvent::select('*')->where('id', $id)->get();
         $masterEvent = masterEvent($page);
-        $user = userAdmin();
-        $userId = $user[0]['id'];
-        $titleUrl = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
+        $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $metodeBayar = M_MetodeBayar::select('*')->get();
 
         if ($page == 'cms') {
@@ -152,15 +153,15 @@ class VisitorEventController extends Controller
             Log::info('User klik Edit di menu Data Visitor Event', ['username' => Auth::user()->username]);
 
             return view('visitor_event.edit-visitor-event', [
-                'titleUrl' => $titleUrl,
-                'id' => $userId,
+                'titleUrl'    => $titleUrl,
+                'id'          => $userId,
                 'masterEvent' => $masterEvent,
-                'data' => $data,
-                'type_menu' => $type_menu,
-                'event' => $event,
+                'data'        => $data,
+                'type_menu'   => $type_menu,
+                'event'       => $event,
                 'metodeBayar' => $metodeBayar,
-                'event_1' => $event,
-                'event_2' => $event,
+                'event_1'     => $event,
+                'event_2'     => $event,
             ]);
         } else {
             return view('error.error-404');
@@ -178,34 +179,34 @@ class VisitorEventController extends Controller
                 DB::table('tbl_visitor_event')
                     ->where('id', $request->id)
                     ->update([
-                        'event_id' => $request->namaEvent,
-                        'ticket_no' => $request->noTiket,
+                        'event_id'          => $request->namaEvent,
+                        'ticket_no'         => $request->noTiket,
                         'registration_date' => $request->tanggalRegistrasi,
-                        'full_name' => $request->namaLengkap,
-                        'address' => $request->alamat,
-                        'email' => $request->email,
-                        'mobile' => $request->noHandphone,
-                        'updated_at' => Carbon::now(),
-                        'updated_by' => $request->username,
-                        'metode_bayar' => $request->metode_bayar,
+                        'full_name'         => $request->namaLengkap,
+                        'address'           => $request->alamat,
+                        'email'             => $request->email,
+                        'mobile'            => $request->noHandphone,
+                        'updated_at'        => Carbon::now(),
+                        'updated_by'        => $request->username,
+                        'metode_bayar'      => $request->metode_bayar,
                         'status_pembayaran' => $request->status_bayar,
-                        'sn_product' => $request->sn_product,
+                        'sn_product'        => $request->sn_product,
                     ]);
 
                 Log::info('User berhasil update di menu Data Visitor Event', [
-                    'username' => Auth::user()->username,
-                    'event_id' => $request->namaEvent,
-                    'ticket_no' => $request->noTiket,
+                    'username'          => Auth::user()->username,
+                    'event_id'          => $request->namaEvent,
+                    'ticket_no'         => $request->noTiket,
                     'registration_date' => $request->tanggalRegistrasi,
-                    'full_name' => $request->namaLengkap,
-                    'address' => $request->alamat,
-                    'email' => $request->email,
-                    'mobile' => $request->noHandphone,
-                    'updated_at' => Carbon::now(),
-                    'updated_by' => $request->username,
-                    'metode_bayar' => $request->metode_bayar,
+                    'full_name'         => $request->namaLengkap,
+                    'address'           => $request->alamat,
+                    'email'             => $request->email,
+                    'mobile'            => $request->noHandphone,
+                    'updated_at'        => Carbon::now(),
+                    'updated_by'        => $request->username,
+                    'metode_bayar'      => $request->metode_bayar,
                     'status_pembayaran' => $request->status_bayar,
-                    'sn_product' => $request->sn_product,
+                    'sn_product'        => $request->sn_product,
                 ]);
 
                 return response()->json(['message' => 'success']);
@@ -214,34 +215,34 @@ class VisitorEventController extends Controller
             DB::table('tbl_visitor_event')
                 ->where('id', $request->id)
                 ->update([
-                    'event_id' => $request->namaEvent,
-                    'ticket_no' => $request->noTiket,
+                    'event_id'          => $request->namaEvent,
+                    'ticket_no'         => $request->noTiket,
                     'registration_date' => $request->tanggalRegistrasi,
-                    'full_name' => $request->namaLengkap,
-                    'address' => $request->alamat,
-                    'email' => $request->email,
-                    'mobile' => $request->noHandphone,
-                    'updated_at' => Carbon::now(),
-                    'updated_by' => $request->username,
-                    'metode_bayar' => $request->metode_bayar,
+                    'full_name'         => $request->namaLengkap,
+                    'address'           => $request->alamat,
+                    'email'             => $request->email,
+                    'mobile'            => $request->noHandphone,
+                    'updated_at'        => Carbon::now(),
+                    'updated_by'        => $request->username,
+                    'metode_bayar'      => $request->metode_bayar,
                     'status_pembayaran' => $request->status_bayar,
-                    'sn_product' => $request->sn_product,
+                    'sn_product'        => $request->sn_product,
                 ]);
 
             Log::info('User berhasil update di menu Data Visitor Event', [
-                'username' => Auth::user()->username,
-                'event_id' => $request->namaEvent,
-                'ticket_no' => $request->noTiket,
+                'username'          => Auth::user()->username,
+                'event_id'          => $request->namaEvent,
+                'ticket_no'         => $request->noTiket,
                 'registration_date' => $request->tanggalRegistrasi,
-                'full_name' => $request->namaLengkap,
-                'address' => $request->alamat,
-                'email' => $request->email,
-                'mobile' => $request->noHandphone,
-                'updated_at' => Carbon::now(),
-                'updated_by' => $request->username,
-                'metode_bayar' => $request->metode_bayar,
+                'full_name'         => $request->namaLengkap,
+                'address'           => $request->alamat,
+                'email'             => $request->email,
+                'mobile'            => $request->noHandphone,
+                'updated_at'        => Carbon::now(),
+                'updated_by'        => $request->username,
+                'metode_bayar'      => $request->metode_bayar,
                 'status_pembayaran' => $request->status_bayar,
-                'sn_product' => $request->sn_product,
+                'sn_product'        => $request->sn_product,
             ]);
 
             return response()->json(['message' => 'success']);
@@ -264,7 +265,7 @@ class VisitorEventController extends Controller
     public function index_register($page)
     {
         $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
-        $data = masterEvent_4($page);
+        $data                      = masterEvent_4($page);
         if (strtotime(!empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? $tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi : '') > strtotime(date('Y-m-d H:i:s'))) {
             $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
         }
@@ -273,8 +274,8 @@ class VisitorEventController extends Controller
             if ($page == $masterEvent[0]['title_url']) {
                 return view('visitor_event.register', [
                     'masterEvent' => $masterEvent,
-                    'data' => $data,
-                    'page' => $page
+                    'data'        => $data,
+                    'page'        => $page
                 ]);
             } else {
                 return view('error.error-404');
@@ -289,15 +290,15 @@ class VisitorEventController extends Controller
         $data = visitorEventandMasterEvent($page);
         foreach ($data as $value) {
             if ($value['id'] == $id) {
-                $val['id'] = $value['id'];
-                $val['product_invoice_no'] = $value['no_invoice'];
-                $val['visitor_que_no'] = $value['no_ticket'];
-                $val['visitor_fullname'] = $value['full_name'];
-                $val['visitor_mobile'] = $value['mobile'];
-                $val['visitor_address'] = $value['metode_bayar'];
+                $val['id']                     = $value['id'];
+                $val['product_invoice_no']     = $value['no_invoice'];
+                $val['visitor_que_no']         = $value['no_ticket'];
+                $val['visitor_fullname']       = $value['full_name'];
+                $val['visitor_mobile']         = $value['mobile'];
+                $val['visitor_address']        = $value['metode_bayar'];
                 $val['visitor_payment_method'] = $value['metode_bayar'];
-                $val['product_serial_no'] = $value['sn_product'];
-                $val['updated_by'] = $value['updated_by'];
+                $val['product_serial_no']      = $value['sn_product'];
+                $val['updated_by']             = $value['updated_by'];
             }
         }
 
@@ -322,5 +323,54 @@ class VisitorEventController extends Controller
 
         $filename = 'Data Visitor Event - ' . ucfirst($page) . '.xlsx';
         return Excel::download(new ExportExcel($page, $customHeadings), $filename);
+    }
+
+    public function template_excel()
+    {
+        $filePath = public_path('library/template-excel/Template Excel Event.xlsx');
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, 'Template Excel Event.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'Template file not found.');
+        }
+    }
+
+    public function import_excel(Request $request, $page)
+    {
+        $validator = Validator::make($request->all(), [
+            'excel_file' => 'required|mimes:xlsx|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $file = $request->file('excel_file');
+        $rows = Excel::toArray([], $file)[0];
+
+        unset($rows[0]);
+        $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
+
+        foreach ($rows as $row) {
+            DB::table('tbl_visitor_event')->insert([
+                'event_id'          => $tanggal_terakhir_aplikasi['id_event'],
+                'created_by'        => Auth::user()->username,
+                'updated_by'        => Auth::user()->username,
+                'ticket_no'         => $row[1],
+                'full_name'         => $row[3],
+                'mobile'            => $row[4],
+                'email'             => $row[5],
+                'address'           => $row[6],
+                'no_invoice'        => $row[7],
+                'sn_product'        => $row[8],
+                'status_pembayaran' => $row[9],
+                'metode_bayar'      => $row[10],
+                'registration_date' => $row[11],
+                'jenis_event'       => $row[12],
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Data berhasil diimport');
     }
 }

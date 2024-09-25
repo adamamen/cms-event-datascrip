@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    
-    @if(!empty($masterEvent)) 
+
+    @if (!empty($masterEvent))
         @foreach ($masterEvent as $value)
             <title>Login &mdash; {{ $value['title'] . ' Event' }}</title>
-        @endforeach 
-    @else 
+        @endforeach
+    @else
         <title>Login &mdash; CMS Event</title>
-    @endif 
+    @endif
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('library/bootstrap/dist/css/bootstrap.min.css') }}">
@@ -60,7 +60,8 @@
                         <p class="text-muted">
                             Before you get started, you must login or register if you don't already have an account.
                         </p>
-                        <form method="POST" class="needs-validation" novalidate="" action="{{ route('login_action') }}">
+                        <form method="POST" class="needs-validation" novalidate=""
+                            action="{{ route('login_action') }}">
                             @csrf
                             <input type="hidden" id="tokens" name="tokens">
                             @if ($errors->has('message'))

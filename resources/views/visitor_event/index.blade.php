@@ -22,6 +22,45 @@
                 <h1>Data Visitor Event</h1>
             </div>
             <div class="row">
+
+                <div class="col-md-6">
+                    {{-- <form id="setting-form"> --}}
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h4>Import Excel</h4>
+                            <a href="{{ route('template.excel', ['page' => 'cms']) }}" class="btn btn-success"><i
+                                    class="fa-solid fa-file-excel"></i>&emsp; Download Template
+                            </a>
+                        </div>
+
+                        <form action="{{ route('import.excel', ['page' => $data[0]['title_url']]) }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <div class="card-body">
+                                <div class="form-group row align-items-center">
+                                    <label class="form-control-label col-sm-3 text-md-right">Upload</label>
+                                    <div class="col-sm-6 col-md-9">
+                                        <div class="custom-file">
+                                            <input type="file" name="excel_file" class="custom-file-input"
+                                                id="excel-file">
+                                            <label class="custom-file-label">Choose File</label>
+                                        </div>
+                                        <div class="form-text text-muted">The image must have a maximum size of 1MB
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-whitesmoke text-md-right">
+                                <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                                <button class="btn btn-secondary" type="button">Reset</button>
+                            </div>
+                        </form>
+
+                    </div>
+                    {{-- </form> --}}
+                </div>
+
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
@@ -232,5 +271,12 @@
                     }
                 });
         });
+
+        $('#excel-file').on('change', function() {
+            //get the file name
+            var fileName = $(this).val();
+            //replace the "Choose a file" label
+            $(this).next('.custom-file-label').html(fileName);
+        })
     </script>
 @endpush
