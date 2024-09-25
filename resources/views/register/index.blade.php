@@ -108,7 +108,7 @@
                         } else {
                             swal('Sukses', 'Data berhasil disimpan', 'success').then(okay => {
                                 if (okay) {
-                                    window.location.href = "/";
+                                    window.location.href = "{{ url('/') }}";
                                 }
                             });
                         }

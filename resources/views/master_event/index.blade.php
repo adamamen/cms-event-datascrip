@@ -86,7 +86,14 @@
                                                 <td>
                                                     @if ($value['status'] == 'A')
                                                         @php
-                                                            $tgl_1 = strtotime(date('Y-m-d', strtotime($value['tanggal_terakhir_aplikasi'] . '+1 days')));
+                                                            $tgl_1 = strtotime(
+                                                                date(
+                                                                    'Y-m-d',
+                                                                    strtotime(
+                                                                        $value['tanggal_terakhir_aplikasi'] . '+1 days',
+                                                                    ),
+                                                                ),
+                                                            );
                                                             $tgl_2 = strtotime(date('Y-m-d'));
                                                         @endphp
 
@@ -182,7 +189,8 @@
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {
-                                                window.location.href = "/master-event/cms";
+                                                window.location.href = "{{ url('/') }}" +
+                                                    "/master-event/cms";
                                             }
                                         });
                                 } else {

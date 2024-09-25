@@ -134,7 +134,8 @@
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {
-                                                window.location.href = "/company-event/cms";
+                                                window.location.href = "{{ url('/') }}" +
+                                                    "/company-event/cms";
                                             }
                                         });
                                 } else if (alerts == "failed") {

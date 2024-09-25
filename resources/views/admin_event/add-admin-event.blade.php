@@ -123,7 +123,7 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            window.location.href = "/admin-event/" + params;
+                            window.location.href = "{{ url('/') }}" + "/admin-event/" + params;
                         }
                     });
             });
@@ -251,7 +251,8 @@
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
                                     okay => {
                                         if (okay) {
-                                            window.location.href = "/admin-event/" + params;
+                                            window.location.href = "{{ url('/') }}" +
+                                                "/admin-event/" + params;
                                         }
                                     });
                             } else {

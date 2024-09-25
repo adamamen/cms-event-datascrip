@@ -248,7 +248,7 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            window.location.href = "/visitor-event/" + params;
+                            window.location.href = "{{ url('/') }}" + "/visitor-event/" + params;
                         }
                     });
             });
@@ -315,7 +315,8 @@
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
                                 okay => {
                                     if (okay) {
-                                        window.location.href = "/visitor-event/" + params;
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/visitor-event/" + params;
                                     }
                                 });
                         } else {

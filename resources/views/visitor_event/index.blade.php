@@ -214,8 +214,8 @@
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {
-                                                window.location.href = "/visitor-event/" +
-                                                    params;
+                                                window.location.href = "{{ url('/') }}" +
+                                                    "/visitor-event/" + params;
                                             }
                                         });
                                 } else if (alerts == "failed") {

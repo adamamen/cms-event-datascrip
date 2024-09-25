@@ -140,7 +140,7 @@
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                         okay => {
                                             if (okay) {
-                                                window.location.href = "/admin-event/" + params;
+
                                             }
                                         });
                                 } else if (alerts == "failed") {

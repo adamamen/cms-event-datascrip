@@ -110,7 +110,7 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            window.location.href = "/company-event/cms";
+                            window.location.href = "{{ url('/') }}" + "/company-event/cms";
                         }
                     });
             });
@@ -153,7 +153,8 @@
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
                                 okay => {
                                     if (okay) {
-                                        window.location.href = "/company-event/cms";
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/company-event/cms";
                                     }
                                 });
                         } else {
