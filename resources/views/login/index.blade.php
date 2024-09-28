@@ -57,7 +57,7 @@
                                     Event</span></h4>
                         @endif
 
-                        <p class="text-muted">
+                        <p class="text-muted" hidden>
                             Before you get started, you must login or register if you don't already have an account.
                         </p>
                         <form method="POST" class="needs-validation" novalidate=""

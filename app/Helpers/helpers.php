@@ -73,7 +73,7 @@ if (!function_exists('visitorEvent')) {
     function visitorEvent()
     {
         $q = DB::table('tbl_visitor_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at', 'jenis_event', 'no_invoice', 'status_pembayaran', 'metode_bayar', 'sn_product')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at', 'jenis_event', 'no_invoice', 'status_pembayaran', 'metode_bayar', 'sn_product', 'gender', 'account_instagram', 'type_invitation', 'invitation_name', 'barcode_no')
             ->get();
         return $q;
     }
@@ -91,7 +91,7 @@ if (!function_exists('tgl_indo')) {
     function tgl_indo($tanggal)
     {
         $bulan = array(
-            1 =>   'Januari',
+            1 => 'Januari',
             'Februari',
             'Maret',
             'April',
@@ -138,9 +138,9 @@ if (!function_exists('validRecaptcaV3')) {
         }
 
         $data = [
-            'token' => $_POST['tokens'],
-            'from_ip' => $ip,
-            'app_name' => 'CMS EVENT' //diganti sesuai nama aplikasi
+            'token'    => $_POST['tokens'],
+            'from_ip'  => $ip,
+            'app_name' => 'CMS EVENT'        //diganti sesuai nama aplikasi
         ];
 
         $headers = array(
@@ -157,7 +157,7 @@ if (!function_exists('validRecaptcaV3')) {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
-        $json = curl_exec($ch);
+        $json          = curl_exec($ch);
         if (!$json) $json = 'gagal: ' . curl_error($ch);
         curl_close($ch);
 
@@ -183,34 +183,34 @@ if (!function_exists('adminEvent')) {
                 if ($admin->event_id == '0') {
                     $merge[] =
                         [
-                            'RowNumber' => $admin->RowNumber,
-                            'admin_id' => $admin->id,
-                            'event_id' => $admin->event_id,
-                            'username' => $admin->username,
-                            'password' => $admin->password,
-                            'full_name' => $admin->full_name,
-                            'status' => $admin->status,
+                            'RowNumber'         => $admin->RowNumber,
+                            'admin_id'          => $admin->id,
+                            'event_id'          => $admin->event_id,
+                            'username'          => $admin->username,
+                            'password'          => $admin->password,
+                            'full_name'         => $admin->full_name,
+                            'status'            => $admin->status,
                             'password_encrypts' => Crypt::decryptString($admin->password_encrypts),
-                            'title_url' => $admin->title_url,
+                            'title_url'         => $admin->title_url,
                         ];
                 }
                 foreach ($queryMasterEvent as $event) {
                     if ($admin->event_id == $event->id_event) {
                         $merge[] = [
-                            'RowNumber' => $admin->RowNumber,
-                            'admin_id' => $admin->id,
-                            'event_id' => $admin->event_id,
-                            'username' => $admin->username,
-                            'password' => $admin->password,
-                            'full_name' => $admin->full_name,
-                            'status' => $admin->status,
-                            'title' => $event->title,
+                            'RowNumber'         => $admin->RowNumber,
+                            'admin_id'          => $admin->id,
+                            'event_id'          => $admin->event_id,
+                            'username'          => $admin->username,
+                            'password'          => $admin->password,
+                            'full_name'         => $admin->full_name,
+                            'status'            => $admin->status,
+                            'title'             => $event->title,
                             'password_encrypts' => Crypt::decryptString($admin->password_encrypts),
-                            'updated_by' => $event->updated_by,
-                            'updated_at' => $event->updated_at,
-                            'created_by' => $event->created_by,
-                            'created_at' => $event->created_at,
-                            'title_url' => $event->title_url,
+                            'updated_by'        => $event->updated_by,
+                            'updated_at'        => $event->updated_at,
+                            'created_by'        => $event->created_by,
+                            'created_at'        => $event->created_at,
+                            'title_url'         => $event->title_url,
                         ];
                     }
                 }
@@ -237,28 +237,33 @@ if (!function_exists('adminEvent')) {
                     foreach ($queryMasterEvent as $event) {
                         if ($visitor->event_id == $event->id_event) {
                             $merge[] = [
-                                'id' => $visitor->id,
-                                'event_id' => $visitor->event_id,
-                                'RowNumber' => $visitor->RowNumber,
-                                'title' => $event->title,
-                                'full_name' => $visitor->full_name,
-                                'mobile' => $visitor->mobile,
-                                'ticket_no' => $visitor->ticket_no,
-                                'email' => $visitor->email,
+                                'id'                => $visitor->id,
+                                'event_id'          => $visitor->event_id,
+                                'RowNumber'         => $visitor->RowNumber,
+                                'title'             => $event->title,
+                                'full_name'         => $visitor->full_name,
+                                'mobile'            => $visitor->mobile,
+                                'ticket_no'         => $visitor->ticket_no,
+                                'email'             => $visitor->email,
                                 'registration_date' => $visitor->registration_date,
-                                'address' => $visitor->address,
-                                'created_by' => $visitor->created_by,
-                                'created_at' => $visitor->created_at,
-                                'updated_by' => $visitor->updated_by,
-                                'updated_at' => $visitor->updated_at,
-                                'title_url' => $event->title_url,
+                                'address'           => $visitor->address,
+                                'created_by'        => $visitor->created_by,
+                                'created_at'        => $visitor->created_at,
+                                'updated_by'        => $visitor->updated_by,
+                                'updated_at'        => $visitor->updated_at,
+                                'title_url'         => $event->title_url,
                                 // 'jenis_event' => $event->jenis_event,
-                                'no_invoice' => $visitor->no_invoice,
+                                'no_invoice'        => $visitor->no_invoice,
                                 'status_pembayaran' => $visitor->status_pembayaran,
-                                'metode_bayar' => $visitor->metode_bayar,
-                                'sn_product' => $visitor->sn_product,
-                                'jenis_event' => $visitor->jenis_event,
-                                'no_ticket' => $visitor->ticket_no
+                                'metode_bayar'      => $visitor->metode_bayar,
+                                'sn_product'        => $visitor->sn_product,
+                                'jenis_event'       => $visitor->jenis_event,
+                                'no_ticket'         => $visitor->ticket_no,
+                                'gender'            => $visitor->gender,
+                                'account_instagram' => $visitor->account_instagram,
+                                'type_invitation'   => $visitor->type_invitation,
+                                'invitation_name'   => $visitor->invitation_name,
+                                'barcode_no'        => $visitor->barcode_no,
                             ];
                         }
                     }
@@ -268,6 +273,12 @@ if (!function_exists('adminEvent')) {
             $merge = !empty($merge) ? $merge : [];
 
             return $merge;
+        }
+    }
+    if (!function_exists('generateUniqueCode')) {
+        function generateUniqueCode($length = 10)
+        {
+            return substr(bin2hex(random_bytes($length / 2)), 0, $length);
         }
     }
 }

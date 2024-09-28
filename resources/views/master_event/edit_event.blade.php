@@ -47,6 +47,20 @@
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
+                                            <label>Jenis Event</label>
+                                            <select class="form-control select2" name="jenis_event" id="jenis_event">
+                                                <option value="A" {{ $value->jenis_event == 'A' ? 'selected' : '' }}>
+                                                    Berbayar</option>
+                                                <option value="D" {{ $value->jenis_event == 'D' ? 'selected' : '' }}>
+                                                    Non Berbayar</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Jenis Event Wajib Diisi
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Status </label>
                                             <select class="form-control select2" name="status" id="status">
                                                 <option value="A"
@@ -60,21 +74,25 @@
                                                 Status Wajib Diisi
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-6 col-12">
-                                            <label>Jenis Event</label>
-                                            <select class="form-control select2" name="jenis_event" id="jenis_event">
-                                                <option value="A" {{ $value->jenis_event == 'A' ? 'selected' : '' }}>
-                                                    Berbayar</option>
-                                                <option value="D" {{ $value->jenis_event == 'D' ? 'selected' : '' }}>
-                                                    Non Berbayar</option>
-                                            </select>
+                                        <div class="form-group col-md-3 col-12">
+                                            <label>Start Registrasi</label>
+                                            <input type="text" class="form-control datetimepicker"
+                                                value="{{ $value->start_registrasi }}" required=""
+                                                name="start_registrasi" id="start_registrasi">
                                             <div class="invalid-feedback">
-                                                Jenis Event Wajib Diisi
+                                                Start Event Wajib Diisi
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-6 col-12">
+                                        <div class="form-group col-md-3 col-12">
+                                            <label>End Registrasi</label>
+                                            <input type="text" class="form-control datetimepicker"
+                                                value="{{ $value->end_registrasi }}" required="" name="end_registrasi"
+                                                id="end_registrasi">
+                                            <div class="invalid-feedback">
+                                                End Event Wajib Diisi
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-3 col-12">
                                             <label>Logo</label>
                                             <div class="custom-file">
                                                 <input type="file" class="custom-file-input"
@@ -267,6 +285,8 @@
                 var divisi = $('#divisi').val();
                 var jenis_event = $('#jenis_event').val();
                 var end_event_application = $('#end_event_application').val();
+                var start_registrasi = $('#start_registrasi').val();
+                var end_registrasi = $('#end_registrasi').val();
 
                 var formData = new FormData();
                 formData.append("namaEvent", namaEvent);
@@ -283,6 +303,8 @@
                 formData.append("divisi", divisi);
                 formData.append("jenis_event", jenis_event);
                 formData.append("end_event_application", end_event_application);
+                formData.append("start_registrasi", start_registrasi);
+                formData.append("end_registrasi", end_registrasi);
 
                 $.ajax({
                     url: '{{ route('update') }}',

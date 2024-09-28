@@ -20,7 +20,7 @@ use App\Http\Controllers\VisitorEventController;
 */
 
 // Register Visitor
-Route::get('/register-visitor/{page}', [VisitorEventController::class, 'index_register'])->name('index_register');
+// Route::get('/register-visitor/{page}', [VisitorEventController::class, 'index_register'])->name('index_register');
 Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
 
 // Login
@@ -34,6 +34,9 @@ Route::get('/logout/{page?}', [LoginController::class, 'logout'])->name('logout'
 // Register Admin
 Route::get('/register/{page?}', [LoginController::class, 'register'])->name('register');
 Route::post('register-add', [LoginController::class, 'register_action'])->name('register.action');
+
+// QR Code
+Route::get('/visitor-event/qrcode/{id}', [VisitorEventController::class, 'showQRCode'])->name('visitor.event.qrcode');
 
 Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
 
@@ -62,9 +65,12 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/edit-visitor/edit/{page?}/{id}', [VisitorEventController::class, 'edit'])->name('edit-visitor');
     Route::post('/update-visitor', [VisitorEventController::class, 'update'])->name('update-visitor');
     Route::delete('/delete-visitor/{id}', [VisitorEventController::class, 'delete'])->name('delete-visitor');
-    Route::get('/visitor-event/cetak-invoice/{page?}/{id}', [VisitorEventController::class, 'generate_pdf'])->name('generate.pdf');
+    Route::get('/visitor-event/cetak-invoice/{id}', [VisitorEventController::class, 'generate_pdf'])->name('generate.pdf');
+    // Route::get('/visitor-event/cetak-invoice/{page?}/{id}', [VisitorEventController::class, 'generate_pdf'])->name('generate.pdf');
+    Route::get('/visitor-event/download-qr/{id}', [VisitorEventController::class, 'downloadQR'])->name('visitor.event.downloadQR');
     Route::get('/visitor-event/export-excel/{page?}', [VisitorEventController::class, 'export_excel'])->name('export.excel');
     Route::post('/visitor-event/import-excel/{page?}', [VisitorEventController::class, 'import_excel'])->name('import.excel');
+    Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
 
     // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
@@ -73,9 +79,6 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/add-admin', [AdminEventController::class, 'add'])->name('add-admin');
     Route::post('/update-admin', [AdminEventController::class, 'update'])->name('update-admin');
     Route::delete('/delete-admin/{id}', [AdminEventController::class, 'delete'])->name('delete-admin');
-
-    // Template Excel
-    Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
 });
 
 // // Dashboard

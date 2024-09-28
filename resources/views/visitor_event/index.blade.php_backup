@@ -24,13 +24,14 @@
                 </div>
             @else
                 <div class="section-header">
-                    <h1>Data Visitor Event {{ '(' . $output . ')' }}</h1>
+                    <h1>Data Visitor Event {{ $output }}</h1>
                 </div>
             @endif
 
             <div class="row">
 
                 <div class="col-md-6">
+                    {{-- <form id="setting-form"> --}}
                     <div class="card">
 
                         <div class="card-header">
@@ -40,27 +41,7 @@
                             </a>
                         </div>
 
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <form id="uploadForm" action="{{ route('import.excel', ['page' => $titleUrl]) }}" method="POST"
+                        <form action="{{ route('import.excel', ['page' => $data[0]['title_url']]) }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
@@ -72,20 +53,19 @@
                                                 id="excel-file">
                                             <label class="custom-file-label">Choose File</label>
                                         </div>
+                                        <div class="form-text text-muted">The image must have a maximum size of 1MB
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-footer bg-whitesmoke text-md-right">
-                                <button class="btn btn-primary" id="save-btn"><i class="fa-solid fa-save"></i>
-                                    &nbsp; Save Changes
-                                </button>
-                                <button class="btn btn-secondary" type="button" id="reset-btn">
-                                    <i class="fa-solid fa-rotate-left"></i>
-                                    &nbsp; Reset
-                                </button>
+                                <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                                <button class="btn btn-secondary" type="button">Reset</button>
                             </div>
                         </form>
+
                     </div>
+                    {{-- </form> --}}
                 </div>
 
                 <div class="col-12">
@@ -103,13 +83,7 @@
                                         Excel</a>
                                 @endif
                             @endif
-                            &emsp;
-                            <a href="#" class="btn btn-success"><i class="fa-solid fa-users"></i>&nbsp;</i>&emsp;
-                                Total Visitor = <b>{{ count($data) }}</b></a>
-                            <div class="article-cta"></div>
-                            &emsp;
-                            <a href="#" class="btn btn-danger"><i class="fa-solid fa-user-check"></i>&emsp; Total
-                                Arrival Visitor = </a>
+
                             <div class="article-cta"></div>
                         </div>
                         <div class="card-body">
@@ -119,15 +93,22 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Gender</th>
-                                            <th>Instagram Account</th>
-                                            <th>Phone Number</th>
-                                            <th>Invitation Type</th>
-                                            <th>Nama Of Agency / Company</th>
-                                            <th>Barcode No</th>
-                                            <th>Date Arrival</th>
+                                            <th hidden>No Tiket</th>
+                                            <th>Nama Event</th>
+                                            <th>Profile </th>
+                                            @if ($jenis_events != '' || $jenis_events == 'A')
+                                                <th>No Invoice / SN Product</th>
+                                                <th>Status Pembayaran</th>
+                                                <th>Metode Pembayaran</th>
+                                            @elseif (Auth::user()->event_id == '0')
+                                                <th>No Invoice / SN Product</th>
+                                                <th>Status Pembayaran</th>
+                                                <th>Metode Pembayaran</th>
+                                            @endif
+                                            <th>Tanggal Registrasi</th>
+                                            @if (Auth::user()->event_id == '0')
+                                                <th>Jenis Event</th>
+                                            @endif
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -135,15 +116,55 @@
                                         @foreach ($data as $value)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $value['full_name'] }}</td>
-                                                <td>{{ $value['email'] }}</td>
-                                                <td>{{ $value['gender'] }}</td>
-                                                <td>{{ $value['account_instagram'] }}</td>
-                                                <td>{{ $value['mobile'] }}</td>
-                                                <td>{{ $value['type_invitation'] }}</td>
-                                                <td>{{ $value['invitation_name'] }}</td>
-                                                <td>{{ $value['barcode_no'] }}</td>
-                                                <td>-</td>
+                                                <td hidden>{{ $value['ticket_no'] }}</td>
+                                                <td>{{ $value['title'] }}</td>
+                                                <td>
+                                                    <i class="fas fa-user"></i> <b>{{ $value['full_name'] }}</b><br>
+                                                    <i class="fas fa-mobile-alt"></i> <b>{{ $value['mobile'] }}</b><br>
+                                                    <i class="fas fa-id-card"></i> <b>{{ $value['email'] }}</b><br>
+                                                    <i class="fas fa-home"></i> <b>{{ $value['address'] }}</b>
+                                                </td>
+                                                @if ($value['jenis_event'] == 'A')
+                                                    <td>
+                                                        <i class="fas fa-newspaper"></i>
+                                                        <b>{{ $value['no_invoice'] }}</b><br>
+                                                        <i class="far fa-newspaper"></i> <b>{{ $value['sn_product'] }}</b>
+                                                    </td>
+                                                    @if ($value['status_pembayaran'] == 'Belum Dibayar')
+                                                        <td><span
+                                                                class="badge badge-warning">{{ $value['status_pembayaran'] }}</span>
+                                                        </td>
+                                                    @else
+                                                        <td><span
+                                                                class="badge badge-success">{{ $value['status_pembayaran'] }}</span>
+                                                        </td>
+                                                    @endif
+                                                    <td>
+                                                        <center>
+                                                            {{ empty($value['metode_bayar']) || $value['metode_bayar'] == 'null' ? '-' : $value['metode_bayar'] }}
+                                                        </center>
+                                                    </td>
+                                                @else
+                                                    @if (Auth::user()->event_id == '0')
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
+                                                        <td>
+                                                            <center>-</center>
+                                                        </td>
+                                                    @endif
+                                                @endif
+                                                <td>{{ $value['created_at'] }}</td>
+                                                @if (Auth::user()->event_id == '0')
+                                                    @if ($value['jenis_event'] == 'A')
+                                                        <td>Berbayar</td>
+                                                    @else
+                                                        <td>Non Berbayar</td>
+                                                    @endif
+                                                @endif
                                                 <td>
                                                     @if ($pages == 'cms')
                                                         <form method="POST"
@@ -152,27 +173,28 @@
                                                             <form method="POST"
                                                                 action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                     @endif
-
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                    <button class="btn btn-info" id="edit-btn" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>&nbsp;
-
-                                                    <a class="btn btn-danger" id="delete-btn" data-id="{{ $value['id'] }}"
-                                                        title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>&nbsp;
-
-                                                    <a href="{{ route('visitor.event.qrcode', ['id' => $value['id']]) }}"
-                                                        target="_blank" class="btn btn-light" id="view-btn"
-                                                        title="View QR">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-
-                                                    <a href="{{ route('visitor.event.downloadQR', ['id' => $value['id']]) }}"
-                                                        class="btn btn-primary" id="download-btn" title="Download QR">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>&nbsp;
+                                                    <input type="hidden" name="page"
+                                                        value="{{ $pages == 'cms' ? 'cms' : $value['title_url'] }}">
+                                                    <input type="hidden" name="page_1" value="{{ $value['title_url'] }}">
+                                                    <input type="hidden" name="id" value="{{ $value['id'] }}">
+                                                    <button name="edit" id="edit" class="btn btn-primary"><i
+                                                            class="fas fa-edit"></i> Edit</button>
+                                                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                                                    {{-- <a href="#" class="btn btn-danger" data-id="{{ $value['id'] }}" name="btn_delete" id="btn_delete">Delete</a> --}}
+                                                    @if ($pages == 'cms')
+                                                        @if ($value['jenis_event'] == 'A')
+                                                            <a href="{{ route('generate.pdf', ['page' => 'cms', 'id' => $value['id']]) }}"
+                                                                class="btn btn-success" target="_blank"><i
+                                                                    class="fas fa-print"></i> Cetak Invoice</a>
+                                                        @endif
+                                                    @else
+                                                        @if ($value['jenis_event'] == 'A')
+                                                            <a href="{{ route('generate.pdf', ['page' => $value['title_url'], 'id' => $value['id']]) }}"
+                                                                class="btn btn-success" target="_blank"><i
+                                                                    class="fas fa-print"></i> Cetak Invoice</a>
+                                                        @endif
+                                                    @endif
                                                     </form>
                                                 </td>
                                             </tr>
@@ -207,7 +229,7 @@
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
 
     <script>
-        $(document).on('click', '#delete-btn', function() {
+        $(document).on('click', '#btn_delete', function() {
             var recordId = $(this).data('id');
             var params = "<?php echo $titleUrl; ?>";
 
@@ -258,13 +280,10 @@
         });
 
         $('#excel-file').on('change', function() {
+            //get the file name
             var fileName = $(this).val();
+            //replace the "Choose a file" label
             $(this).next('.custom-file-label').html(fileName);
         })
-
-        document.getElementById('reset-btn').addEventListener('click', function() {
-            document.getElementById('uploadForm').reset();
-            document.querySelector('.custom-file-label').textContent = 'Choose File';
-        });
     </script>
 @endpush

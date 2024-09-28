@@ -15,10 +15,10 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Edit Visitor Event</h1>
+                <h1>Edit Visitor Event {{ '(' . $output . ')' }}</h1>
             </div>
             <div class="section-body">
-                <h2 class="section-title">Profile</h2>
+                <h2 class="section-title">Profile Visitor</h2>
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
@@ -26,51 +26,14 @@
                                 <div class="card-body">
                                     <meta name="csrf-token" content="{{ csrf_token() }}">
                                     <input value="{{ $value->id }}" name="id" id="id" hidden>
+                                    <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                     <div class="row">
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Nama Lengkap</label>
+                                            <label>Name</label>
                                             <input type="text" class="form-control" value="{{ $value->full_name }}"
-                                                required="" name="nama_lengkap" id="nama_lengkap">
+                                                required="" name="name" id="name">
                                             <div class="invalid-feedback">
-                                                Nama Lengkap Wajib Diisi
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>Nama Event</label>
-                                            <select class="form-control select2" name="nama_event" id="nama_event">
-                                                <option selected disabled>-- Silahkan Pilih --</option>
-                                                @foreach ($event as $event)
-                                                    <option value="{{ $event['id_event'] }}"
-                                                        {{ $event['id_event'] == $value->event_id ? 'selected' : '' }}>
-                                                        {{ $event['title'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <div class="invalid-feedback">
-                                                Status Wajib Diisi
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>No Handphone</label>
-                                            <input type="text" class="form-control" value="{{ $value->mobile }}"
-                                                required="" name="no_handphone" id="no_handphone"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
-                                            <div class="invalid-feedback">
-                                                No Handphone Wajib Diisi
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>No Tiket</label>
-                                            <input type="text" class="form-control" value="{{ $value->ticket_no }}"
-                                                required="" name="no_tiket" id="no_tiket"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
-                                            <input name="no_tiket_before" id="no_tiket_before"
-                                                value="{{ $value->ticket_no }}" hidden>
-                                            <div class="invalid-feedback">
-                                                No Tiket Wajib Diisi
+                                                Name is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
@@ -78,136 +41,68 @@
                                             <input type="email" class="form-control" value="{{ $value->email }}"
                                                 required="" name="email" id="email">
                                             <div class="invalid-feedback">
-                                                Email Wajib Diisi
+                                                Email is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Tanggal Registrasi</label>
-                                            <input type="text" class="form-control datepicker"
-                                                value="{{ $value->registration_date }}" required=""
-                                                name="tanggal_registrasi" id="tanggal_registrasi">
+                                            <label>Gender</label>
+                                            <input type="email" class="form-control" value="{{ $value->gender }}"
+                                                required="" name="gender" id="gender">
                                             <div class="invalid-feedback">
-                                                Tanggal Registrasi Wajib Diisi
+                                                Gender is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Instagram Account</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $value->account_instagram }}" required=""
+                                                name="instagram_account" id="instagram_account">
+                                            <div class="invalid-feedback">
+                                                Instagram Account is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Phone Number</label>
+                                            <input type="text" class="form-control" value="{{ $value->mobile }}"
+                                                required="" name="phone_number" id="phone_number"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
+                                            <div class="invalid-feedback">
+                                                Phone Number is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Invitation Type</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $value->type_invitation }}" required="" name="invitation_type"
+                                                id="invitation_type">
+                                            <div class="invalid-feedback">
+                                                Invitation Type is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Name Of Agency / Company</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $value->type_invitation }}" required="" name="name_of_agency"
+                                                id="name_of_agency">
+                                            <div class="invalid-feedback">
+                                                Name Of Agency / Company is required
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-6 col-12">
-                                            <div class="form-group">
-                                                <label>Alamat </label>
-                                                <textarea class="form-control" data-height="150" name="alamat" id="alamat">{{ $value->address }}</textarea>
-                                            </div>
-                                            <div class="invalid-feedback">
-                                                Alamat Wajib Diisi
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @foreach ($event_1 as $event_1)
-                                        @if ($event_1['jenis_event'] == 'D')
-                                            <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
-                                                name="btn_submit"><i class="fas fa-check"></i> Submit </a>
-                                            <a href="#" class="btn disabled btn-primary btn-progress"
-                                                id="btn_progress" name="btn_progress">Submit</a>
-                                            <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                                name="btn_cancel"><i class="fas fa-xmark"></i> Cancel </a>
-                                        @endif
-                                    @endforeach
                                 </div>
                             @endforeach
+                            <div class="card-body">
+                                <meta name="csrf-token" content="{{ csrf_token() }}">
+                                <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
+                                    name="btn_submit"><i class="fas fa-check"></i> Submit</a>
+                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                    name="btn_progress">Submit</a>
+                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                    name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            @foreach ($event_2 as $event_2)
-                @if ($event_2['jenis_event'] == 'A')
-                    <div class="section-body">
-                        <h2 class="section-title">Payment </h2>
-                        <div class="row">
-                            <div class="col-12 col-md-12 col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <meta name="csrf-token" content="{{ csrf_token() }}">
-                                        @foreach ($data as $value)
-                                            <div class="row">
-                                                <div class="form-group col-md-6 col-12">
-                                                    <label>Metode Bayar</label>
-                                                    <select class="form-control select2" name="metode_bayar"
-                                                        id="metode_bayar">
-                                                        <option selected disabled>-- Silahkan Pilih --</option>
-                                                        @foreach ($metodeBayar as $bayar)
-                                                            <option value="{{ $bayar->metode_bayar }}"
-                                                                {{ $bayar->metode_bayar == $value->metode_bayar ? 'selected' : '' }}>
-                                                                {{ $bayar->metode_bayar }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-md-6 col-12">
-                                                    <label>Status Bayar</label>
-                                                    <select class="form-control select2" name="status_bayar"
-                                                        id="status_bayar">
-                                                        <option selected disabled>-- Silahkan Pilih --</option>
-                                                        <option value="Belum Dibayar"
-                                                            {{ $value->status_pembayaran == 'Belum Dibayar' ? 'selected' : '' }}>
-                                                            Belum Dibayar</option>
-                                                        <option value="Sudah Dibayar"
-                                                            {{ $value->status_pembayaran == 'Sudah Dibayar' ? 'selected' : '' }}>
-                                                            Sudah Dibayar</option>
-                                                    </select>
-                                                    <p style="color: red">* Pastikan pembayaran telah terverifikasi sebelum
-                                                        melakukan simpan data </p>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <h2 class="section-title">Products</h2>
-                        <div class="row">
-                            <div class="col-12 col-md-12 col-lg-12">
-                                <div class="card">
-                                    @foreach ($data as $value)
-                                        <div class="card-body">
-                                            <meta name="csrf-token" content="{{ csrf_token() }}">
-                                            <div class="row">
-                                                <div class="form-group col-md-4 col-12">
-                                                    <label>SN Product</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $value->sn_product }}" required=""
-                                                        name="sn_product" id="sn_product">
-                                                    <p style="color: red">* Pastikan posisi cursor aktif sebelum scan SN
-                                                    </p>
-                                                </div>
-                                                <div class="form-group col-md-4 col-12">
-                                                    <label>No Invoice</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $value->no_invoice }}" name="no_invoice"
-                                                        id="no_invoice" required readonly>
-                                                </div>
-                                                <div class="form-group col-md-4 col-12">
-                                                    <label>Tgl. Terakhir Diupdate</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $value->updated_at }}" name="tgl_terakhir_diupdate"
-                                                        id="tgl_terakhir_diupdate" required readonly>
-                                                </div>
-                                            </div>
-                                            <a href="#" class="btn btn-primary mr-1" type="submit"
-                                                id="btn_submit" name="btn_submit"><i class="fas fa-check"></i> Submit</a>
-                                            <a href="#" class="btn disabled btn-primary btn-progress"
-                                                id="btn_progress" name="btn_progress">Submit</a>
-                                            <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
-                                                name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
         </section>
     </div>
 @endsection
@@ -262,36 +157,26 @@
                 $("#btn_submit").hide();
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
-                var namaLengkap = $('#nama_lengkap').val();
-                // var namaEvent = $('#nama_event').find(":selected").text();
-                var namaEvent = $('#nama_event option:selected').val();
-                var email = $('#email').val();
-                var noHandphone = $('#no_handphone').val();
-                var noTiket = $('#no_tiket').val();
-                var noTiketBefore = $('#no_tiket_before').val();
-                var tanggalRegistrasi = $('#tanggal_registrasi').val();
-                var alamat = $('#alamat').val();
-                var username = $('#username').val();
                 var id = $('#id').val();
-                var metode_bayar = $('#metode_bayar').val();
-                var status_bayar = $('#status_bayar').val();
-                var sn_product = $('#sn_product').val();
+                var username = $('#username').val();
+                var name = $('#name').val();
+                var email = $('#email').val();
+                var gender = $('#gender').val();
+                var instagramAccount = $('#instagram_account').val();
+                var phoneNumber = $('#phone_number').val();
+                var invitationType = $('#invitation_type').val();
+                var nameOfAgency = $('#name_of_agency').val();
 
                 var formData = new FormData();
-                formData.append("namaLengkap", namaLengkap);
-                formData.append("namaEvent", namaEvent);
-                formData.append("email", email);
-                formData.append("noHandphone", noHandphone);
-                formData.append("noTiket", noTiket);
-                formData.append("noTiketBefore", noTiketBefore);
-                formData.append("tanggalRegistrasi", tanggalRegistrasi);
-                formData.append("alamat", alamat);
-                formData.append("username", username);
                 formData.append("id", id);
-                formData.append("params", params);
-                formData.append("metode_bayar", metode_bayar);
-                formData.append("status_bayar", status_bayar);
-                formData.append("sn_product", sn_product);
+                formData.append("username", username);
+                formData.append("name", name);
+                formData.append("email", email);
+                formData.append("gender", gender);
+                formData.append("instagramAccount", instagramAccount);
+                formData.append("phoneNumber", phoneNumber);
+                formData.append("invitationType", invitationType);
+                formData.append("nameOfAgency", nameOfAgency);
 
                 $.ajax({
                     url: '{{ route('update-visitor') }}',
@@ -307,21 +192,13 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
 
-                        if (alerts == "failed") {
-                            swal('Gagal',
-                                'No Tiket sudah pernah digunakan, silahkan coba lagi...',
-                                'warning');
-                        } else if (alerts == "success") {
-                            swal('Sukses', 'Data berhasil diupdate...', 'success').then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.href = "{{ url('/') }}" +
-                                            "/visitor-event/" + params;
-                                    }
-                                });
-                        } else {
-                            swal('Gagal', 'Data gagal diupdate...', 'warning');
-                        }
+                        swal('Sukses', 'Data berhasil diupdate...', 'success').then(
+                            okay => {
+                                if (okay) {
+                                    window.location.href = "{{ url('/') }}" +
+                                        "/visitor-event/" + params;
+                                }
+                            });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $("#btn_progress").hide();

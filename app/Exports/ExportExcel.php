@@ -15,7 +15,7 @@ class ExportExcel implements FromCollection, WithHeadings
 
     public function __construct($page, $customHeadings)
     {
-        $this->page = $page;
+        $this->page           = $page;
         $this->customHeadings = $customHeadings;
     }
 
@@ -37,8 +37,9 @@ class ExportExcel implements FromCollection, WithHeadings
 
     function query($page)
     {
+        // dd('1');
         $queryVisitorEvent = visitorEvent();
-        $sequenceNumber = 1;
+        $sequenceNumber    = 1;
         if ($page == "cms") {
             $queryMasterEvent = masterEvent_1();
         } else {
@@ -50,47 +51,61 @@ class ExportExcel implements FromCollection, WithHeadings
                 foreach ($queryMasterEvent as $event) {
                     if ($visitor->event_id == $event->id_event) {
                         if ($page == "cms") {
+                            // dd('1');
                             $merge[] = [
-                                'RowNumber' => $sequenceNumber++,
-                                'ticket_no' => $visitor->ticket_no,
-                                'title' => $event->title,
-                                'full_name' => $visitor->full_name,
-                                'mobile' => $visitor->mobile,
-                                'email' => $visitor->email,
-                                'address' => $visitor->address,
-                                'no_invoice' => $visitor->no_invoice,
-                                'sn_product' => $visitor->sn_product,
+                                'RowNumber'         => $sequenceNumber++,
+                                'ticket_no'         => $visitor->ticket_no,
+                                'title'             => $event->title,
+                                'full_name'         => $visitor->full_name,
+                                'mobile'            => $visitor->mobile,
+                                'email'             => $visitor->email,
+                                'address'           => $visitor->address,
+                                'no_invoice'        => $visitor->no_invoice,
+                                'sn_product'        => $visitor->sn_product,
                                 'status_pembayaran' => $visitor->status_pembayaran,
-                                'metode_bayar' => $visitor->metode_bayar,
-                                'created_at' => $visitor->created_at,
-                                'jenis_event' => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
+                                'metode_bayar'      => $visitor->metode_bayar,
+                                'created_at'        => $visitor->created_at,
+                                'jenis_event'       => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
                             ];
                         } else if ($visitor->jenis_event == "A") {
+                            // dd('2');
                             $merge[] = [
-                                'RowNumber' => $sequenceNumber++,
-                                'ticket_no' => $visitor->ticket_no,
-                                'title' => $event->title,
-                                'full_name' => $visitor->full_name,
-                                'mobile' => $visitor->mobile,
-                                'email' => $visitor->email,
-                                'address' => $visitor->address,
-                                'no_invoice' => $visitor->no_invoice,
-                                'sn_product' => $visitor->sn_product,
+                                'RowNumber'         => $sequenceNumber++,
+                                'ticket_no'         => $visitor->ticket_no,
+                                'title'             => $event->title,
+                                'full_name'         => $visitor->full_name,
+                                'mobile'            => $visitor->mobile,
+                                'email'             => $visitor->email,
+                                'address'           => $visitor->address,
+                                'no_invoice'        => $visitor->no_invoice,
+                                'sn_product'        => $visitor->sn_product,
                                 'status_pembayaran' => $visitor->status_pembayaran,
-                                'metode_bayar' => $visitor->metode_bayar,
-                                'created_at' => $visitor->created_at,
-                                'jenis_event' => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
+                                'metode_bayar'      => $visitor->metode_bayar,
+                                'created_at'        => $visitor->created_at,
+                                'jenis_event'       => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
                             ];
                         } else {
+                            // dd('3');
                             $merge[] = [
-                                'RowNumber' => $sequenceNumber++,
-                                'ticket_no' => $visitor->ticket_no,
-                                'title' => $event->title,
-                                'full_name' => $visitor->full_name,
-                                'mobile' => $visitor->mobile,
-                                'email' => $visitor->email,
-                                'address' => $visitor->address,
-                                'created_at' => $visitor->created_at,
+                                'RowNumber'         => $sequenceNumber++,
+                                'full_name'         => $visitor->full_name,
+                                'email'             => $visitor->email,
+                                'gender'            => $visitor->gender,
+                                'account_instagram' => $visitor->account_instagram,
+                                'mobile'            => $visitor->mobile,
+                                'type_invitation'   => $visitor->type_invitation,
+                                'invitation_name'   => $visitor->invitation_name,
+                                'barcode_no'        => $visitor->barcode_no,
+
+                                // $merge[] = [
+                                //     'RowNumber'  => $sequenceNumber++,
+                                //     'ticket_no'  => $visitor->ticket_no,
+                                //     'title'      => $event->title,
+                                //     'full_name'  => $visitor->full_name,
+                                //     'mobile'     => $visitor->mobile,
+                                //     'email'      => $visitor->email,
+                                //     'address'    => $visitor->address,
+                                //     'created_at' => $visitor->created_at,
                             ];
                         }
                     }
@@ -99,7 +114,7 @@ class ExportExcel implements FromCollection, WithHeadings
         }
 
         $merge = !empty($merge) ? $merge : [];
-        $q = collect($merge);
+        $q     = collect($merge);
 
         return $q;
     }

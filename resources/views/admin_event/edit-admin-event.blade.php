@@ -61,8 +61,8 @@
                                                 {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
                                                 <option selected disabled>-- Silahkan Pilih --</option>
                                                 @foreach ($event as $event)
-                                                    <option value="{{ $value['event_id'] }}"
-                                                        {{ $event->id_event == $value['event_id'] ? 'selected' : '' }}>
+                                                    <option value="{{ $event->id_event }}"
+                                                        {{ $event->id_event == $value['event_id'] ? 'selected' : $event->id_event }}>
                                                         {{ $event->title }}</option>
                                                 @endforeach
                                             </select>
@@ -157,6 +157,9 @@
                 var nama_lengkap = $('#nama_lengkap').val();
                 var status = $('#status').val();
                 var events_id = $('#events_id').val();
+
+                console.log(event)
+                console.log(events_id)
 
                 var formData = new FormData();
                 formData.append("admin_id", admin_id);

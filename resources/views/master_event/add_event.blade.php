@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-6 col-12">
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status">
                                             <option selected disabled>-- Silahkan Pilih --</option>
@@ -66,7 +66,23 @@
                                             Status Wajib Diisi
                                         </div>
                                     </div>
-                                    <div class="form-group col-md-6 col-12">
+                                    <div class="form-group col-md-3 col-12">
+                                        <label>Start Registrasi</label>
+                                        <input type="text" class="form-control datetimepicker" value=""
+                                            required="" name="start_registrasi" id="start_registrasi">
+                                        <div class="invalid-feedback">
+                                            Start Event Wajib Diisi
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-12">
+                                        <label>End Registrasi</label>
+                                        <input type="text" class="form-control datetimepicker" value=""
+                                            required="" name="end_registrasi" id="end_registrasi">
+                                        <div class="invalid-feedback">
+                                            End Event Wajib Diisi
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3 col-12">
                                         <label>Logo</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input"
@@ -97,8 +113,8 @@
                                     </div>
                                     <div class="form-group col-md-3 col-12">
                                         <label>Tanggal Terakhir Aplikasi</label>
-                                        <input type="text" class="form-control datepicker" value="" required=""
-                                            name="end_event_application" id="end_event_application">
+                                        <input type="text" class="form-control datepicker" value=""
+                                            required="" name="end_event_application" id="end_event_application">
                                         <div class="invalid-feedback">
                                             Tanggal Terakhir Aplikasi Wajib Diisi
                                         </div>
@@ -246,6 +262,8 @@
                 var namaEvent = $('#nama_event').val();
                 var title_url = $('#title_url').val();
                 var status = $('#status').val();
+                var start_registrasi = $('#start_registrasi').val();
+                var end_registrasi = $('#end_registrasi').val();
                 var divisi = $('#divisi').val();
                 var logo = $("#logo")[0].files[0];
                 var startEvent = $('#start_event').val();
@@ -260,6 +278,8 @@
                 formData.append("namaEvent", namaEvent);
                 formData.append("title_url", title_url);
                 formData.append("status", status);
+                formData.append("start_registrasi", start_registrasi);
+                formData.append("end_registrasi", end_registrasi);
                 formData.append("logo", logo);
                 formData.append("startEvent", startEvent);
                 formData.append("endEvent", endEvent);
@@ -302,6 +322,36 @@
                     });
                 } else if (status == null) {
                     var name = "Status";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(okay => {
+                        if (okay) {
+                            $("#btn_progress").hide();
+                            $("#btn_submit").show();
+                        }
+                    });
+                } else if (start_registrasi == null) {
+                    var name = "Start Registrasi";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(okay => {
+                        if (okay) {
+                            $("#btn_progress").hide();
+                            $("#btn_submit").show();
+                        }
+                    });
+                } else if (end_registrasi == null) {
+                    var name = "End Registrasi";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> tidak boleh kosong, silahkan coba lagi...';
