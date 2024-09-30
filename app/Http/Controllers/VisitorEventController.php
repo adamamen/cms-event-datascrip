@@ -47,6 +47,8 @@ class VisitorEventController extends Controller
         } else if ($page == "cetak-invoice") {
             Log::info('User cetak Excel di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             $this->generate_pdf($page, $userId);
+        } else if ($page == "landing-page-qr") {
+            $this->index_landing_page();
         } else {
             return view('error.error-404');
         }
@@ -391,7 +393,7 @@ class VisitorEventController extends Controller
 
         if (!empty($event)) {
             foreach ($rows as $row) {
-                $barcodeNo = generateUniqueCode();
+                $barcodeNo = strtoupper(generateUniqueCode());
                 $filename  = $barcodeNo . '-qrcode.png';
                 $qrCode    = new QrCode($barcodeNo);
                 $writer    = new PngWriter();
@@ -467,33 +469,6 @@ class VisitorEventController extends Controller
         return $pdf->download($visitor->barcode_no . '-' . $visitor->full_name . '.pdf');
     }
 
-    public function verifyScan(Request $request)
-    {
-        $barcodeNo = $request->input('barcode_no');
-
-        // Find the visitor by barcode number
-        $visitor = M_VisitorEvent::where('barcode_no', $barcodeNo)->first();
-
-        // If the visitor is not found, return 'not_found' status
-        if (!$visitor) {
-            return response()->json(['status' => 'not_found']);
-        }
-
-        // Check if the QR code has already been scanned
-        if ($visitor->is_scanned) {
-            return response()->json(['status' => 'already_scanned']);
-        }
-
-        // Mark as scanned for the first time
-        $visitor->is_scanned = true;
-        $visitor->save();
-
-        return response()->json([
-            'status' => 'success',
-            'full_name' => $visitor->full_name
-        ]);
-    }
-
     public function deleteMultipleVisitors(Request $request)
     {
         $ids = $request->ids;
@@ -504,5 +479,41 @@ class VisitorEventController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No IDs selected']);
+    }
+
+    public function index_landing_page()
+    {
+        return view('visitor_event.landing-page-qr');
+    }
+
+    public function verify_qr(Request $request)
+    {
+        $request->validate([
+            'qr_code' => 'required|string'
+        ]);
+
+        $visitor = M_VisitorEvent::where('barcode_no', $request->qr_code)->first();
+
+        if ($visitor) {
+            if ($visitor->flag_qr) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'QR Code sudah pernah digunakan. Silahkan coba lagi.'
+                ], 400);
+            }
+
+            $visitor->flag_qr = true;
+            $visitor->save();
+
+            return response()->json([
+                'status'      => 'success',
+                'visitorName' => $visitor->full_name
+            ]);
+        } else {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'QR Code tidak ditemukan, silahkan coba lagi'
+            ], 404);
+        }
     }
 }

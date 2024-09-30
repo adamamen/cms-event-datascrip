@@ -37,7 +37,8 @@ Route::post('register-add', [LoginController::class, 'register_action'])->name('
 
 // QR Code
 Route::get('/visitor-event/qrcode/{id}', [VisitorEventController::class, 'showQRCode'])->name('visitor.event.qrcode');
-Route::post('/verify-scan', [VisitorEventController::class, 'verifyScan']);
+Route::get('/visitor-event/landing-page-qr', [VisitorEventController::class, 'index_landing_page'])->name('landing.page');
+Route::post('/visitor-event/verify-qr', [VisitorEventController::class, 'verify_qr'])->name('verify.qr');
 
 Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
 
@@ -73,7 +74,6 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/visitor-event/import-excel/{page?}', [VisitorEventController::class, 'import_excel'])->name('import.excel');
     Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
     Route::post('/delete-multiple-visitors', [VisitorEventController::class, 'deleteMultipleVisitors'])->name('delete-multiple-visitors');
-
 
     // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');
