@@ -108,9 +108,13 @@
                                 Total Visitor = <b>{{ count($data) }}</b></a>
                             <div class="article-cta"></div>
                             &emsp;
-                            <a href="#" class="btn btn-danger"><i class="fa-solid fa-user-check"></i>&emsp; Total
+                            <a href="#" class="btn btn-info"><i class="fa-solid fa-user-check"></i>&emsp; Total
                                 Arrival Visitor = </a>
                             <div class="article-cta"></div>
+                            &emsp;
+                            <a href="#" class="btn btn-danger" id="delete-checkbox-btn">
+                                <i class="fas fa-trash"></i>&emsp; Delete Selected
+                            </a>
                         </div>
                         <div class="card-body">
                             <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -118,6 +122,7 @@
                                 <table class="table-striped table" id="table-1">
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
                                             <th>No</th>
                                             <th>Name</th>
                                             <th>Email</th>
@@ -134,6 +139,9 @@
                                     <tbody>
                                         @foreach ($data as $value)
                                             <tr>
+                                                <td><input type="checkbox" class="checkbox-item"
+                                                        value="{{ $value['id'] }}">
+                                                </td>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $value['full_name'] }}</td>
                                                 <td>{{ $value['email'] }}</td>
@@ -184,6 +192,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Hidden input field to capture QR code scan -->
+            <input type="text" id="qr-scan-input" style="position: absolute; top: -1000px;" autocomplete="off">
         </section>
     </div>
 @endsection
@@ -265,6 +275,115 @@
         document.getElementById('reset-btn').addEventListener('click', function() {
             document.getElementById('uploadForm').reset();
             document.querySelector('.custom-file-label').textContent = 'Choose File';
+        });
+
+        $(document).ready(function() {
+            // Focus on the hidden input field where the QR code scanner will paste the data
+            $('#qr-scan-input').focus();
+
+            // Listen for the input change when a QR code is scanned
+            $('#qr-scan-input').on('input', function() {
+                var scannedCode = $(this).val(); // Get the scanned QR code
+
+                // Ensure the QR code is captured completely
+                if (scannedCode) {
+                    // Send AJAX request to verify the scan
+                    $.ajax({
+                        url: '/verify-scan', // Backend route to handle the scan verification
+                        type: 'POST',
+                        data: {
+                            barcode_no: scannedCode,
+                            _token: '{{ csrf_token() }}' // CSRF token for security
+                        },
+                        success: function(response) {
+                            if (response.status === 'already_scanned') {
+                                swal('Gagal', 'QR Code sudah digunakan.', 'warning');
+                            } else if (response.status === 'success') {
+                                swal('Sukses', 'Verifikasi berhasil untuk ' + response
+                                    .full_name, 'success');
+                            } else if (response.status === 'not_found') {
+                                swal('Gagal', 'Verifikasi tidak berhasil, QR code tidak valid.',
+                                    'warning');
+                            }
+                        },
+                        error: function(error) {
+                            console.log('Error:', error);
+                        }
+                    });
+
+                    // Clear the input after processing
+                    $(this).val('');
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('#select-all').on('click', function() {
+                $('.checkbox-item').prop('checked', this.checked);
+            });
+
+            $('.checkbox-item').on('change', function() {
+                const anyChecked = $('.checkbox-item:checked').length > 0;
+                $('#delete-checkbox-btn').prop('disabled', !anyChecked);
+            });
+
+            $('#delete-checkbox-btn').on('click', function(e) {
+                e.preventDefault();
+
+                let selectedIds = [];
+                $('.checkbox-item:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    swal('Tidak ada data yang dipilih', 'Silakan pilih setidaknya satu item untuk dihapus.',
+                        'warning');
+                    return;
+                }
+
+                swal({
+                    title: 'Apakah Anda yakin?',
+                    text: "Anda tidak dapat mengembalikan item yang dihapus!",
+                    type: 'warning',
+                    icon: "warning",
+                    buttons: [
+                        'Tidak',
+                        'Iya'
+                    ],
+                    dangerMode: true,
+                }).then(function(isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            url: "{{ route('delete-multiple-visitors') }}",
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                ids: selectedIds
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    selectedIds.forEach(id => {
+                                        $('input[value="' + id + '"]').closest(
+                                            'tr').remove();
+                                    });
+
+                                    swal('Berhasil',
+                                        'Data yang terpilih sudah dihapus',
+                                        'success');
+
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 1500);
+                                } else {
+                                    swal('Gagal!',
+                                        'Terjadi kesalahan saat menghapus item.',
+                                        'error');
+                                }
+                            }
+                        });
+                    }
+                })
+            });
         });
     </script>
 @endpush

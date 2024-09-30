@@ -62,7 +62,13 @@
                                                 <center>Deskripsi</center>
                                             </th>
                                             <th>
+                                                <center>Start Registrasi</center>
+                                            </th>
+                                            <th>
                                                 <center>Lokasi</center>
+                                            </th>
+                                            <th>
+                                                <center>End Registrasi</center>
                                             </th>
                                             <th>
                                                 <center>Jenis Event</center>
@@ -113,7 +119,13 @@
                                                 <td>{{ $value['nama_divisi'] }}</td>
                                                 <td>{{ $value['end_event'] }}</td>
                                                 <td>{{ $value['desc'] }}</td>
+                                                <td>
+                                                    {{ !empty($value['start_registrasi']) ? $value['start_registrasi'] : '-' }}
+                                                </td>
                                                 <td>{{ $value['location'] }}</td>
+                                                <td>
+                                                    {{ !empty($value['end_registrasi']) ? $value['end_registrasi'] : '-' }}
+                                                </td>
                                                 <td>{{ $value['jenis_event'] == 'A' ? 'Berbayar' : 'Non Berbayar' }}</td>
                                                 <td>{{ $value['title_url'] }}</td>
                                                 <td>{{ $value['tanggal_terakhir_aplikasi_indo'] }}</td>

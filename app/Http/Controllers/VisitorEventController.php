@@ -391,17 +391,14 @@ class VisitorEventController extends Controller
 
         if (!empty($event)) {
             foreach ($rows as $row) {
-                $qrData = $row[1] . '-' . $row[2];
-                $filename = $row[1] . '-qrcode.png';
-
-                $qrCode = new QrCode($qrData);
-                $writer = new PngWriter();
-                $path = 'qrcodes/' . $filename;
+                $barcodeNo = generateUniqueCode();
+                $filename  = $barcodeNo . '-qrcode.png';
+                $qrCode    = new QrCode($barcodeNo);
+                $writer    = new PngWriter();
+                $path      = 'qrcodes/' . $filename;
                 $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path));
 
-                // $barcodeLink = url('storage/' . $path);
                 $barcodeLink = asset('storage/qrcodes/' . $filename);
-                $barcodeNo = generateUniqueCode();
 
                 DB::table('tbl_visitor_event')->insert([
                     'event_id'          => $event['id_event'],
@@ -433,8 +430,8 @@ class VisitorEventController extends Controller
 
     public function showQRCode($id)
     {
-        $visitor     = DB::table('tbl_visitor_event')->where('id', $id)->first();
-        $masterEvent = DB::table('tbl_visitor_event')
+        $visitor      = DB::table('tbl_visitor_event')->where('id', $id)->first();
+        $visitorEvent = DB::table('tbl_visitor_event')
             ->select('*')
             ->join('tbl_master_event', 'tbl_visitor_event.event_id', '=', 'tbl_master_event.id_event')
             ->where('tbl_visitor_event.id', $id)
@@ -445,7 +442,7 @@ class VisitorEventController extends Controller
             return redirect()->back()->with('error', 'Visitor tidak ditemukan.');
         }
 
-        return view('visitor_event.qrcode', compact('visitor'), compact('masterEvent'));
+        return view('visitor_event.qrcode', compact('visitor'), compact('visitorEvent'));
     }
 
     public function downloadQR($id)
@@ -468,5 +465,44 @@ class VisitorEventController extends Controller
         $pdf = PDF::loadView('visitor_event.cetak-pdf-qr', compact('visitor', 'qrCodePath'));
 
         return $pdf->download($visitor->barcode_no . '-' . $visitor->full_name . '.pdf');
+    }
+
+    public function verifyScan(Request $request)
+    {
+        $barcodeNo = $request->input('barcode_no');
+
+        // Find the visitor by barcode number
+        $visitor = M_VisitorEvent::where('barcode_no', $barcodeNo)->first();
+
+        // If the visitor is not found, return 'not_found' status
+        if (!$visitor) {
+            return response()->json(['status' => 'not_found']);
+        }
+
+        // Check if the QR code has already been scanned
+        if ($visitor->is_scanned) {
+            return response()->json(['status' => 'already_scanned']);
+        }
+
+        // Mark as scanned for the first time
+        $visitor->is_scanned = true;
+        $visitor->save();
+
+        return response()->json([
+            'status' => 'success',
+            'full_name' => $visitor->full_name
+        ]);
+    }
+
+    public function deleteMultipleVisitors(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            DB::table('tbl_visitor_event')->whereIn('id', $ids)->delete();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No IDs selected']);
     }
 }

@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <h1>QR Code for {{ $visitor->full_name }}</h1>
+    <h1>{{ ucwords($visitor->full_name) }}</h1>
     <div class="qr-code">
         <img src="{{ public_path($qrCodePath) }}" alt="QR Code" width="200">
     </div>

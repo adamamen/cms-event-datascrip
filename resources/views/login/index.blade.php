@@ -7,7 +7,7 @@
 
     @if (!empty($masterEvent))
         @foreach ($masterEvent as $value)
-            <title>Login &mdash; {{ $value['title'] . ' Event' }}</title>
+            <title>Login &mdash; {{ ucwords($value['title']) . ' Event' }}</title>
         @endforeach
     @else
         <title>Login &mdash; CMS Event</title>
