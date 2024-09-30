@@ -8,33 +8,57 @@
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
     <style>
-        .image-thumbnail {
-            max-width: 250px;
-            max-height: 250px;
+        .card-header h1,
+        .card-header h4 {
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            text-align: center;
+        }
+
+        .form-control {
+            width: 50%;
+            margin: 0 auto;
         }
     </style>
 @endpush
 
 @section('main')
     <div class="main-content">
-        <section class="section">
+        <section class="section" style="right: 9%"">
             <div class="section-header">
-                <h1>View Link QR</h1>
+                <h1>Event {{ ucwords($page[0]['title']) }}</h1>
             </div>
             <div class="row">
-                <div class="form-group col-md-4 col-12">
-                    <label>QR Code</label>
-                    <input type="text" class="form-control" value="" required="" id="qr_code"
-                        placeholder="Enter your QR code" autocomplete="off" maxlength="10">
-                    <div class="invalid-feedback">
-                        QR Code Wajib Diisi
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h1 class="font-weight-bold mb-6">Event</h1>
+                        </div>
+                        <div class="card-header text-center">
+                            <h1 class="font-weight-bold mb-6">{{ ucwords($page[0]['title']) }}</h1>
+                        </div>
+                        <div class="card-header text-center">
+                            <h4 class="font-weight-bold mb-6">{{ ucwords($page[0]['location']) }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="qr_code" class="font-weight-bold">QR Code</label>
+                                <input type="text" class="form-control" id="qr_code" required
+                                    placeholder="Enter your QR code" autocomplete="off" maxlength="10">
+                                <div class="invalid-feedback">
+                                    QR Code Wajib Diisi
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            {{-- <button type="button" class="btn btn-success" id="submitQrCode">Verify QR Code</button> --}}
         </section>
     </div>
-
 @endsection
 
 @push('scripts')

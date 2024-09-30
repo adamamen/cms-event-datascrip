@@ -47,8 +47,13 @@
             <!-- Header -->
             @include('components.header')
 
-            <!-- Sidebar -->
-            @include('components.sidebar')
+            @if (!empty($title))
+                @if ($title != 'landing-page-qr')
+                    @include('components.sidebar')
+                @endif
+            @else
+                @include('components.sidebar')
+            @endif
 
             <!-- Content -->
             @yield('main')

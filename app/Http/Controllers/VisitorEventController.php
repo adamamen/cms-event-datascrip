@@ -31,6 +31,9 @@ class VisitorEventController extends Controller
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $title       = str_replace('-', ' ', $titleUrl);
         $output      = ucwords($title);
+        $dataArrival = M_VisitorEvent::select('*')
+            ->whereNotNull('scan_date')
+            ->get();
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
@@ -42,13 +45,14 @@ class VisitorEventController extends Controller
                 'titleUrl'     => $titleUrl,
                 'pages'        => $page,
                 'output'       => $output,
+                'dataArrival'  => count($dataArrival),
                 'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
             Log::info('User cetak Excel di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             $this->generate_pdf($page, $userId);
         } else if ($page == "landing-page-qr") {
-            $this->index_landing_page();
+            $this->index_landing_page($page);
         } else {
             return view('error.error-404');
         }
@@ -251,7 +255,7 @@ class VisitorEventController extends Controller
 
     public function generate_pdf($id)
     {
-        $visitor = DB::table('tbl_visitor_event')->where('id', $id)->first();
+        $visitor     = DB::table('tbl_visitor_event')->where('id', $id)->first();
         $masterEvent = DB::table('tbl_visitor_event')
             ->select('*')
             ->join('tbl_master_event', 'tbl_visitor_event.event_id', '=', 'tbl_master_event.id_event')
@@ -404,7 +408,7 @@ class VisitorEventController extends Controller
 
                 DB::table('tbl_visitor_event')->insert([
                     'event_id'          => $event['id_event'],
-                    'ticket_no'         => 'NULL',
+                    'ticket_no'         => NULL,
                     'full_name'         => $row[1],
                     'email'             => $row[2],
                     'gender'            => $row[3],
@@ -413,12 +417,13 @@ class VisitorEventController extends Controller
                     'type_invitation'   => $row[6],
                     'invitation_name'   => $row[7],
                     'registration_date' => Carbon::now(),
-                    'address'           => 'NULL',
+                    'address'           => NULL,
                     'barcode_no'        => strtoupper($barcodeNo),
-                    'source'            => 'NULL',
+                    'source'            => NULL,
                     'barcode_link'      => $barcodeLink,
-                    'noted'             => 'NULL',
-                    'scan_date'         => Carbon::now(),
+                    'noted'             => NULL,
+                    'scan_date'         => NULL,
+                    'created_at'        => Carbon::now(),
                     'created_by'        => Auth::user()->username,
                     'updated_by'        => Auth::user()->username,
                 ]);
@@ -432,7 +437,18 @@ class VisitorEventController extends Controller
 
     public function showQRCode($id)
     {
-        $visitor      = DB::table('tbl_visitor_event')->where('id', $id)->first();
+        try {
+            $id = decrypt($id);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'ID tidak valid.');
+        }
+
+        $visitor = DB::table('tbl_visitor_event')->where('id', $id)->first();
+
+        if (!$visitor) {
+            return redirect()->back()->with('error', 'Visitor tidak ditemukan.');
+        }
+
         $visitorEvent = DB::table('tbl_visitor_event')
             ->select('*')
             ->join('tbl_master_event', 'tbl_visitor_event.event_id', '=', 'tbl_master_event.id_event')
@@ -440,11 +456,7 @@ class VisitorEventController extends Controller
             ->get()
             ->toArray();
 
-        if (!$visitor) {
-            return redirect()->back()->with('error', 'Visitor tidak ditemukan.');
-        }
-
-        return view('visitor_event.qrcode', compact('visitor'), compact('visitorEvent'));
+        return view('visitor_event.qrcode', compact('visitor', 'visitorEvent'));
     }
 
     public function downloadQR($id)
@@ -481,9 +493,19 @@ class VisitorEventController extends Controller
         return response()->json(['success' => false, 'message' => 'No IDs selected']);
     }
 
-    public function index_landing_page()
+    public function index_landing_page($page)
     {
-        return view('visitor_event.landing-page-qr');
+        $title = "landing-page-qr";
+        $page  = masterEvent($page);
+
+        if (!empty($page)) {
+            return view('visitor_event.landing-page-qr', [
+                'page' => $page,
+                'title' => $title
+            ]);
+        } else {
+            return view('error.error-404');
+        }
     }
 
     public function verify_qr(Request $request)
@@ -502,7 +524,8 @@ class VisitorEventController extends Controller
                 ], 400);
             }
 
-            $visitor->flag_qr = true;
+            $visitor->flag_qr   = true;
+            $visitor->scan_date = Carbon::now();
             $visitor->save();
 
             return response()->json([
