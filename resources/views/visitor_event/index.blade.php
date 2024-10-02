@@ -7,12 +7,6 @@
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
-    <style>
-        .image-thumbnail {
-            max-width: 250px;
-            max-height: 250px;
-        }
-    </style>
 @endpush
 
 @section('main')
@@ -69,7 +63,8 @@
                                     <div class="col-sm-6 col-md-9">
                                         <div class="custom-file">
                                             <input type="file" name="excel_file" class="custom-file-input"
-                                                id="excel-file">
+                                                id="excel-file"
+                                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                                             <label class="custom-file-label">Choose File</label>
                                         </div>
                                     </div>
@@ -113,10 +108,6 @@
                                 Arrival Visitor = {{ $dataArrival }}</a>
                             <div class="article-cta"></div>
                             &emsp;
-                            <a href="#" class="btn btn-danger" id="delete-checkbox-btn">
-                                <i class="fas fa-trash"></i>&emsp; Delete Selected
-                            </a>
-                            &emsp;
                             @foreach ($data as $value)
                                 <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
                                     class="btn btn-warning" id="view-link-qr" target="_blank">
@@ -124,6 +115,37 @@
                                 </a>
                             @break
                         @endforeach
+                        &emsp;
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-tasks"></i>&emsp; Actions Selected
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" id="delete-checkbox-btn">
+                                    <i class="fas fa-trash"></i>&emsp; Delete Selected
+                                </a>
+                                <a class="dropdown-item" href="#" id="send-whatsapp-btn">
+                                    <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp Selected
+                                </a>
+                                <a class="dropdown-item" href="#" id="send-email-btn">
+                                    <i class="fas fa-envelope"></i>&emsp; Send Email Selected
+                                </a>
+                            </div>
+                        </div>
+                        {{-- <a href="#" class="btn btn-danger" id="delete-checkbox-btn">
+                            <i class="fas fa-trash"></i>&emsp; Delete Selected
+                        </a>
+                        &emsp;
+                        <a href="#" class="btn btn-success" id="send-whatsapp-btn">
+                            <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp
+                        </a>
+                        &emsp;
+                        <a href="#" class="btn btn-primary" id="send-email-btn">
+                            <i class="fas fa-envelope"></i>&emsp; Send Email
+                        </a>
+                        &emsp; --}}
+
                     </div>
                     <div class="card-body">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -175,8 +197,8 @@
                                                     <i class="fas fa-edit"></i>
                                                 </button>&nbsp;
 
-                                                <a class="btn btn-danger" id="delete-btn" data-id="{{ $value['id'] }}"
-                                                    title="Delete">
+                                                <a class="btn btn-danger" id="delete-btn"
+                                                    data-id="{{ $value['id'] }}" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </a>&nbsp;
 
@@ -309,8 +331,8 @@
             }
 
             swal({
-                title: 'Apakah Anda yakin?',
-                text: "Anda tidak dapat mengembalikan item yang dihapus!",
+                title: 'Apakah Kamu yakin?',
+                text: "Apakah kamu yakin ingin menghapus data ini?",
                 type: 'warning',
                 icon: "warning",
                 buttons: [
@@ -351,6 +373,58 @@
                 }
             })
         });
+    });
+
+    document.getElementById('send-email-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        let selectedIds = [];
+        $('.checkbox-item:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+
+        if (selectedIds.length === 0) {
+            swal('Tidak ada data yang dipilih', 'Silakan pilih setidaknya satu item untuk kirim email.',
+                'warning');
+            return;
+        }
+
+        swal({
+                title: "Apakah anda yakin ingin mengirim email?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willSend) => {
+                if (willSend) {
+                    let ids = [];
+                    document.querySelectorAll('.checkbox-item:checked').forEach((checkbox) => {
+                        ids.push(checkbox.value);
+                    });
+
+                    fetch("{{ route('send.email') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                ids: ids
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === 'Emails sent successfully!') {
+                                swal("Berhasil!", "Email telah terkirim.", "success");
+                            } else {
+                                swal("Gagal!", "Email telah gagal dikirim.", "error");
+                            }
+                        })
+                        .catch((error) => {
+                            swal("Gagal!", "Email telah gagal dikirim.", "error");
+                        });
+                }
+            });
     });
 </script>
 @endpush

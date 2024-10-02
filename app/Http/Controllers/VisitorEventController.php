@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class VisitorEventController extends Controller
 {
@@ -289,7 +290,7 @@ class VisitorEventController extends Controller
     public function export_excel($page)
     {
         $query = visitorEventandMasterEvent($page);
-        // dd($query);
+        $pages = ucwords(str_replace('-', ' ', $page));
 
         // if (!empty($query)) {
         //     if ($page == "cms") {
@@ -304,7 +305,7 @@ class VisitorEventController extends Controller
             $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No'];
         }
 
-        $filename = 'Data Visitor Event - ' . ucfirst($page) . '.xlsx';
+        $filename = 'Data Visitor Event - ' . ucfirst($pages) . '.xlsx';
         return Excel::download(new ExportExcel($page, $customHeadings), $filename);
     }
 
@@ -538,5 +539,98 @@ class VisitorEventController extends Controller
                 'message' => 'QR Code tidak ditemukan, silahkan coba lagi'
             ], 404);
         }
+    }
+
+    public function sendEmail(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!empty($ids)) {
+            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
+            $masterEvent = DB::table('tbl_master_event')
+                ->select("*")
+                ->get();
+
+            foreach ($visitors as $visitor) {
+                foreach ($masterEvent as $event) {
+                    if ($event->id_event == $visitor->event_id) {
+                        $judul           = ucwords($event->title);
+                        $nama            = $visitor->full_name;
+                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
+                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
+                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
+                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
+                        $encryptedId     = encrypt($visitor->id);
+                        $email           = $visitor->email;
+
+                        $body = '<html>
+                                    <head>
+                                    <style type="text/css">
+                                        body, td {
+                                            font-family: "Times New Roman", Times, serif;
+                                            font-size: 16px;
+                                        }
+                                        table#info {
+                                            border: 1px solid #555;
+                                            border-collapse: collapse;
+                                        }
+                                        table#info th,
+                                        table#info td {
+                                            padding: 3px;
+                                            border: 1px solid #555;
+                                        }
+                                    </style>
+                                    </head>
+                                    <body>Selamat Pagi Bapak/Ibu, <br />
+                                    <strong>' . $nama . '</strong><br />
+                                    Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
+                                    Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
+                                    
+                                    Tanggal Acara &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; : ' . $tanggalMulai . ' & ' . $tanggalAkhir . ' <br />
+                                    Mulai Registrasi &nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
+                                    Selesai Registrasi &nbsp; &nbsp; : ' . $akhirRegistrasi . ' <br />
+                                    Tempat &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; : ' . $event->location . ' <br /><br />
+
+                                    <strong>Syarat & Ketentuan</strong><br />
+                                    - QR Code hanya bisa digunakan 1x pada event. <br />
+                                    - QR Code Tidak boleh diperjual-belikan. <br />
+                                    - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
+                                    </body>
+                                </html>';
+
+                        $mail = new PHPMailer(true);
+
+                        $mail->SMTPOptions = array(
+                            'ssl' => array(
+                                'verify_peer'       => false,
+                                'verify_peer_name'  => false,
+                                'allow_self_signed' => true
+                            )
+                        );
+
+                        $mail->isSMTP();
+                        $mail->Host       = env('MAIL_HOST');
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = env('MAIL_USERNAME');
+                        $mail->Password   = env('MAIL_PASSWORD');
+                        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                        $mail->Port       = env('MAIL_PORT');
+
+                        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                        $mail->addAddress($email, $nama);
+
+                        //Content
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Event ' . $judul;
+                        $mail->Body    = $body;
+                        $mail->send();
+                    }
+                }
+            }
+
+            return response()->json(['message' => 'Emails sent successfully!'], 200);
+        }
+
+        return response()->json(['message' => 'No visitors selected'], 400);
     }
 }

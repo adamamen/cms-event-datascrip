@@ -29,9 +29,7 @@
 @section('main')
     <div class="main-content">
         <section class="section" style="right: 9%"">
-            <div class="section-header">
-                <h1>Event {{ ucwords($page[0]['title']) }}</h1>
-            </div>
+            <br><br>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -53,6 +51,15 @@
                                     QR Code Wajib Diisi
                                 </div>
                             </div>
+                            <p>
+                                <center>
+                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate in velit neque
+                                    quod
+                                    perspiciatis eligendi sapiente adipisci, blanditiis ex, molestiae esse tempore? Error
+                                    ipsam,
+                                    suscipit cupiditate voluptatum tenetur inventore tempore.
+                                </center>
+                            </p>
                         </div>
                     </div>
                 </div>
