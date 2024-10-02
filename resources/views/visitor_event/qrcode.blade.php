@@ -31,36 +31,7 @@
         <h3>Barcode Number: {{ $visitor->barcode_no }}</h3>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            // Simulate QR code scanning
-            $('#barcode').on('click', function() {
-                const barcodeNo = '{{ $visitor->barcode_no }}';
-
-                // AJAX request to check the scan status
-                $.ajax({
-                    url: '/verify-scan', // Backend route to handle the scan verification
-                    type: 'POST',
-                    data: {
-                        barcode_no: barcodeNo,
-                        _token: '{{ csrf_token() }}' // Laravel CSRF protection
-                    },
-                    success: function(response) {
-                        if (response.status === 'already_scanned') {
-                            alert('QR Code Already Used');
-                        } else if (response.status === 'success') {
-                            alert('Verification Success (' + response.full_name + ')');
-                        } else if (response.status === 'not_found') {
-                            alert('Verification not successful, QR code not valid');
-                        }
-                    },
-                    error: function(error) {
-                        console.log('Error:', error);
-                    }
-                });
-            });
-        });
-    </script>
+    <script></script>
 </body>
 
 </html>

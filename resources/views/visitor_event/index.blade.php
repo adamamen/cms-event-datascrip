@@ -125,9 +125,9 @@
                                 <a class="dropdown-item" href="#" id="delete-checkbox-btn">
                                     <i class="fas fa-trash"></i>&emsp; Delete Selected
                                 </a>
-                                <a class="dropdown-item" href="#" id="send-whatsapp-btn">
+                                {{-- <a class="dropdown-item" href="#" id="send-whatsapp-btn">
                                     <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp Selected
-                                </a>
+                                </a> --}}
                                 <a class="dropdown-item" href="#" id="send-email-btn">
                                     <i class="fas fa-envelope"></i>&emsp; Send Email Selected
                                 </a>

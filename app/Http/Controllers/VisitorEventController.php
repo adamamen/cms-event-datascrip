@@ -379,6 +379,63 @@ class VisitorEventController extends Controller
     //         }
     //     }
 
+    //     public function import_excel(Request $request, $page)
+    //     {
+    //         $validator = Validator::make($request->all(), [
+    //             'excel_file' => 'required|mimes:xlsx|max:2048',
+    //         ]);
+    // 
+    //         if ($validator->fails()) {
+    //             return redirect()->back()->withErrors($validator)->withInput();
+    //         }
+    // 
+    //         $file = $request->file('excel_file');
+    //         $rows = Excel::toArray([], $file)[0];
+    // 
+    //         unset($rows[0]);
+    // 
+    //         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
+    // 
+    //         if (!empty($event)) {
+    //             foreach ($rows as $row) {
+    //                 $barcodeNo = strtoupper(generateUniqueCode());
+    //                 $filename  = $barcodeNo . '-qrcode.png';
+    //                 $qrCode    = new QrCode($barcodeNo);
+    //                 $writer    = new PngWriter();
+    //                 $path      = 'qrcodes/' . $filename;
+    //                 $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path));
+    // 
+    //                 $barcodeLink = asset('storage/qrcodes/' . $filename);
+    // 
+    //                 DB::table('tbl_visitor_event')->insert([
+    //                     'event_id'          => $event['id_event'],
+    //                     'ticket_no'         => NULL,
+    //                     'full_name'         => $row[1],
+    //                     'email'             => $row[2],
+    //                     'gender'            => $row[3],
+    //                     'account_instagram' => $row[4],
+    //                     'mobile'            => $row[5],
+    //                     'type_invitation'   => $row[6],
+    //                     'invitation_name'   => $row[7],
+    //                     'registration_date' => Carbon::now(),
+    //                     'address'           => NULL,
+    //                     'barcode_no'        => strtoupper($barcodeNo),
+    //                     'source'            => NULL,
+    //                     'barcode_link'      => $barcodeLink,
+    //                     'noted'             => NULL,
+    //                     'scan_date'         => NULL,
+    //                     'created_at'        => Carbon::now(),
+    //                     'created_by'        => Auth::user()->username,
+    //                     'updated_by'        => Auth::user()->username,
+    //                 ]);
+    //             }
+    // 
+    //             return redirect()->back()->with('success', 'Data berhasil diimport');
+    //         } else {
+    //             return redirect()->back()->with('error', 'Data gagal diimport, event tidak ditemukan.');
+    //         }
+    //     }
+
     public function import_excel(Request $request, $page)
     {
         $validator = Validator::make($request->all(), [
@@ -402,13 +459,16 @@ class VisitorEventController extends Controller
                 $filename  = $barcodeNo . '-qrcode.png';
                 $qrCode    = new QrCode($barcodeNo);
                 $writer    = new PngWriter();
-                $path      = 'qrcodes/' . $filename;
-                $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path));
+                $path1      = 'qrcodes/' . $filename;
+                $path2      = 'storage/qrcodes/' . $filename;
+
+                $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path1));
+                $writer->write($qrCode)->saveToFile(public_path($path2)); // Simpan ke public path
 
                 $barcodeLink = asset('storage/qrcodes/' . $filename);
 
                 DB::table('tbl_visitor_event')->insert([
-                    'event_id'          => $event['id_event'],
+                    'event_id'          => $event->id_event,
                     'ticket_no'         => NULL,
                     'full_name'         => $row[1],
                     'email'             => $row[2],
@@ -430,9 +490,9 @@ class VisitorEventController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Data berhasil diimport');
+            return redirect()->back()->with('success', 'Data berhasil diimpor');
         } else {
-            return redirect()->back()->with('error', 'Data gagal diimport, event tidak ditemukan.');
+            return redirect()->back()->with('error', 'Data gagal diimpor, event tidak ditemukan.');
         }
     }
 
@@ -471,10 +531,10 @@ class VisitorEventController extends Controller
         $qrCode = QrCode::create($visitor->barcode_no)
             ->setSize(200);
 
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
+        $writer     = new PngWriter();
+        $result     = $writer->write($qrCode);
+        $qrCodePath = 'storage/qrcodes/' . $visitor->barcode_no . '-qrcode.png';
 
-        $qrCodePath = 'storage/qrcodes/' . $visitor->full_name . '-qrcode.png';
         Storage::disk('public')->put($qrCodePath, $result->getString());
 
         $pdf = PDF::loadView('visitor_event.cetak-pdf-qr', compact('visitor', 'qrCodePath'));
@@ -567,7 +627,7 @@ class VisitorEventController extends Controller
                                     <head>
                                     <style type="text/css">
                                         body, td {
-                                            font-family: "Times New Roman", Times, serif;
+                                            font-family: "Aptos", sans-serif;
                                             font-size: 16px;
                                         }
                                         table#info {
@@ -586,10 +646,10 @@ class VisitorEventController extends Controller
                                     Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
                                     Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
                                     
-                                    Tanggal Acara &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; : ' . $tanggalMulai . ' & ' . $tanggalAkhir . ' <br />
-                                    Mulai Registrasi &nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                    Selesai Registrasi &nbsp; &nbsp; : ' . $akhirRegistrasi . ' <br />
-                                    Tempat &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; : ' . $event->location . ' <br /><br />
+                                    <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' & ' . $tanggalAkhir . ' <br />
+                                    <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
+                                    <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
+                                    <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
 
                                     <strong>Syarat & Ketentuan</strong><br />
                                     - QR Code hanya bisa digunakan 1x pada event. <br />
