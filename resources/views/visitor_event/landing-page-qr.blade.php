@@ -44,9 +44,17 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="qr_code" class="font-weight-bold">QR Code</label>
-                                <input type="text" class="form-control" id="qr_code" required
-                                    placeholder="Enter your QR code" autocomplete="off" maxlength="10">
+                                <label for="qr_code" class="font-weight-bold"><span style="color:red">*</span> QR Code
+                                </label>
+                                <div class="container">
+                                    <input type="text" class="form-control" id="qr_code" required
+                                        placeholder="Enter your QR code" autocomplete="off" maxlength="10">
+                                    <p>
+                                        <span style="color:red">*</span>
+                                        <span style="font-size: 14px;"><strong>Masukkan 10 karakter di form input
+                                            </strong></span>
+                                    </p>
+                                </div>
                                 <div class="invalid-feedback">
                                     QR Code Wajib Diisi
                                 </div>
@@ -98,19 +106,38 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
+                            var name = response.visitorName;
+                            var content = document.createElement('div');
+                            content.innerHTML = 'QR Code is valid! <br> Welcome <strong>' + name +
+                                '</strong>';
                             swal({
-                                title: "Success",
-                                text: "QR Code is valid! Welcome " + response.visitorName,
+                                title: 'Sukses',
+                                content: content,
                                 icon: "success",
+                            });
+
+                            $('#qr_code').val('');
+                        } else if (response.status === 'error_arrival') {
+                            var name = response.message;
+                            var content = document.createElement('div');
+                            content.innerHTML =
+                                'QR Code sudah pernah digunakan. Silahkan coba lagi. <br> <strong>' +
+                                name + '</strong>';
+                            swal({
+                                title: 'Error',
+                                content: content,
+                                icon: "error",
                             });
 
                             $('#qr_code').val('');
                         } else {
                             swal({
-                                title: "Error",
-                                text: response.message,
+                                title: 'Error',
+                                content: content,
                                 icon: "error",
                             });
+
+                            $('#qr_code').val('');
                         }
                     },
                     error: function(response) {
@@ -121,6 +148,8 @@
                             text: message,
                             icon: "error",
                         });
+
+                        $('#qr_code').val('');
                     }
                 });
             }

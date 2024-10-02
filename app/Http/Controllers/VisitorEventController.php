@@ -35,6 +35,7 @@ class VisitorEventController extends Controller
         $dataArrival = M_VisitorEvent::select('*')
             ->whereNotNull('scan_date')
             ->get();
+        // dd($masterEvent);
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
@@ -57,6 +58,28 @@ class VisitorEventController extends Controller
         } else {
             return view('error.error-404');
         }
+
+        // if (!empty($masterEvent) || $page == "cms") {
+        //     Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
+        //     return view('visitor_event.index', [
+        //         'id'           => $userId,
+        //         'masterEvent'  => $masterEvent,
+        //         'data'         => $data,
+        //         'type_menu'    => $type_menu,
+        //         'titleUrl'     => $titleUrl,
+        //         'pages'        => $page,
+        //         'output'       => $output,
+        //         'dataArrival'  => count($dataArrival),
+        //         'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
+        //     ]);
+        // } else if ($page == "cetak-invoice") {
+        //     Log::info('User cetak Excel di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
+        //     $this->generate_pdf($page, $userId);
+        // } else if ($page == "landing-page-qr") {
+        //     $this->index_landing_page($page);
+        // } else {
+        //     return view('error.error-404');
+        // }
     }
 
     public function add_visitor_index($page)
@@ -578,21 +601,24 @@ class VisitorEventController extends Controller
         $visitor = M_VisitorEvent::where('barcode_no', $request->qr_code)->first();
 
         if ($visitor) {
-            if ($visitor->flag_qr) {
+            $tanggalDatang = tgl_indo(date('Y-m-d', strtotime($visitor->scan_date)));
+            $waktuDatang   = date('H:i:s', strtotime($visitor->scan_date));
+
+            if ($visitor->flag_qr == '0') {
+                $visitor->flag_qr   = true;
+                $visitor->scan_date = Carbon::now();
+                $visitor->save();
+
                 return response()->json([
-                    'status'  => 'error',
-                    'message' => 'QR Code sudah pernah digunakan. Silahkan coba lagi.'
-                ], 400);
+                    'status'         => 'success',
+                    'visitorName'    => $visitor->full_name,
+                ]);
+            } else {
+                return response()->json([
+                    'status'  => 'error_arrival',
+                    'message' => 'Time Arrival = ' . $tanggalDatang . " " . $waktuDatang,
+                ]);
             }
-
-            $visitor->flag_qr   = true;
-            $visitor->scan_date = Carbon::now();
-            $visitor->save();
-
-            return response()->json([
-                'status'      => 'success',
-                'visitorName' => $visitor->full_name
-            ]);
         } else {
             return response()->json([
                 'status'  => 'error',
