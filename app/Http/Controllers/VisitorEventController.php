@@ -233,7 +233,7 @@ class VisitorEventController extends Controller
             Log::info('Data Berhasil di Delete di menu Data Visitor Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['message' => 'success']);
         } else {
-            return response()->json(['error' => 'failed'], 404);
+            return response()->json(['error' => 'failed']);
         }
     }
 
@@ -514,10 +514,10 @@ class VisitorEventController extends Controller
 
         $file = $request->file('excel_file');
         $rows = Excel::toArray([], $file)[0];
-        unset($rows[0]); // Menghapus header jika ada
+        unset($rows[0]);
 
         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
-        $countImported = 0; // Inisialisasi penghitung jumlah data yang diimpor
+        $countImported = 0;
 
         if (!empty($event)) {
             foreach ($rows as $row) {
@@ -553,6 +553,7 @@ class VisitorEventController extends Controller
                     'created_at'        => Carbon::now(),
                     'created_by'        => Auth::user()->username,
                     'updated_by'        => Auth::user()->username,
+                    'flag_qr'           => '0',
                 ]);
 
                 $countImported++; // Menambahkan setiap kali ada data yang berhasil diimpor

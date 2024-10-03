@@ -279,7 +279,8 @@
             var fileInput = $('#excel-file').val();
             if (!fileInput) {
                 var content = document.createElement('div');
-                content.innerHTML = '<strong>File</strong> tidak boleh kosong, silahkan coba lagi...';
+                content.innerHTML =
+                    '<strong>Upload File</strong> tidak boleh kosong, silahkan coba lagi...';
                 swal({
                     title: 'Warning',
                     content: content,
@@ -324,7 +325,7 @@
                 error: function(xhr) {
                     swal({
                         title: "Error!",
-                        text: "Gagal mengimpor data.",
+                        text: "Gagal Import data, silahkan coba lagi.",
                         icon: "error",
                         button: "OK",
                     });
@@ -360,11 +361,12 @@
                         success: function(response) {
                             var alerts = response.message
 
-                            if (alerts == "failed") {
-                                swal('Gagal',
-                                    'No Tiket sudah pernah digunakan, silahkan coba lagi...',
-                                    'warning');
-                            } else if (alerts == "success") {
+                            // if (alerts == "failed") {
+                            //     swal('Gagal',
+                            //         'No Tiket sudah pernah digunakan, silahkan coba lagi...',
+                            //         'warning');
+                            // } else
+                            if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil di delete...', 'success').then(
                                     okay => {
                                         if (okay) {
@@ -373,6 +375,8 @@
                                         }
                                     });
                             } else if (alerts == "failed") {
+                                swal('Gagal', 'Data gagal di delete...', 'warning');
+                            } else {
                                 swal('Gagal', 'Data gagal di delete...', 'warning');
                             }
                         },
