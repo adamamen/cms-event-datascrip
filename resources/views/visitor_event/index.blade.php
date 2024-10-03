@@ -74,6 +74,10 @@
                                 <button class="btn btn-primary" id="save-btn"><i class="fa-solid fa-save"></i>
                                     &nbsp; Save Changes
                                 </button>
+                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                    name="btn_progress" style="display: none;">
+                                    Submit
+                                </a>
                                 <button class="btn btn-secondary" type="button" id="reset-btn">
                                     <i class="fa-solid fa-rotate-left"></i>
                                     &nbsp; Reset
@@ -133,6 +137,7 @@
                                 </a>
                             </div>
                         </div>
+                        <div id="loading" style="display: none;">Mengirim email, mohon tunggu...</div>
                         {{-- <a href="#" class="btn btn-danger" id="delete-checkbox-btn">
                             <i class="fas fa-trash"></i>&emsp; Delete Selected
                         </a>
@@ -244,8 +249,94 @@
 
 <!-- Page Specific JS File -->
 <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
+@if (session('success'))
+    <script>
+        swal({
+            title: "Sukses!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            button: "OK",
+        });
+    </script>
+@endif
+
+@if (session('error'))
+    <script>
+        swal({
+            title: "Error!",
+            text: "{{ session('error') }}",
+            icon: "error",
+            button: "OK",
+        });
+    </script>
+@endif
 
 <script>
+    $(document).ready(function() {
+        $('#uploadForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var fileInput = $('#excel-file').val();
+            if (!fileInput) {
+                var content = document.createElement('div');
+                content.innerHTML = '<strong>File</strong> tidak boleh kosong, silahkan coba lagi...';
+                swal({
+                    title: 'Warning',
+                    content: content,
+                    icon: "warning",
+                }).then(okay => {
+                    if (okay) {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    }
+                });
+                return;
+            }
+
+            $('#save-btn').hide();
+            $('#btn_progress').show();
+
+            var form = $(this);
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    var content = document.createElement('div');
+                    content.innerHTML = 'Data telah berhasil di import sebanyak <strong>' +
+                        response.count + ' orang. </strong> ';
+                    swal({
+                        title: 'Sukses!',
+                        content: content,
+                        icon: "success",
+                    }).then(okay => {
+                        if (okay) {
+                            $('#save-btn').show();
+                            $('#btn_progress').hide();
+                            window.location.reload();
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    swal({
+                        title: "Error!",
+                        text: "Gagal mengimpor data.",
+                        icon: "error",
+                        button: "OK",
+                    });
+
+                    $('#btn_progress').addClass('disabled');
+                    $('#save-btn').show();
+                    $('#btn_progress').hide();
+                },
+            });
+        });
+    });
+
     $(document).on('click', '#delete-btn', function() {
         var recordId = $(this).data('id');
         var params = "<?php echo $titleUrl; ?>";
@@ -390,16 +481,19 @@
         }
 
         swal({
-                title: "Apakah anda yakin ingin mengirim email?",
+                title: "Apakah Anda yakin ingin mengirim email?",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
             })
             .then((willSend) => {
                 if (willSend) {
-                    let ids = [];
-                    document.querySelectorAll('.checkbox-item:checked').forEach((checkbox) => {
-                        ids.push(checkbox.value);
+                    swal({
+                        title: "Mengirim email, mohon tunggu...",
+                        text: "Proses sedang berlangsung",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
                     });
 
                     fetch("{{ route('send.email') }}", {
@@ -409,19 +503,40 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
                             body: JSON.stringify({
-                                ids: ids
+                                ids: selectedIds
                             })
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.message === 'Emails sent successfully!') {
-                                swal("Berhasil!", "Email telah terkirim.", "success");
+                                var content = document.createElement('div');
+                                content.innerHTML = "Email telah berhasil dikirim sebanyak <b>" +
+                                    selectedIds.length + " orang. </b>";
+
+                                swal({
+                                    title: "Berhasil!",
+                                    content: content,
+                                    icon: "success",
+                                }).then(okay => {
+                                    if (okay) {
+                                        window.location.reload();
+                                    }
+                                });
                             } else {
-                                swal("Gagal!", "Email telah gagal dikirim.", "error");
+                                swal("Gagal!", "Email gagal dikirim.", "error").then(okay => {
+                                    if (okay) {
+                                        window.location.reload();
+                                    }
+                                });
                             }
                         })
                         .catch((error) => {
-                            swal("Gagal!", "Email telah gagal dikirim.", "error");
+                            swal("Gagal!", "Terjadi kesalahan saat mengirim email.", "error").then(
+                                okay => {
+                                    if (okay) {
+                                        window.location.reload();
+                                    }
+                                });
                         });
                 }
             });

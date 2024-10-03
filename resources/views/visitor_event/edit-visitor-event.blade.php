@@ -82,7 +82,7 @@
                                         <div class="form-group col-md-4 col-12">
                                             <label>Name Of Agency / Company</label>
                                             <input type="text" class="form-control"
-                                                value="{{ $value->type_invitation }}" required="" name="name_of_agency"
+                                                value="{{ $value->invitation_name }}" required="" name="name_of_agency"
                                                 id="name_of_agency">
                                             <div class="invalid-feedback">
                                                 Name Of Agency / Company is required
