@@ -192,13 +192,14 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
 
-                        swal('Sukses', 'Data berhasil diupdate...', 'success').then(
-                            okay => {
-                                if (okay) {
-                                    window.location.href = "{{ url('/') }}" +
-                                        "/visitor-event/" + params;
-                                }
-                            });
+                        swal('Success', 'Data has been successfully updated...', 'success')
+                            .then(
+                                okay => {
+                                    if (okay) {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/visitor-event/" + params;
+                                    }
+                                });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $("#btn_progress").hide();

@@ -36,11 +36,11 @@ class VisitorEventController extends Controller
             ->whereNotNull('scan_date')
             ->get();
 
-        $isAdmin = ($user[0]['event_id'] == 0);
-
-        if ($isAdmin && ($page == 'cms' || $page != $titleUrl)) {
-            return view('error.error-403');
-        }
+        //         $isAdmin = ($user[0]['event_id'] == 0);
+        // 
+        //         if (!$isAdmin && ($page == 'cms' || $page != $titleUrl)) {
+        //             return view('error.error-403');
+        //         }
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
@@ -668,7 +668,7 @@ class VisitorEventController extends Controller
         } else {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'QR Code tidak ditemukan, silahkan coba lagi'
+                'message' => 'QR Code not found, please try again.'
             ], 404);
         }
     }
@@ -718,7 +718,7 @@ class VisitorEventController extends Controller
                                     Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
                                     Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
                                     
-                                    <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' & ' . $tanggalAkhir . ' <br />
+                                    <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
                                     <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
                                     <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
                                     <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />

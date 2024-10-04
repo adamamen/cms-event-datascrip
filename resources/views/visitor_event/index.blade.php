@@ -252,7 +252,7 @@
 @if (session('success'))
     <script>
         swal({
-            title: "Sukses!",
+            title: "Success!",
             text: "{{ session('success') }}",
             icon: "success",
             button: "OK",
@@ -280,7 +280,7 @@
             if (!fileInput) {
                 var content = document.createElement('div');
                 content.innerHTML =
-                    '<strong>Upload File</strong> tidak boleh kosong, silahkan coba lagi...';
+                    '<strong>The upload file</strong> cannot be empty, please try again...';
                 swal({
                     title: 'Warning',
                     content: content,
@@ -308,10 +308,10 @@
                 processData: false,
                 success: function(response) {
                     var content = document.createElement('div');
-                    content.innerHTML = 'Data telah berhasil di import sebanyak <strong>' +
-                        response.count + ' orang. </strong> ';
+                    content.innerHTML = 'Data has been successfully imported for <strong>' +
+                        response.count + ' people. </strong> ';
                     swal({
-                        title: 'Sukses!',
+                        title: 'Success!',
                         content: content,
                         icon: "success",
                     }).then(okay => {
@@ -325,7 +325,7 @@
                 error: function(xhr) {
                     swal({
                         title: "Error!",
-                        text: "Gagal Import data, silahkan coba lagi.",
+                        text: "Failed to import data, please try again.",
                         icon: "error",
                         button: "OK",
                     });
@@ -343,8 +343,8 @@
         var params = "<?php echo $titleUrl; ?>";
 
         swal({
-                title: 'Apakah kamu yakin?',
-                text: 'Apakah kamu yakin ingin menghapus data ini?',
+                title: "Are you sure?",
+                text: 'Are you sure you want to delete this data?',
                 icon: 'warning',
                 buttons: true,
                 dangerMode: true,
@@ -367,7 +367,8 @@
                             //         'warning');
                             // } else
                             if (alerts == "success") {
-                                swal('Sukses', 'Data berhasil di delete...', 'success').then(
+                                swal('Success', 'Data has been successfully deleted...',
+                                    'success').then(
                                     okay => {
                                         if (okay) {
                                             window.location.href = "{{ url('/') }}" +
@@ -375,9 +376,9 @@
                                         }
                                     });
                             } else if (alerts == "failed") {
-                                swal('Gagal', 'Data gagal di delete...', 'warning');
+                                swal('Failed', 'Failed to delete data...', 'warning');
                             } else {
-                                swal('Gagal', 'Data gagal di delete...', 'warning');
+                                swal('Failed', 'Failed to delete data...', 'warning');
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
@@ -420,14 +421,14 @@
             });
 
             if (selectedIds.length === 0) {
-                swal('Tidak ada data yang dipilih', 'Silakan pilih setidaknya satu item untuk dihapus.',
+                swal('No data selected.', 'Please select at least one item to delete.',
                     'warning');
                 return;
             }
 
             swal({
-                title: 'Apakah Kamu yakin?',
-                text: "Apakah kamu yakin ingin menghapus data ini?",
+                title: 'Are you soure?',
+                text: "Are you sure you want to delete this data?",
                 type: 'warning',
                 icon: "warning",
                 buttons: [
@@ -451,16 +452,16 @@
                                         'tr').remove();
                                 });
 
-                                swal('Berhasil',
-                                    'Data yang terpilih sudah dihapus',
+                                swal('Success',
+                                    'The selected data has been deleted.',
                                     'success');
 
                                 setTimeout(function() {
                                     location.reload();
                                 }, 1500);
                             } else {
-                                swal('Gagal!',
-                                    'Terjadi kesalahan saat menghapus item.',
+                                swal('Failed!',
+                                    'An error occurred while deleting the item.',
                                     'error');
                             }
                         }
@@ -479,13 +480,13 @@
         });
 
         if (selectedIds.length === 0) {
-            swal('Tidak ada data yang dipilih', 'Silakan pilih setidaknya satu item untuk kirim email.',
+            swal('No data selected.', 'Please select at least one item to send the email.',
                 'warning');
             return;
         }
 
         swal({
-                title: "Apakah Anda yakin ingin mengirim email?",
+                title: "Are you sure you want to send the email?",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
@@ -493,8 +494,8 @@
             .then((willSend) => {
                 if (willSend) {
                     swal({
-                        title: "Mengirim email, mohon tunggu...",
-                        text: "Proses sedang berlangsung",
+                        title: "Sending email, please wait...",
+                        text: "The process is ongoing.",
                         icon: "info",
                         buttons: false,
                         closeOnClickOutside: false,
@@ -514,11 +515,11 @@
                         .then(data => {
                             if (data.message === 'Emails sent successfully!') {
                                 var content = document.createElement('div');
-                                content.innerHTML = "Email telah berhasil dikirim sebanyak <b>" +
-                                    selectedIds.length + " orang. </b>";
+                                content.innerHTML = "Email has been successfully sent to <b>" +
+                                    selectedIds.length + " people. </b>";
 
                                 swal({
-                                    title: "Berhasil!",
+                                    title: "Success!",
                                     content: content,
                                     icon: "success",
                                 }).then(okay => {
@@ -527,7 +528,7 @@
                                     }
                                 });
                             } else {
-                                swal("Gagal!", "Email gagal dikirim.", "error").then(okay => {
+                                swal("Failed!", "Email failed to send.", "error").then(okay => {
                                     if (okay) {
                                         window.location.reload();
                                     }
@@ -535,7 +536,7 @@
                             }
                         })
                         .catch((error) => {
-                            swal("Gagal!", "Terjadi kesalahan saat mengirim email.", "error").then(
+                            swal("Failed!", "An error occurred while sending the email.", "error").then(
                                 okay => {
                                     if (okay) {
                                         window.location.reload();

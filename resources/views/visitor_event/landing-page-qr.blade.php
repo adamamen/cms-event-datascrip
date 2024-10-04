@@ -51,7 +51,7 @@
                                         placeholder="Enter your QR code" autocomplete="off" maxlength="10">
                                     <p>
                                         <span style="color:red">*</span>
-                                        <span style="font-size: 14px;"><strong>Masukkan 10 karakter di form input
+                                        <span style="font-size: 14px;"><strong>Enter 10 characters in the input form
                                             </strong></span>
                                     </p>
                                 </div>
@@ -257,8 +257,8 @@
 
             function verifyQRCode(qrCode) {
                 swal({
-                    title: "Sedang memproses scan",
-                    text: "Mohon tunggu...",
+                    title: "Processing scan",
+                    text: "Please wait...",
                     icon: "info",
                     buttons: false,
                     closeOnClickOutside: false,
@@ -283,7 +283,7 @@
                             content.innerHTML = 'QR Code is valid! <br> Welcome <strong>' + name +
                                 '</strong>';
                             swal({
-                                title: 'Sukses',
+                                title: 'Success',
                                 content: content,
                                 icon: "success",
                             }).then(() => {
@@ -295,7 +295,7 @@
                             var name = response.message;
                             var content = document.createElement('div');
                             content.innerHTML =
-                                'QR Code sudah pernah digunakan. Silahkan coba lagi. <br> <strong>' +
+                                'The QR Code has already been used. Please try again. <br> <strong>' +
                                 name + '</strong>';
                             swal({
                                 title: 'Error',
