@@ -19,6 +19,9 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
 
 class VisitorEventController extends Controller
 {
@@ -554,9 +557,10 @@ class VisitorEventController extends Controller
                     'created_by'        => Auth::user()->username,
                     'updated_by'        => Auth::user()->username,
                     'flag_qr'           => '0',
+                    'flag_email'        => '0',
                 ]);
 
-                $countImported++; // Menambahkan setiap kali ada data yang berhasil diimpor
+                $countImported++;
             }
 
             return response()->json(['message' => 'Data berhasil diimpor', 'count' => $countImported]);
@@ -675,7 +679,9 @@ class VisitorEventController extends Controller
 
     public function sendEmail(Request $request)
     {
-        $ids = $request->input('ids');
+        $ids           = $request->input('ids');
+        $emailsSent    = 0;
+        $totalSelected = count($ids);
 
         if (!empty($ids)) {
             $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
@@ -686,7 +692,7 @@ class VisitorEventController extends Controller
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
                     if ($event->id_event == $visitor->event_id) {
-                        $judul           = ucwords($event->title);
+                        $judul = ucwords($event->title);
                         $nama            = $visitor->full_name;
                         $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
                         $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
@@ -731,38 +737,73 @@ class VisitorEventController extends Controller
                                 </html>';
 
                         $mail = new PHPMailer(true);
+                        try {
+                            $mail->SMTPOptions = array(
+                                'ssl' => array(
+                                    'verify_peer'       => false,
+                                    'verify_peer_name'  => false,
+                                    'allow_self_signed' => true
+                                )
+                            );
 
-                        $mail->SMTPOptions = array(
-                            'ssl' => array(
-                                'verify_peer'       => false,
-                                'verify_peer_name'  => false,
-                                'allow_self_signed' => true
-                            )
-                        );
+                            $mail->isSMTP();
+                            $mail->Host       = env('MAIL_HOST');
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = env('MAIL_USERNAME');
+                            $mail->Password   = env('MAIL_PASSWORD');
+                            $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                            $mail->Port       = env('MAIL_PORT');
 
-                        $mail->isSMTP();
-                        $mail->Host       = env('MAIL_HOST');
-                        $mail->SMTPAuth   = true;
-                        $mail->Username   = env('MAIL_USERNAME');
-                        $mail->Password   = env('MAIL_PASSWORD');
-                        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                        $mail->Port       = env('MAIL_PORT');
+                            $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                            $mail->addAddress($email, $nama);
 
-                        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                        $mail->addAddress($email, $nama);
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Event ' . $judul;
+                            $mail->Body = $body;
 
-                        //Content
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Event ' . $judul;
-                        $mail->Body    = $body;
-                        $mail->send();
+                            if ($mail->send()) {
+                                $visitor->flag_email = 1;
+                                $emailsSent++;
+                            } else {
+                                $visitor->flag_email = 0;
+                            }
+                        } catch (Exception $e) {
+                            $visitor->flag_email = 0;
+                        }
+
+                        $visitor->save();
                     }
                 }
             }
 
-            return response()->json(['message' => 'Emails sent successfully!'], 200);
+            return response()->json([
+                'message'        => 'Emails processed!',
+                'emails_sent'    => $emailsSent,
+                'total_selected' => $totalSelected
+            ], 200);
         }
 
         return response()->json(['message' => 'No visitors selected'], 400);
+    }
+
+    public function storeArrival(Request $request)
+    {
+        $request->validate([
+            'visitorId' => 'required|exists:tbl_visitor_event,id',
+            'dateArrival' => 'required|date',
+        ]);
+
+        try {
+            $visitor = M_VisitorEvent::findOrFail($request->visitorId);
+
+            $visitor->scan_date = Carbon::now();
+            $visitor->flag_qr   = 1;
+
+            $visitor->save();
+
+            return response()->json(['success' => true, 'message' => 'Arrival details saved successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 }

@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ asset('library/jqvmap/dist/jqvmap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('library/datatables/media/css/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/bootstrap-daterangepicker/daterangepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('library/select2/dist/css/select2.min.css') }}">
 @endpush
 
 @section('main')
@@ -137,19 +139,6 @@
                                 </a>
                             </div>
                         </div>
-                        <div id="loading" style="display: none;">Mengirim email, mohon tunggu...</div>
-                        {{-- <a href="#" class="btn btn-danger" id="delete-checkbox-btn">
-                            <i class="fas fa-trash"></i>&emsp; Delete Selected
-                        </a>
-                        &emsp;
-                        <a href="#" class="btn btn-success" id="send-whatsapp-btn">
-                            <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp
-                        </a>
-                        &emsp;
-                        <a href="#" class="btn btn-primary" id="send-email-btn">
-                            <i class="fas fa-envelope"></i>&emsp; Send Email
-                        </a>
-                        &emsp; --}}
 
                     </div>
                     <div class="card-body">
@@ -169,6 +158,7 @@
                                         <th>Nama Of Agency / Company</th>
                                         <th>Barcode No</th>
                                         <th>Date Arrival</th>
+                                        <th>E-mail Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -188,6 +178,15 @@
                                             <td>{{ $value['invitation_name'] }}</td>
                                             <td>{{ $value['barcode_no'] }}</td>
                                             <td>{{ $value['scan_date'] }}</td>
+                                            @if ($value['flag_email'] == '1')
+                                                <td>
+                                                    <span class="badge badge-success">Delivered</span>
+                                                </td>
+                                            @else
+                                                <td>
+                                                    <span class="badge badge-danger">Not Delivered</span>
+                                                </td>
+                                            @endif
                                             <td>
                                                 @if ($pages == 'cms')
                                                     <form method="POST"
@@ -196,29 +195,43 @@
                                                         <form method="POST"
                                                             action="{{ route('edit-visitor', ['page' => $value['title_url'], 'id' => $value['id']]) }}">
                                                 @endif
-
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                                <button class="btn btn-info" id="edit-btn" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>&nbsp;
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-dark dropdown-toggle"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-tasks"></i>&emsp; Actions
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <button type="submit" class="dropdown-item" title="Edit">
+                                                            <i class="fas fa-edit"></i>&emsp; Edit
+                                                        </button>
+                                                        <a class="dropdown-item" id="delete-btn"
+                                                            data-id="{{ $value['id'] }}" title="Delete">
+                                                            <i class="fas fa-trash"></i>&emsp; Delete
+                                                        </a>
+                                                        <a href="{{ route('visitor.event.qrcode', ['id' => encrypt($value['id'])]) }}"
+                                                            target="_blank" class="dropdown-item" title="View QR">
+                                                            <i class="fas fa-eye"></i>&emsp; View QR
+                                                        </a>
+                                                        <a href="{{ route('visitor.event.downloadQR', ['id' => $value['id']]) }}"
+                                                            class="dropdown-item" title="Download QR">
+                                                            <i class="fas fa-download"></i>&emsp; Download QR
+                                                        </a>
+                                                        @if (empty($value['scan_date']))
+                                                            <a href="#" class="dropdown-item arrival-btn"
+                                                                data-id="{{ $value['id'] }}"
+                                                                data-name="{{ $value['full_name'] }}"
+                                                                title="Arrival">
+                                                                <i class="fas fa-plane-arrival"></i>&emsp; Arrival
+                                                            </a>
+                                                        @endif
 
-                                                <a class="btn btn-danger" id="delete-btn"
-                                                    data-id="{{ $value['id'] }}" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>&nbsp;
-
-                                                <a href="{{ route('visitor.event.qrcode', ['id' => encrypt($value['id'])]) }}"
-                                                    target="_blank" class="btn btn-light" id="view-btn"
-                                                    title="View QR">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-
-                                                <a href="{{ route('visitor.event.downloadQR', ['id' => $value['id']]) }}"
-                                                    class="btn btn-primary" id="download-btn" title="Download QR">
-                                                    <i class="fas fa-download"></i>
-                                                </a>&nbsp;
+                                                    </div>
+                                                </div>
                                                 </form>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -228,6 +241,7 @@
                 </div>
             </div>
         </div>
+
     </section>
 </div>
 @endsection
@@ -242,6 +256,7 @@
 <script src="{{ asset('library/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
 <script src="{{ asset('library/jquery-ui-dist/jquery-ui.min.js') }}"></script>
 <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('library/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
 
 <!-- Page Specific JS File -->
 <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
@@ -362,9 +377,9 @@
                             var alerts = response.message
 
                             // if (alerts == "failed") {
-                            //     swal('Gagal',
-                            //         'No Tiket sudah pernah digunakan, silahkan coba lagi...',
-                            //         'warning');
+                            // swal('Gagal',
+                            // 'No Tiket sudah pernah digunakan, silahkan coba lagi...',
+                            // 'warning');
                             // } else
                             if (alerts == "success") {
                                 swal('Success', 'Data has been successfully deleted...',
@@ -480,8 +495,7 @@
         });
 
         if (selectedIds.length === 0) {
-            swal('No data selected.', 'Please select at least one item to send the email.',
-                'warning');
+            swal('No data selected.', 'Please select at least one item to send the email.', 'warning');
             return;
         }
 
@@ -513,10 +527,13 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.message === 'Emails sent successfully!') {
+                            const emailsSent = data.emails_sent;
+                            const totalSelected = data.total_selected;
+
+                            if (emailsSent > 0) {
                                 var content = document.createElement('div');
                                 content.innerHTML = "Email has been successfully sent to <b>" +
-                                    selectedIds.length + " people. </b>";
+                                    emailsSent + " out of " + totalSelected + " people.</b>";
 
                                 swal({
                                     title: "Success!",
@@ -528,7 +545,7 @@
                                     }
                                 });
                             } else {
-                                swal("Failed!", "Email failed to send.", "error").then(okay => {
+                                swal("Failed!", "All emails failed to send.", "error").then(okay => {
                                     if (okay) {
                                         window.location.reload();
                                     }
@@ -545,6 +562,62 @@
                         });
                 }
             });
+    });
+
+    $(document).ready(function() {
+        $('.arrival-btn').click(function(e) {
+            e.preventDefault();
+
+            const visitorId = $(this).data('id');
+            const userName = $(this).data('name');
+
+            var content = document.createElement('div');
+            content.innerHTML =
+                `Are you sure <strong>${userName}</strong> is already at the place?`;
+            swal({
+                title: "Confirmation",
+                content: content,
+                icon: "warning",
+                buttons: {
+                    cancel: "No",
+                    confirm: {
+                        text: "Yes",
+                        value: true,
+                    }
+                },
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    const arrivalDate = new Date().toISOString().slice(0, 10);
+
+                    $.ajax({
+                        url: '{{ route('visitor.arrival') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            visitorId: visitorId,
+                            dateArrival: arrivalDate
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                swal("Success", response.message, "success").then(
+                                    () => {
+                                        $(`.arrival-btn[data-id="${visitorId}"]`)
+                                            .hide();
+                                        window.location
+                                            .reload();
+                                    });
+                            } else {
+                                swal("Failed", response.message, "error");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Failed", "Terjadi kesalahan, coba lagi.",
+                                "error");
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>
 @endpush
