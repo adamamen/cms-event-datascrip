@@ -203,7 +203,8 @@
                                                         <i class="fas fa-tasks"></i>&emsp; Actions
                                                     </button>
                                                     <div class="dropdown-menu">
-                                                        <button type="submit" class="dropdown-item" title="Edit">
+                                                        <button type="submit" class="dropdown-item" title="Edit"
+                                                            style="font-size: 14px">
                                                             <i class="fas fa-edit"></i>&emsp; Edit
                                                         </button>
                                                         <a class="dropdown-item" id="delete-btn"
