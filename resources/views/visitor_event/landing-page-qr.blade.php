@@ -23,16 +23,47 @@
             width: 50%;
             margin: 0 auto;
         }
+
+        .custom-card-height {
+            height: 100%;
+            min-height: 70vh;
+        }
+
+        @media (max-width: 1024px) {
+            .custom-card-height {
+                height: auto;
+            }
+        }
+
+        .custom-section {
+            display: flex;
+            justify-content: center;
+            padding-right: 16%;
+        }
+
+        @media (max-width: 1024px) {
+            .custom-section {
+                padding-right: 5%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .custom-section {
+                padding-right: 0%;
+                justify-content: flex-start;
+            }
+        }
     </style>
 @endpush
 
 @section('main')
-    <div class="main-content">
-        <section class="section" style="right: 9%"">
+    <div class="main-content"
+        style="background-image: url('{{ asset('img/BG-LANDING-PAGE-SCAN-QR-EVENT.jpg') }}'); height:50px;">
+        <section class="section custom-section">
             <br><br>
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
+                    <div class="card custom-card-height">
                         <div class="card-header text-center">
                             <h1 class="font-weight-bold mb-6">Event</h1>
                         </div>
@@ -51,8 +82,8 @@
                                         placeholder="Enter your QR code" autocomplete="off" maxlength="10">
                                     <p>
                                         <span style="color:red">*</span>
-                                        <span style="font-size: 14px;"><strong>Enter 10 characters in the input form
-                                            </strong></span>
+                                        <span style="font-size: 14px;"><strong>Enter 10 characters in the input
+                                                form</strong></span>
                                     </p>
                                 </div>
                                 <div class="invalid-feedback">
@@ -61,8 +92,7 @@
                             </div>
                             <p>
                                 <center>
-                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate in velit neque
-                                    quod
+                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate in velit neque quod
                                     perspiciatis eligendi sapiente adipisci, blanditiis ex, molestiae esse tempore? Error
                                     ipsam,
                                     suscipit cupiditate voluptatum tenetur inventore tempore.
@@ -72,6 +102,7 @@
                     </div>
                 </div>
             </div>
+
         </section>
     </div>
 @endsection
