@@ -26,7 +26,7 @@
 
         .custom-card-height {
             height: 100%;
-            min-height: 70vh;
+            min-height: 30vh;
         }
 
         @media (max-width: 1024px) {

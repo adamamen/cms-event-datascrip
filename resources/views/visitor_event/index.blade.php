@@ -117,7 +117,7 @@
                             @foreach ($data as $value)
                                 <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
                                     class="btn btn-warning" id="view-link-qr" target="_blank">
-                                    <i class="fas fa-qrcode"></i>&emsp; View Link QR
+                                    <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
                                 </a>
                             @break
                         @endforeach
@@ -144,7 +144,7 @@
                     <div class="card-body">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
                         <div class="table-responsive">
-                            <table class="table-striped table" id="table-1">
+                            <table class="table-striped table" id="tbl_data_visitor">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="select-all"></th>
@@ -219,6 +219,10 @@
                                                             class="dropdown-item" title="Download QR">
                                                             <i class="fas fa-download"></i>&emsp; Download QR
                                                         </a>
+                                                        <a class="send-email-btn-id dropdown-item"
+                                                            data-id="{{ $value['id'] }}" title="Send Email">
+                                                            <i class="fas fa-envelope"></i>&emsp; Send Email
+                                                        </a>
                                                         @if (empty($value['scan_date']))
                                                             <a href="#" class="dropdown-item arrival-btn"
                                                                 data-id="{{ $value['id'] }}"
@@ -288,6 +292,77 @@
 @endif
 
 <script>
+    // Email Satuan 
+    $(document).ready(function() {
+        $('.send-email-btn-id').on('click', function() {
+            const id = $(this).data('id');
+            const url = "{{ route('send.email.id', ['id' => '__ID__']) }}".replace('__ID__',
+                id);
+
+            swal({
+                title: "Are you sure you want to send the email?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willSend) => {
+                if (willSend) {
+                    swal({
+                        title: "Sending email, please wait...",
+                        text: "The process is ongoing.",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
+                    fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const emailsSent = data.emails_sent ||
+                                0;
+
+                            if (emailsSent > 0) {
+                                var content = document.createElement('div');
+                                content.innerHTML =
+                                    "Email has been successfully sent";
+
+                                swal({
+                                    title: "Success!",
+                                    content: content,
+                                    icon: "success",
+                                }).then(okay => {
+                                    if (okay) {
+                                        window.location.reload();
+                                    }
+                                });
+                            } else {
+                                swal("Failed!", "Emails failed to send.", "error").then(
+                                    okay => {
+                                        if (okay) {
+                                            window.location.reload();
+                                        }
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            swal("Failed!", "An error occurred while sending the email.",
+                                "error").then(
+                                okay => {
+                                    if (okay) {
+                                        window.location.reload();
+                                    }
+                                });
+                        });
+                }
+            });
+        });
+    });
+
+    // Upload Excel 
     $(document).ready(function() {
         $('#uploadForm').on('submit', function(e) {
             e.preventDefault();
@@ -354,6 +429,7 @@
         });
     });
 
+    // Delete satuan 
     $(document).on('click', '#delete-btn', function() {
         var recordId = $(this).data('id');
         var params = "<?php echo $titleUrl; ?>";
@@ -367,6 +443,14 @@
             })
             .then((ok) => {
                 if (ok) {
+                    swal({
+                        title: "Process Delete...",
+                        text: "The process is ongoing.",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
                     $.ajax({
                         url: '{{ route('delete-visitor', ':id') }}'.replace(':id', recordId),
                         type: "DELETE",
@@ -408,163 +492,19 @@
             });
     });
 
+    // Agar muncul path nya
     $('#excel-file').on('change', function() {
         var fileName = $(this).val();
         $(this).next('.custom-file-label').html(fileName);
     })
 
+    // Reset upload excel 
     document.getElementById('reset-btn').addEventListener('click', function() {
         document.getElementById('uploadForm').reset();
         document.querySelector('.custom-file-label').textContent = 'Choose File';
     });
 
-    $(document).ready(function() {
-        $('#select-all').on('click', function() {
-            $('.checkbox-item').prop('checked', this.checked);
-        });
-
-        $('.checkbox-item').on('change', function() {
-            const anyChecked = $('.checkbox-item:checked').length > 0;
-            $('#delete-checkbox-btn').prop('disabled', !anyChecked);
-        });
-
-        $('#delete-checkbox-btn').on('click', function(e) {
-            e.preventDefault();
-
-            let selectedIds = [];
-            $('.checkbox-item:checked').each(function() {
-                selectedIds.push($(this).val());
-            });
-
-            if (selectedIds.length === 0) {
-                swal('No data selected.', 'Please select at least one item to delete.',
-                    'warning');
-                return;
-            }
-
-            swal({
-                title: 'Are you soure?',
-                text: "Are you sure you want to delete this data?",
-                type: 'warning',
-                icon: "warning",
-                buttons: [
-                    'Tidak',
-                    'Iya'
-                ],
-                dangerMode: true,
-            }).then(function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('delete-multiple-visitors') }}",
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            ids: selectedIds
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                selectedIds.forEach(id => {
-                                    $('input[value="' + id + '"]').closest(
-                                        'tr').remove();
-                                });
-
-                                swal('Success',
-                                    'The selected data has been deleted.',
-                                    'success');
-
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 1500);
-                            } else {
-                                swal('Failed!',
-                                    'An error occurred while deleting the item.',
-                                    'error');
-                            }
-                        }
-                    });
-                }
-            })
-        });
-    });
-
-    document.getElementById('send-email-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-
-        let selectedIds = [];
-        $('.checkbox-item:checked').each(function() {
-            selectedIds.push($(this).val());
-        });
-
-        if (selectedIds.length === 0) {
-            swal('No data selected.', 'Please select at least one item to send the email.', 'warning');
-            return;
-        }
-
-        swal({
-                title: "Are you sure you want to send the email?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willSend) => {
-                if (willSend) {
-                    swal({
-                        title: "Sending email, please wait...",
-                        text: "The process is ongoing.",
-                        icon: "info",
-                        buttons: false,
-                        closeOnClickOutside: false,
-                    });
-
-                    fetch("{{ route('send.email') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                ids: selectedIds
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            const emailsSent = data.emails_sent;
-                            const totalSelected = data.total_selected;
-
-                            if (emailsSent > 0) {
-                                var content = document.createElement('div');
-                                content.innerHTML = "Email has been successfully sent to <b>" +
-                                    emailsSent + " out of " + totalSelected + " people.</b>";
-
-                                swal({
-                                    title: "Success!",
-                                    content: content,
-                                    icon: "success",
-                                }).then(okay => {
-                                    if (okay) {
-                                        window.location.reload();
-                                    }
-                                });
-                            } else {
-                                swal("Failed!", "All emails failed to send.", "error").then(okay => {
-                                    if (okay) {
-                                        window.location.reload();
-                                    }
-                                });
-                            }
-                        })
-                        .catch((error) => {
-                            swal("Failed!", "An error occurred while sending the email.", "error").then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.reload();
-                                    }
-                                });
-                        });
-                }
-            });
-    });
-
+    // Arrival 
     $(document).ready(function() {
         $('.arrival-btn').click(function(e) {
             e.preventDefault();
@@ -614,6 +554,210 @@
                         error: function(xhr, status, error) {
                             swal("Failed", "Terjadi kesalahan, coba lagi.",
                                 "error");
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    // Select All Checkbox, Delete Selected, Send Email Selected
+    $(document).ready(function() {
+        const dt = $('#tbl_data_visitor').DataTable({
+            "bSort": false,
+            "lengthMenu": [10, 25, 50, 100, -1],
+            "order": [],
+            "drawCallback": function(settings) {
+                updateSelectAllCheckbox();
+            },
+            "initComplete": function() {
+                const select = this.api().table().container().querySelector('select');
+                select.options[select.options.length - 1].text =
+                    'All';
+            }
+        });
+
+        let selectedCheckboxes = [];
+
+        // Select All Checkbox
+        $('#select-all').on('click', function() {
+            const isChecked = this.checked;
+
+            dt.rows().nodes().each(function(row) {
+                $(row).find('.checkbox-item').prop('checked', isChecked);
+                const id = $(row).find('.checkbox-item').val();
+                if (isChecked) {
+                    if (!selectedCheckboxes.includes(id)) {
+                        selectedCheckboxes.push(id);
+                    }
+                } else {
+                    selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !==
+                        id);
+                }
+            });
+
+            updateSendEmailButton();
+        });
+
+        $('.checkbox-item').on('change', function() {
+            const id = $(this).val();
+
+            if (this.checked) {
+                if (!selectedCheckboxes.includes(id)) {
+                    selectedCheckboxes.push(id);
+                }
+            } else {
+                selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !== id);
+            }
+
+            $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
+                .length);
+            updateSendEmailButton();
+        });
+
+        function updateSelectAllCheckbox() {
+            const totalCheckboxes = $('.checkbox-item').length;
+            const totalChecked = $('.checkbox-item:checked').length;
+            $('#select-all').prop('checked', totalChecked === totalCheckboxes);
+        }
+
+        function updateSendEmailButton() {
+            const anyChecked = selectedCheckboxes.length > 0;
+            $('#send-email-btn').prop('disabled', !anyChecked);
+        }
+
+        // Send Email Selected
+        document.getElementById('send-email-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (selectedCheckboxes.length === 0) {
+                swal('No data selected.', 'Please select at least one item to send the email.',
+                    'warning');
+                return;
+            }
+
+            swal({
+                    title: "Are you sure you want to send the email?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                .then((willSend) => {
+                    if (willSend) {
+                        swal({
+                            title: "Sending email, please wait...",
+                            text: "The process is ongoing.",
+                            icon: "info",
+                            buttons: false,
+                            closeOnClickOutside: false,
+                        });
+
+                        fetch("{{ route('send.email') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    ids: selectedCheckboxes
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                const emailsSent = data.emails_sent;
+                                const totalSelected = data.total_selected;
+
+                                if (emailsSent > 0) {
+                                    var content = document.createElement('div');
+                                    content.innerHTML =
+                                        "Email has been successfully sent to <b>" + emailsSent +
+                                        " out of " + totalSelected + " people.</b>";
+
+                                    swal({
+                                        title: "Success!",
+                                        content: content,
+                                        icon: "success",
+                                    }).then(okay => {
+                                        if (okay) {
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    swal("Failed!", "Emails failed to send.", "error").then(
+                                        okay => {
+                                            if (okay) {
+                                                window.location.reload();
+                                            }
+                                        });
+                                }
+                            })
+                            .catch((error) => {
+                                swal("Failed!", "An error occurred while sending the email.",
+                                    "error").then(
+                                    okay => {
+                                        if (okay) {
+                                            window.location.reload();
+                                        }
+                                    });
+                            });
+                    }
+                });
+        });
+
+        // Delete Selected
+        $('#delete-checkbox-btn').on('click', function(e) {
+            e.preventDefault();
+
+            if (selectedCheckboxes.length === 0) {
+                swal('No data selected.', 'Please select at least one item to delete.', 'warning');
+                return;
+            }
+
+            swal({
+                title: 'Are you sure?',
+                text: "Are you sure you want to delete this data?",
+                icon: "warning",
+                buttons: [
+                    'No',
+                    'Yes'
+                ],
+                dangerMode: true,
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    swal({
+                        title: "Process Delete...",
+                        text: "The process is ongoing.",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
+                    $.ajax({
+                        url: "{{ route('delete-multiple-visitors') }}",
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            ids: selectedCheckboxes
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                selectedCheckboxes.forEach(id => {
+                                    $('input[value="' + id + '"]').closest(
+                                        'tr').remove();
+                                });
+
+                                swal('Success',
+                                    'The selected data has been deleted.',
+                                    'success');
+
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                swal('Failed!',
+                                    'An error occurred while deleting the item.',
+                                    'error');
+                            }
                         }
                     });
                 }

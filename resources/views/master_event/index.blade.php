@@ -74,7 +74,7 @@
                                                 <center>Jenis Event</center>
                                             </th>
                                             <th>
-                                                <center>Title Url</center>
+                                                <center>Url Event</center>
                                             </th>
                                             <th>
                                                 <center>Tgl Terakhir Aplikasi</center>
@@ -127,7 +127,11 @@
                                                     {{ !empty($value['end_registrasi']) ? $value['end_registrasi'] : '-' }}
                                                 </td>
                                                 <td>{{ $value['jenis_event'] == 'A' ? 'Berbayar' : 'Non Berbayar' }}</td>
-                                                <td>{{ $value['title_url'] }}</td>
+                                                <td>
+                                                    <a href="{{ url('visitor-event/' . $value['title_url']) }}">
+                                                        {{ $value['title_url'] }}
+                                                    </a>
+                                                </td>
                                                 <td>{{ $value['tanggal_terakhir_aplikasi_indo'] }}</td>
                                                 <td>
                                                     <center>

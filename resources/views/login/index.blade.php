@@ -100,12 +100,12 @@
                                     id="btn_submit" name="btn_submit">Login</button>
                             </div>
 
-                            <div class="mt-5 text-center">
+                            {{-- <div class="mt-5 text-center">
                                 @if (empty($masterEvent))
                                     Don't have an account? <a href="{{ route('register', ['page' => 'cms']) }}">Create
                                         new one for Admin</a>
                                 @endif
-                            </div>
+                            </div> --}}
                         </form>
 
                         <div class="text-small mt-5 text-center">

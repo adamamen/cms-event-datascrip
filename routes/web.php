@@ -86,6 +86,7 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
     Route::post('/delete-multiple-visitors', [VisitorEventController::class, 'deleteMultipleVisitors'])->name('delete-multiple-visitors');
     Route::post('/visitor-event/send-email', [VisitorEventController::class, 'sendEmail'])->name('send.email');
+    Route::get('/visitor-event/send-email/{id}', [VisitorEventController::class, 'sendEmailId'])->name('send.email.id');
     Route::post('/visitor-event/arrival', [VisitorEventController::class, 'storeArrival'])->name('visitor.arrival');
 
     // Admin Event

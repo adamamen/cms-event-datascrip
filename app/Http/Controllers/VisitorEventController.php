@@ -27,23 +27,28 @@ class VisitorEventController extends Controller
 {
     function index($page)
     {
-        $type_menu   = 'visitor_event';
-        $data        = visitorEventandMasterEvent($page);
-        $masterEvent = masterEvent($page);
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
-        $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $title       = str_replace('-', ' ', $titleUrl);
-        $output      = ucwords($title);
-        $dataArrival = M_VisitorEvent::select('*')
+        $type_menu     = 'visitor_event';
+        $data          = visitorEventandMasterEvent($page);
+        $masterEvent   = masterEvent($page);
+        $user          = userAdmin();
+        $userId        = $user[0]['id'];
+        $userIdSession = Auth::user()->id;
+        $titleUrl      = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $title         = str_replace('-', ' ', $titleUrl);
+        $output        = ucwords($title);
+        $dataArrival   = M_VisitorEvent::select('*')
             ->whereNotNull('scan_date')
             ->get();
 
-        //         $isAdmin = ($user[0]['event_id'] == 0);
-        // 
-        //         if (!$isAdmin && ($page == 'cms' || $page != $titleUrl)) {
-        //             return view('error.error-403');
-        //         }
+        // if ($userIdSession !== 0) {
+        //     if ($page != 'canon-september' && $page != 'cms' && $page != $titleUrl) {
+        //         return view('error.error-403');
+        //     }
+        // } else {
+        //     if ($page != 'canon-september') {
+        //         return view('error.error-403');
+        //     }
+        // }
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
@@ -311,7 +316,7 @@ class VisitorEventController extends Controller
         //     }
         // }
         if (!empty($query)) {
-            $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No'];
+            $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No', 'Date Arrival', 'Email Status'];
         }
 
         $filename = 'Data Visitor Event - ' . ucfirst($pages) . '.xlsx';
@@ -677,6 +682,122 @@ class VisitorEventController extends Controller
         }
     }
 
+    public function sendEmailId($id)
+    {
+        $ids        = explode(',', $id);
+        $emailsSent = 0;
+
+        if (!empty($ids)) {
+            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
+            $masterEvent = DB::table('tbl_master_event')
+                ->select("*")
+                ->get();
+
+            foreach ($visitors as $visitor) {
+                foreach ($masterEvent as $event) {
+                    if ($event->id_event == $visitor->event_id) {
+                        $judul           = ucwords($event->title);
+                        $nama            = $visitor->full_name;
+                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
+                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
+                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
+                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
+                        $encryptedId     = encrypt($visitor->id);
+                        $email           = $visitor->email;
+                        $domain          = explode("@", $email)[1];
+                        $ipAddress       = gethostbyname($domain);
+
+                        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+                            $body = '<html>
+                                        <head>
+                                        <style type="text/css">
+                                            body, td {
+                                                font-family: "Aptos", sans-serif;
+                                                font-size: 16px;
+                                            }
+                                            table#info {
+                                                border: 1px solid #555;
+                                                border-collapse: collapse;
+                                            }
+                                            table#info th,
+                                            table#info td {
+                                                padding: 3px;
+                                                border: 1px solid #555;
+                                            }
+                                        </style>
+                                        </head>
+                                        <body>Bapak/Ibu, <br />
+                                        <strong>' . $nama . '</strong><br />
+                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
+                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
+                                        
+                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
+                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
+                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
+                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
+    
+                                        <strong>Syarat & Ketentuan</strong><br />
+                                        - QR Code hanya bisa digunakan 1x pada event. <br />
+                                        - QR Code Tidak boleh diperjual-belikan. <br />
+                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
+                                        </body>
+                                    </html>';
+
+                            $mail = new PHPMailer(true);
+                            try {
+                                $mail->SMTPOptions = array(
+                                    'ssl' => array(
+                                        'verify_peer'       => false,
+                                        'verify_peer_name'  => false,
+                                        'allow_self_signed' => true
+                                    )
+                                );
+
+                                $mail->isSMTP();
+                                $mail->Host       = env('MAIL_HOST');
+                                $mail->SMTPAuth   = true;
+                                $mail->Username   = env('MAIL_USERNAME');
+                                $mail->Password   = env('MAIL_PASSWORD');
+                                $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                                $mail->Port       = env('MAIL_PORT');
+
+                                $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                                $mail->addAddress($email, $nama);
+
+                                $mail->isHTML(true);
+                                $mail->Subject = 'Event ' . $judul;
+                                $mail->Body = $body;
+
+                                // $mail->SMTPDebug = 2;
+
+                                if ($mail->send()) {
+                                    $visitor->flag_email = 1;
+                                    $emailsSent++;
+                                } else {
+                                    $visitor->flag_email = 0;
+                                }
+                            } catch (Exception $e) {
+                                $visitor->flag_email = 0;
+                            }
+
+                            $visitor->save();
+                        } else {
+                            $visitor->flag_email = 0;
+                            $visitor->save();
+                        }
+                    }
+                }
+            }
+
+            return response()->json([
+                'message'        => 'Emails processed!',
+                'emails_sent'    => $emailsSent
+            ], 200);
+        }
+
+        return response()->json(['message' => 'No visitors selected'], 400);
+    }
+
     public function sendEmail(Request $request)
     {
         $ids           = $request->input('ids');
@@ -692,7 +813,7 @@ class VisitorEventController extends Controller
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
                     if ($event->id_event == $visitor->event_id) {
-                        $judul = ucwords($event->title);
+                        $judul           = ucwords($event->title);
                         $nama            = $visitor->full_name;
                         $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
                         $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
@@ -700,78 +821,87 @@ class VisitorEventController extends Controller
                         $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
                         $encryptedId     = encrypt($visitor->id);
                         $email           = $visitor->email;
+                        $domain          = explode("@", $email)[1];
+                        $ipAddress       = gethostbyname($domain);
 
-                        $body = '<html>
-                                    <head>
-                                    <style type="text/css">
-                                        body, td {
-                                            font-family: "Aptos", sans-serif;
-                                            font-size: 16px;
-                                        }
-                                        table#info {
-                                            border: 1px solid #555;
-                                            border-collapse: collapse;
-                                        }
-                                        table#info th,
-                                        table#info td {
-                                            padding: 3px;
-                                            border: 1px solid #555;
-                                        }
-                                    </style>
-                                    </head>
-                                    <body>Selamat Pagi Bapak/Ibu, <br />
-                                    <strong>' . $nama . '</strong><br />
-                                    Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
-                                    Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
-                                    
-                                    <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
-                                    <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                    <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
-                                    <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
+                        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+                            $body = '<html>
+                                        <head>
+                                        <style type="text/css">
+                                            body, td {
+                                                font-family: "Aptos", sans-serif;
+                                                font-size: 16px;
+                                            }
+                                            table#info {
+                                                border: 1px solid #555;
+                                                border-collapse: collapse;
+                                            }
+                                            table#info th,
+                                            table#info td {
+                                                padding: 3px;
+                                                border: 1px solid #555;
+                                            }
+                                        </style>
+                                        </head>
+                                        <body>Selamat Pagi Bapak/Ibu, <br />
+                                        <strong>' . $nama . '</strong><br />
+                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
+                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
+                                        
+                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
+                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
+                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
+                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
+    
+                                        <strong>Syarat & Ketentuan</strong><br />
+                                        - QR Code hanya bisa digunakan 1x pada event. <br />
+                                        - QR Code Tidak boleh diperjual-belikan. <br />
+                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
+                                        </body>
+                                    </html>';
 
-                                    <strong>Syarat & Ketentuan</strong><br />
-                                    - QR Code hanya bisa digunakan 1x pada event. <br />
-                                    - QR Code Tidak boleh diperjual-belikan. <br />
-                                    - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
-                                    </body>
-                                </html>';
+                            $mail = new PHPMailer(true);
+                            try {
+                                $mail->SMTPOptions = array(
+                                    'ssl' => array(
+                                        'verify_peer'       => false,
+                                        'verify_peer_name'  => false,
+                                        'allow_self_signed' => true
+                                    )
+                                );
 
-                        $mail = new PHPMailer(true);
-                        try {
-                            $mail->SMTPOptions = array(
-                                'ssl' => array(
-                                    'verify_peer'       => false,
-                                    'verify_peer_name'  => false,
-                                    'allow_self_signed' => true
-                                )
-                            );
+                                $mail->isSMTP();
+                                $mail->Host       = env('MAIL_HOST');
+                                $mail->SMTPAuth   = true;
+                                $mail->Username   = env('MAIL_USERNAME');
+                                $mail->Password   = env('MAIL_PASSWORD');
+                                $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                                $mail->Port       = env('MAIL_PORT');
 
-                            $mail->isSMTP();
-                            $mail->Host       = env('MAIL_HOST');
-                            $mail->SMTPAuth   = true;
-                            $mail->Username   = env('MAIL_USERNAME');
-                            $mail->Password   = env('MAIL_PASSWORD');
-                            $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                            $mail->Port       = env('MAIL_PORT');
+                                $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                                $mail->addAddress($email, $nama);
 
-                            $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                            $mail->addAddress($email, $nama);
+                                $mail->isHTML(true);
+                                $mail->Subject = 'Event ' . $judul;
+                                $mail->Body = $body;
 
-                            $mail->isHTML(true);
-                            $mail->Subject = 'Event ' . $judul;
-                            $mail->Body = $body;
+                                // $mail->SMTPDebug = 2;
 
-                            if ($mail->send()) {
-                                $visitor->flag_email = 1;
-                                $emailsSent++;
-                            } else {
+                                if ($mail->send()) {
+                                    $visitor->flag_email = 1;
+                                    $emailsSent++;
+                                } else {
+                                    $visitor->flag_email = 0;
+                                }
+                            } catch (Exception $e) {
                                 $visitor->flag_email = 0;
                             }
-                        } catch (Exception $e) {
-                            $visitor->flag_email = 0;
-                        }
 
-                        $visitor->save();
+                            $visitor->save();
+                        } else {
+                            $visitor->flag_email = 0;
+                            $visitor->save();
+                        }
                     }
                 }
             }
@@ -789,7 +919,7 @@ class VisitorEventController extends Controller
     public function storeArrival(Request $request)
     {
         $request->validate([
-            'visitorId' => 'required|exists:tbl_visitor_event,id',
+            'visitorId'   => 'required|exists:tbl_visitor_event,id',
             'dateArrival' => 'required|date',
         ]);
 
