@@ -40,15 +40,9 @@ class VisitorEventController extends Controller
             ->whereNotNull('scan_date')
             ->get();
 
-        // if ($userIdSession !== 0) {
-        //     if ($page != 'canon-september' && $page != 'cms' && $page != $titleUrl) {
-        //         return view('error.error-403');
-        //     }
-        // } else {
-        //     if ($page != 'canon-september') {
-        //         return view('error.error-403');
-        //     }
-        // }
+        if ($userIdSession != 0 && $page == "cms") {
+            return view('error.error-403');
+        }
 
         if (!empty($masterEvent) || $page == "cms") {
             Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
