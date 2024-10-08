@@ -583,7 +583,9 @@
         $('#select-all').on('click', function() {
             const isChecked = this.checked;
 
-            dt.rows().nodes().each(function(row) {
+            dt.rows({
+                'search': 'applied'
+            }).nodes().each(function(row) {
                 $(row).find('.checkbox-item').prop('checked', isChecked);
                 const id = $(row).find('.checkbox-item').val();
                 if (isChecked) {
@@ -598,6 +600,7 @@
 
             updateSendEmailButton();
         });
+
 
         $('.checkbox-item').on('change', function() {
             const id = $(this).val();

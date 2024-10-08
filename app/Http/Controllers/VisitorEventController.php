@@ -837,7 +837,7 @@ class VisitorEventController extends Controller
                                             }
                                         </style>
                                         </head>
-                                        <body>Selamat Pagi Bapak/Ibu, <br />
+                                        <body>Bapak/Ibu, <br />
                                         <strong>' . $nama . '</strong><br />
                                         Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
                                         Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
