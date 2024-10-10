@@ -32,7 +32,7 @@ class VisitorEventController extends Controller
         $masterEvent   = masterEvent($page);
         $user          = userAdmin();
         $userId        = $user[0]['id'];
-        $userIdSession = Auth::user()->id;
+        $userIdSession = Auth::user()->event_id;
         $titleUrl      = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $title         = str_replace('-', ' ', $titleUrl);
         $output        = ucwords($title);

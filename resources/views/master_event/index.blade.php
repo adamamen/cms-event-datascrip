@@ -128,7 +128,7 @@
                                                 </td>
                                                 <td>{{ $value['jenis_event'] == 'A' ? 'Berbayar' : 'Non Berbayar' }}</td>
                                                 <td>
-                                                    <a href="{{ url('visitor-event/' . $value['title_url']) }}">
+                                                    <a href="{{ url('/' . $value['title_url']) }}" target="_blank">
                                                         {{ $value['title_url'] }}
                                                     </a>
                                                 </td>
