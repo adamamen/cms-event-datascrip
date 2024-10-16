@@ -132,11 +132,9 @@
 
                                 if (alerts == "success") {
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
-                                        okay => {
-                                            if (okay) {
-                                                window.location.href = "{{ url('/') }}" +
-                                                    "/company-event/cms";
-                                            }
+                                        () => {
+                                            window.location.href = "{{ url('/') }}" +
+                                                "/company-event/cms";
                                         });
                                 } else if (alerts == "failed") {
                                     swal('Gagal', 'Data gagal di delete...', 'warning');

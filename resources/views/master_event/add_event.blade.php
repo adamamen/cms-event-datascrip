@@ -476,11 +476,9 @@
                                     'warning');
                             } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.href = "{{ url('/') }}" +
-                                                "/master-event/cms";
-                                        }
+                                    () => {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/master-event/cms";
                                     });
                             } else if (alerts == "failed") {
                                 swal('Gagal',

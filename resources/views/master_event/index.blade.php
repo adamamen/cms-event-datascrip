@@ -203,11 +203,9 @@
 
                                 if (alerts == "success") {
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
-                                        okay => {
-                                            if (okay) {
-                                                window.location.href = "{{ url('/') }}" +
-                                                    "/master-event/cms";
-                                            }
+                                        () => {
+                                            window.location.href = "{{ url('/') }}" +
+                                                "/master-event/cms";
                                         });
                                 } else {
                                     swal('Gagal', 'Data gagal di delete...', 'warning');

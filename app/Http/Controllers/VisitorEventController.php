@@ -37,6 +37,7 @@ class VisitorEventController extends Controller
         $title         = str_replace('-', ' ', $titleUrl);
         $output        = ucwords($title);
         $dataArrival   = M_VisitorEvent::select('*')
+            ->where('event_id', $userIdSession)
             ->whereNotNull('scan_date')
             ->get();
 

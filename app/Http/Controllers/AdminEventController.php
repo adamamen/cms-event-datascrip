@@ -139,7 +139,7 @@ class AdminEventController extends Controller
 
     public function update(Request $request)
     {
-        $titleUrl = M_MasterEvent::select('*')->where('id_event', $request->event)->first();
+        $titleUrl = M_MasterEvent::select('*')->where('id_event', $request->events_id)->first();
 
         if ($request->event == NULL) {
             DB::table('tbl_user')
@@ -178,7 +178,7 @@ class AdminEventController extends Controller
                     'created_at'        => now(),
                     'updated_at'        => now(),
                     'password_encrypts' => Crypt::encryptString($request->password),
-                    'title_url'         => $titleUrl->title_url,
+                    'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
                 ]);
 
             Log::info('User berhasil Edit di menu Admin Event', [
@@ -191,7 +191,7 @@ class AdminEventController extends Controller
                 'created_at'        => now(),
                 'updated_at'        => now(),
                 'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url'         => $titleUrl->title_url,
+                'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
             ]);
         }
 

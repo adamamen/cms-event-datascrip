@@ -192,11 +192,9 @@
                                     'warning');
                             } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.href = "{{ url('/') }}" +
-                                                "/company-event/cms";
-                                        }
+                                    () => {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/company-event/cms";
                                     });
                             } else {
                                 swal('Gagal', 'Data gagal disimpan...', 'warning');

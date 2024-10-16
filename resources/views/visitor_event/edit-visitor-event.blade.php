@@ -194,11 +194,9 @@
 
                         swal('Success', 'Data has been successfully updated...', 'success')
                             .then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.href = "{{ url('/') }}" +
-                                            "/visitor-event/" + params;
-                                    }
+                                () => {
+                                    window.location.href = "{{ url('/') }}" +
+                                        "/visitor-event/" + params;
                                 });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

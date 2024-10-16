@@ -304,11 +304,9 @@
                                     'warning');
                             } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.href = "{{ url('/') }}" +
-                                                "/visitor-event/" + params;
-                                        }
+                                    () => {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/visitor-event/" + params;
                                     });
                             } else {
                                 swal('Gagal', 'Data gagal disimpan...', 'warning');

@@ -302,10 +302,8 @@
                                     'warning');
                             } else if (alerts == "success") {
                                 swal('Sukses', 'Data berhasil disimpan...', 'success').then(
-                                    okay => {
-                                        if (okay) {
-                                            location.reload(true)
-                                        }
+                                    () => {
+                                        location.reload(true)
                                     });
                             } else {
                                 swal('Gagal', 'Data gagal disimpan...', 'warning');

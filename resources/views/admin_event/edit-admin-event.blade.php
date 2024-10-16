@@ -157,11 +157,8 @@
                 var nama_lengkap = $('#nama_lengkap').val();
                 var status = $('#status').val();
                 var events_id = $('#events_id').val();
-
-                console.log(event)
-                console.log(events_id)
-
                 var formData = new FormData();
+
                 formData.append("admin_id", admin_id);
                 formData.append("event", event);
                 formData.append("username", username);
@@ -186,11 +183,9 @@
 
                         if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.href = "{{ url('/') }}" +
-                                            "/admin-event/" + params;
-                                    }
+                                () => {
+                                    window.location.href = "{{ url('/') }}" +
+                                        "/admin-event/" + params;
                                 });
                         } else {
                             swal('Gagal', 'Data gagal diupdate...', 'warning');

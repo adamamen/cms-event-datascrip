@@ -140,7 +140,11 @@ class LoginController extends Controller
                     }
                 }
             } else {
-                return redirect()->route('login')->withErrors(['message' => 'Username anda tidak berhak untuk login, silahkan coba lagi']);
+                if ($selectedPage == "cms") {
+                    return redirect()->route('login')->withErrors(['message' => 'Username anda tidak berhak untuk login, silahkan coba lagi']);
+                } else {
+                    return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'Username anda tidak berhak untuk login, silahkan coba lagi']);
+                }
             }
         }
     }

@@ -334,27 +334,21 @@
                                     title: "Success!",
                                     content: content,
                                     icon: "success",
-                                }).then(okay => {
-                                    if (okay) {
-                                        window.location.reload();
-                                    }
+                                }).then(() => {
+                                    window.location.reload();
                                 });
                             } else {
                                 swal("Failed!", "Emails failed to send.", "error").then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.reload();
-                                        }
+                                    () => {
+                                        window.location.reload();
                                     });
                             }
                         })
                         .catch((error) => {
                             swal("Failed!", "An error occurred while sending the email.",
                                 "error").then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.reload();
-                                    }
+                                () => {
+                                    window.location.reload();
                                 });
                         });
                 }
@@ -405,12 +399,10 @@
                         title: 'Success!',
                         content: content,
                         icon: "success",
-                    }).then(okay => {
-                        if (okay) {
-                            $('#save-btn').show();
-                            $('#btn_progress').hide();
-                            window.location.reload();
-                        }
+                    }).then(() => {
+                        $('#save-btn').show();
+                        $('#btn_progress').hide();
+                        window.location.reload();
                     });
                 },
                 error: function(xhr) {
@@ -469,11 +461,9 @@
                             if (alerts == "success") {
                                 swal('Success', 'Data has been successfully deleted...',
                                     'success').then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.href = "{{ url('/') }}" +
-                                                "/visitor-event/" + params;
-                                        }
+                                    () => {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/visitor-event/" + params;
                                     });
                             } else if (alerts == "failed") {
                                 swal('Failed', 'Failed to delete data...', 'warning');
@@ -680,27 +670,21 @@
                                         title: "Success!",
                                         content: content,
                                         icon: "success",
-                                    }).then(okay => {
-                                        if (okay) {
-                                            window.location.reload();
-                                        }
+                                    }).then(() => {
+                                        window.location.reload();
                                     });
                                 } else {
                                     swal("Failed!", "Emails failed to send.", "error").then(
-                                        okay => {
-                                            if (okay) {
-                                                window.location.reload();
-                                            }
+                                        () => {
+                                            window.location.reload();
                                         });
                                 }
                             })
                             .catch((error) => {
                                 swal("Failed!", "An error occurred while sending the email.",
                                     "error").then(
-                                    okay => {
-                                        if (okay) {
-                                            window.location.reload();
-                                        }
+                                    () => {
+                                        window.location.reload();
                                     });
                             });
                     }

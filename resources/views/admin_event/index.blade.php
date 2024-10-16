@@ -138,10 +138,8 @@
 
                                 if (alerts == "success") {
                                     swal('Sukses', 'Data berhasil di delete...', 'success').then(
-                                        okay => {
-                                            if (okay) {
-
-                                            }
+                                    () => {
+                                            location.reload(true);
                                         });
                                 } else if (alerts == "failed") {
                                     swal('Gagal', 'Data gagal di delete...', 'warning');

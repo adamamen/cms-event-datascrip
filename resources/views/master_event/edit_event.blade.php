@@ -333,11 +333,9 @@
                                 'warning');
                         } else if (alerts == "success") {
                             swal('Sukses', 'Data berhasil diupdate...', 'success').then(
-                                okay => {
-                                    if (okay) {
-                                        window.location.href = "{{ url('/') }}" +
-                                            "/master-event/cms";
-                                    }
+                                () => {
+                                    window.location.href = "{{ url('/') }}" +
+                                        "/master-event/cms";
                                 });
                         } else {
                             swal('Gagal', 'Data gagal diupdate...', 'warning');

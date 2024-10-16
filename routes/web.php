@@ -37,17 +37,6 @@ Route::post('register-add', [LoginController::class, 'register_action'])->name('
 
 // QR Code
 Route::get('/visitor-event/qrcode/{id}', [VisitorEventController::class, 'showQRCode'])->name('visitor.event.qrcode');
-// Route::get('/visitor-event/qrcode/{id}', function ($id) {
-//     $targetFolder = storage_path('app/public');
-//     $linkFolder = public_path('storage');
-// 
-//     if (!file_exists($linkFolder)) {
-//         symlink($targetFolder, $linkFolder);
-//     }
-// 
-//     return (new VisitorEventController)->showQRCode($id);
-// })->name('visitor.event.qrcode');
-
 Route::get('/visitor-event/landing-page-qr/{page?}', [VisitorEventController::class, 'index_landing_page'])->name('landing.page');
 Route::post('/visitor-event/verify-qr', [VisitorEventController::class, 'verify_qr'])->name('verify.qr');
 
