@@ -41,7 +41,7 @@
                                                 <center>No</center>
                                             </th>
                                             <th>
-                                                <center>Nama Event</center>
+                                                <center>Event Name</center>
                                             </th>
                                             <th>
                                                 <center>Status</center>
@@ -53,31 +53,31 @@
                                                 <center>Start Event</center>
                                             </th>
                                             <th>
-                                                <center>Divisi</center>
+                                                <center>Division</center>
                                             </th>
                                             <th>
                                                 <center>End Event</center>
                                             </th>
                                             <th>
-                                                <center>Deskripsi</center>
+                                                <center>Description</center>
                                             </th>
                                             <th>
-                                                <center>Start Registrasi</center>
+                                                <center>Start Registration</center>
                                             </th>
                                             <th>
-                                                <center>Lokasi</center>
+                                                <center>Location</center>
                                             </th>
                                             <th>
-                                                <center>End Registrasi</center>
+                                                <center>End Registration</center>
                                             </th>
                                             <th>
-                                                <center>Jenis Event</center>
+                                                <center>Event Type</center>
                                             </th>
                                             <th>
                                                 <center>Url Event</center>
                                             </th>
                                             <th>
-                                                <center>Tgl Terakhir Aplikasi</center>
+                                                <center>Last Application Date</center>
                                             </th>
                                             <th>
                                                 <center>Action</center>
@@ -104,13 +104,13 @@
                                                         @endphp
 
                                                         @if ($tgl_1 > $tgl_2)
-                                                            <center><span class="badge badge-success">Aktif</span></center>
+                                                            <center><span class="badge badge-success">Active</span></center>
                                                         @else
-                                                            <center><span class="badge badge-danger">Tidak Aktif</span>
+                                                            <center><span class="badge badge-danger">Inactive</span>
                                                             </center>
                                                         @endif
                                                     @else
-                                                        <center><span class="badge badge-danger">Tidak Aktif</span></center>
+                                                        <center><span class="badge badge-danger">Inactive</span></center>
                                                     @endif
                                                 </td>
                                                 <td> <img src="{{ asset('images/' . $value['logo']) }}" alt="Image"
@@ -183,8 +183,8 @@
             var recordId = $(this).data('id');
 
             swal({
-                    title: 'Apakah kamu yakin?',
-                    text: 'Apakah kamu yakin ingin menghapus data ini?',
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to delete this data?',
                     icon: 'warning',
                     buttons: true,
                     dangerMode: true,
@@ -202,13 +202,13 @@
                                 var alerts = response.message
 
                                 if (alerts == "success") {
-                                    swal('Sukses', 'Data berhasil di delete...', 'success').then(
+                                    swal('Success', 'Data deleted successfully', 'success').then(
                                         () => {
                                             window.location.href = "{{ url('/') }}" +
                                                 "/master-event/cms";
                                         });
                                 } else {
-                                    swal('Gagal', 'Data gagal di delete...', 'warning');
+                                    swal('Failed', 'Failed to delete data', 'warning');
                                 }
                             },
                             error: function(jqXHR, textStatus, errorThrown) {

@@ -28,7 +28,7 @@
                             <h4>Admin Event </h4>
                             <div class="article-cta">
                                 <a href="{{ route('add_admin_index', ['page' => $pages]) }}" class="btn btn-success"><i
-                                        class="fas fa-plus"></i> Add Admin</a>
+                                        class="fas fa-plus"></i> Add Admin Event</a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -41,8 +41,8 @@
                                             <th>Status</th>
                                             <th>Username</th>
                                             <th>Password</th>
-                                            <th>Nama Lengkap</th>
-                                            <th>Nama Event</th>
+                                            <th>Full Name</th>
+                                            <th>Event Name</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -52,9 +52,9 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>
                                                     @if ($value['status'] == 'A')
-                                                        <span class="badge badge-success">Aktif</span>
+                                                        <span class="badge badge-success">Active</span>
                                                     @else
-                                                        <span class="badge badge-danger">Tidak Aktif</span>
+                                                        <span class="badge badge-danger">Inactive</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $value['username'] }}</td>
@@ -118,8 +118,8 @@
             var params = "<?php echo $pages; ?>";
 
             swal({
-                    title: 'Apakah kamu yakin?',
-                    text: 'Apakah kamu yakin ingin menghapus data ini?',
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to delete this data?',
                     icon: 'warning',
                     buttons: true,
                     dangerMode: true,
@@ -137,12 +137,12 @@
                                 var alerts = response.message
 
                                 if (alerts == "success") {
-                                    swal('Sukses', 'Data berhasil di delete...', 'success').then(
-                                    () => {
+                                    swal('Success', 'Data deleted successfully', 'success').then(
+                                        () => {
                                             location.reload(true);
                                         });
                                 } else if (alerts == "failed") {
-                                    swal('Gagal', 'Data gagal di delete...', 'warning');
+                                    swal('Failed', 'Failed to delete data', 'warning');
                                 }
                             },
                             error: function(jqXHR, textStatus, errorThrown) {

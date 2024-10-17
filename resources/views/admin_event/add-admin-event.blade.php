@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Admin')
+@section('title', 'Add Admin Event')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -15,10 +15,10 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Add Admin</h1>
+                <h1>Add Admin Event</h1>
             </div>
             <div class="section-body">
-                <h2 class="section-title">Add Admin</h2>
+                <h2 class="section-title">Add Admin Event</h2>
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
@@ -30,7 +30,7 @@
                                         <input type="text" class="form-control" value="" required=""
                                             name="username" id="username">
                                         <div class="invalid-feedback">
-                                            Username Wajib Diisi
+                                            Username is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
@@ -38,38 +38,38 @@
                                         <input type="password" class="form-control" value="" required=""
                                             name="password" id="password">
                                         <div class="invalid-feedback">
-                                            Password Wajib Diisi
+                                            Password is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Nama Lengkap</label>
+                                        <label>Full Name</label>
                                         <input type="text" class="form-control" value="" required=""
                                             name="nama_lengkap" id="nama_lengkap">
                                         <div class="invalid-feedback">
-                                            Nama Lengkap Wajib Diisi
+                                            Full Name is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Event</label>
+                                        <label>Event Name</label>
                                         <select class="form-control select2" name="event" id="event">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
+                                            <option selected disabled>-- Please Select --</option>
                                             @foreach ($data as $value)
                                                 <option value="{{ $value->id_event }}">{{ $value->title }}</option>
                                             @endforeach
                                         </select>
                                         <div class="invalid-feedback">
-                                            Status Wajib Diisi
+                                            Status is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
-                                            <option value="A">Aktif</option>
-                                            <option value="D">Tidak Aktif</option>
+                                            <option selected disabled>-- Please Select --</option>
+                                            <option value="A">Active</option>
+                                            <option value="D">Inactive</option>
                                         </select>
                                         <div class="invalid-feedback">
-                                            Status Wajib Diisi
+                                            Status is required
                                         </div>
                                     </div>
                                 </div>
@@ -115,8 +115,8 @@
 
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -154,76 +154,66 @@
                     var name = "Username";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (password == "") {
                     var name = "Password";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (nama_lengkap == "") {
-                    var name = "Nama Lengkap";
+                    var name = "Full Name";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (event == null) {
-                    var name = "Event";
+                    var name = "Event Name";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (status == null) {
                     var name = "Status";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else {
                     $.ajax({
@@ -241,20 +231,21 @@
                             $("#btn_submit").show();
 
                             if (alerts == "failed_space") {
-                                swal('Gagal',
-                                    'Username tidak boleh terdapat spasi, silahkan coba lagi...',
+                                swal('Failed',
+                                    'Username cannot contain spaces, please try again',
                                     'warning');
                             } else if (alerts == "failed") {
-                                swal('Gagal', 'Username sudah terdaftar, silahkan coba lagi...',
+                                swal('Failed',
+                                    'Username is already registered, please try again',
                                     'warning');
                             } else if (alerts == "success") {
-                                swal('Sukses', 'Data berhasil disimpan...', 'success').then(
+                                swal('Success', 'Data saved successfully', 'success').then(
                                     () => {
                                         window.location.href = "{{ url('/') }}" +
                                             "/admin-event/" + params;
                                     });
                             } else {
-                                swal('Gagal', 'Data gagal disimpan...', 'warning');
+                                swal('Failed', 'Failed to save data', 'warning');
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {

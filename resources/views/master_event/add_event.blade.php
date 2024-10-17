@@ -27,11 +27,11 @@
                                 <div class="row">
                                     <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Nama Event</label>
+                                        <label>Event Name</label>
                                         <input type="text" class="form-control" value="" required=""
                                             name="nama_event" id="nama_event">
                                         <div class="invalid-feedback">
-                                            Nama Event Wajib Diisi
+                                            Event Name is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
@@ -39,18 +39,18 @@
                                         <input type="text" class="form-control" value="" required=""
                                             name="title_url" id="title_url">
                                         <div class="invalid-feedback">
-                                            Title Url Wajib Diisi
+                                            Title Url is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Jenis Event</label>
+                                        <label>Event Type</label>
                                         <select class="form-control select2" name="jenis_event" id="jenis_event">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
+                                            <option selected disabled>-- Please Select --</option>
                                             <option value="A">Berbayar</option>
                                             <option value="D">Non Berbayar</option>
                                         </select>
                                         <div class="invalid-feedback">
-                                            Jenis Event Wajib Diisi
+                                            Event Type is required
                                         </div>
                                     </div>
                                 </div>
@@ -58,28 +58,28 @@
                                     <div class="form-group col-md-3 col-12">
                                         <label>Status</label>
                                         <select class="form-control select2" name="status" id="status">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
-                                            <option value="A">Aktif</option>
-                                            <option value="D">Tidak Aktif</option>
+                                            <option selected disabled>-- Please Select --</option>
+                                            <option value="A">Active</option>
+                                            <option value="D">Inactive</option>
                                         </select>
                                         <div class="invalid-feedback">
-                                            Status Wajib Diisi
+                                            Status is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
-                                        <label>Start Registrasi</label>
+                                        <label>Start Registration</label>
                                         <input type="text" class="form-control datetimepicker" value=""
                                             required="" name="start_registrasi" id="start_registrasi">
                                         <div class="invalid-feedback">
-                                            Start Event Wajib Diisi
+                                            Start Registration is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
-                                        <label>End Registrasi</label>
+                                        <label>End Registration</label>
                                         <input type="text" class="form-control datetimepicker" value=""
                                             required="" name="end_registrasi" id="end_registrasi">
                                         <div class="invalid-feedback">
-                                            End Event Wajib Diisi
+                                            End Registration is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
@@ -90,7 +90,7 @@
                                             <label class="custom-file-label" for="customFile">Choose file</label>
                                         </div>
                                         <div class="invalid-feedback">
-                                            Logo Wajib Diisi
+                                            Logo is required
                                         </div>
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@
                                         <input type="text" class="form-control datepicker" value="" required=""
                                             name="start_event" id="start_event">
                                         <div class="invalid-feedback">
-                                            Start Event Wajib Diisi
+                                            Start Event is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
@@ -108,47 +108,47 @@
                                         <input type="text" class="form-control datepicker" value="" required=""
                                             name="end_event" id="end_event">
                                         <div class="invalid-feedback">
-                                            End Event Wajib Diisi
+                                            End Event is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
-                                        <label>Tanggal Terakhir Aplikasi</label>
+                                        <label>Last Application Date</label>
                                         <input type="text" class="form-control datepicker" value=""
                                             required="" name="end_event_application" id="end_event_application">
                                         <div class="invalid-feedback">
-                                            Tanggal Terakhir Aplikasi Wajib Diisi
+                                            Last Application Date is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-3 col-12">
-                                        <label>Divisi</label>
+                                        <label>Division</label>
                                         <select class="form-control select2" name="divisi" id="divisi">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
+                                            <option selected disabled>-- Please Select --</option>
                                             @foreach ($listDivisi as $value)
                                                 <option value="{{ $value->id }}">{{ $value->name }}</option>
                                             @endforeach
                                         </select>
                                         <div class="invalid-feedback">
-                                            Divisi Wajib Diisi
+                                            Division is required
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-6 col-12">
                                         <div class="form-group">
-                                            <label>Deskripsi</label>
+                                            <label>Description</label>
                                             <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi"></textarea>
                                         </div>
                                         <div class="invalid-feedback">
-                                            Deskripsi Wajib Diisi
+                                            Description is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6 col-12">
                                         <div class="form-group">
-                                            <label>Lokasi</label>
+                                            <label>Location</label>
                                             <textarea class="form-control" data-height="150" name="lokasi" id="lokasi"></textarea>
                                         </div>
                                         <div class="invalid-feedback">
-                                            Lokasi Wajib Diisi
+                                            Location is required
                                         </div>
                                     </div>
                                 </div>
@@ -203,8 +203,8 @@
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -233,7 +233,7 @@
 
             titleUrl.on('input', function() {
                 if (titleUrl.val().trim() === '' && namaEvent.val().trim() === '') {
-                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...',
+                    swal('Failed', 'Please fill in the "Event Name" first, please try again',
                         'warning');
                 }
             });
@@ -291,169 +291,147 @@
                 formData.append("end_event_application", end_event_application);
 
                 if (namaEvent == "") {
-                    var name = "Nama Event";
+                    var name = "Event Name";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (jenis_event == null) {
-                    var name = "Jenis Event";
+                    var name = "Event Type";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (status == null) {
                     var name = "Status";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (start_registrasi == null) {
-                    var name = "Start Registrasi";
+                    var name = "Start Registration";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (end_registrasi == null) {
-                    var name = "End Registrasi";
+                    var name = "End Registration";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (divisi == null) {
-                    var name = "Divisi";
+                    var name = "Division";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (logo == undefined) {
                     var name = "Logo";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (startEvent == "") {
                     var name = "Start Event";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (endEvent == "") {
                     var name = "End Event";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (deskripsi == "") {
-                    var name = "Deskripsi";
+                    var name = "Description";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (lokasi == "") {
-                    var name = "Lokasi";
+                    var name = "Location";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again.';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else {
                     $.ajax({
@@ -471,21 +449,21 @@
                             $("#btn_submit").show();
 
                             if (alerts == "failed last character") {
-                                swal('Gagal',
-                                    'Title Url Tidak boleh diakhiri dengan simbol, silahkan coba lagi...',
+                                swal('Failed',
+                                    'The URL Title cannot end with a symbol, please try again',
                                     'warning');
                             } else if (alerts == "success") {
-                                swal('Sukses', 'Data berhasil disimpan...', 'success').then(
+                                swal('Success', 'Data saved successfully', 'success').then(
                                     () => {
                                         window.location.href = "{{ url('/') }}" +
                                             "/master-event/cms";
                                     });
                             } else if (alerts == "failed") {
-                                swal('Gagal',
-                                    'Title Url sudah pernah ada, silahkan coba lagi...',
+                                swal('Failed',
+                                    'The URL Title already exists, please try again',
                                     'warning');
                             } else {
-                                swal('Gagal', 'Data gagal disimpan...', 'warning');
+                                swal('Failed', 'Failed to save data', 'warning');
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {

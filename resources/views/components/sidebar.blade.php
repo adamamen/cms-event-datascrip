@@ -119,7 +119,7 @@
                     <li class="menu-header">Event</li>
                     <li class="{{ $type_menu == 'company_event' ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('company_event.index', ['page' => 'cms']) }}"><i
-                                class="fas fa-building"></i> <span>Divisi Event</span></a>
+                                class="fas fa-building"></i> <span>Division Event</span></a>
                     </li>
                     <li class="{{ $type_menu == 'master_event' ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('index', ['page' => 'cms']) }}"><i

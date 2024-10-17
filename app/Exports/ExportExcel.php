@@ -37,7 +37,6 @@ class ExportExcel implements FromCollection, WithHeadings
 
     function query($page)
     {
-        // dd('1');
         $queryVisitorEvent = visitorEvent();
         $sequenceNumber    = 1;
         if ($page == "cms") {
@@ -51,7 +50,6 @@ class ExportExcel implements FromCollection, WithHeadings
                 foreach ($queryMasterEvent as $event) {
                     if ($visitor->event_id == $event->id_event) {
                         if ($page == "cms") {
-                            // dd('1');
                             $merge[] = [
                                 'RowNumber'         => $sequenceNumber++,
                                 'ticket_no'         => $visitor->ticket_no,

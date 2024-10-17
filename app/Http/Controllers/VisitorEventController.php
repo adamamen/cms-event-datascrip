@@ -14,14 +14,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-// use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\RFCValidation;
 
 class VisitorEventController extends Controller
 {
@@ -40,13 +37,13 @@ class VisitorEventController extends Controller
             ->where('event_id', $userIdSession)
             ->whereNotNull('scan_date')
             ->get();
+        // dd($data);
 
         if ($userIdSession != 0 && $page == "cms") {
             return view('error.error-403');
         }
 
         if (!empty($masterEvent) || $page == "cms") {
-            Log::info('User berada di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             return view('visitor_event.index', [
                 'id'           => $userId,
                 'masterEvent'  => $masterEvent,
@@ -197,7 +194,6 @@ class VisitorEventController extends Controller
 
     public function update(Request $request)
     {
-        // dd($request->id);
         DB::table('tbl_visitor_event')
             ->where('id', $request->id)
             ->update([
@@ -274,26 +270,6 @@ class VisitorEventController extends Controller
             ->toArray();
 
         return view('visitor_event.cetak-pdf-qr', ['visitor' => $visitor, 'masterEvent' => $masterEvent]);
-
-        // $data = visitorEventandMasterEvent($id);
-
-        // foreach ($data as $value) {
-        //     if ($value['id'] == $id) {
-        //         $val['id']                     = $value['id'];
-        //         $val['product_invoice_no']     = $value['no_invoice'];
-        //         $val['visitor_que_no']         = $value['no_ticket'];
-        //         $val['visitor_fullname']       = $value['full_name'];
-        //         $val['visitor_mobile']         = $value['mobile'];
-        //         $val['visitor_address']        = $value['metode_bayar'];
-        //         $val['visitor_payment_method'] = $value['metode_bayar'];
-        //         $val['product_serial_no']      = $value['sn_product'];
-        //         $val['updated_by']             = $value['updated_by'];
-        //     }
-        // }
-
-        //         Log::info('User Cetak Invoice di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
-        // 
-        //         return view('visitor_event.cetak-invoice', ['val' => $val]);
     }
 
     public function export_excel($page)
@@ -301,15 +277,6 @@ class VisitorEventController extends Controller
         $query = visitorEventandMasterEvent($page);
         $pages = ucwords(str_replace('-', ' ', $page));
 
-        // if (!empty($query)) {
-        //     if ($page == "cms") {
-        //         $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'No Invoice', 'SN Product', 'Status Pembayaran', 'Metode Pembayaran', 'Tanggal Registrasi', 'Jenis Event'];
-        //     } else if ($query[0]['jenis_event'] == "A") {
-        //         $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'No Invoice', 'SN Product', 'Status Pembayaran', 'Metode Pembayaran', 'Tanggal Registrasi'];
-        //     } else {
-        //         $customHeadings = ['No', 'No Tiket', 'Nama Event', 'Nama', 'No Handphone', 'Email', 'Alamat', 'Tanggal Registrasi'];
-        //     }
-        // }
         if (!empty($query)) {
             $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No', 'Date Arrival', 'Email Status'];
         }
@@ -329,182 +296,6 @@ class VisitorEventController extends Controller
         }
     }
 
-    //     public function import_excel(Request $request, $page)
-    //     {
-    //         $validator = Validator::make($request->all(), [
-    //             'excel_file' => 'required|mimes:xlsx|max:2048',
-    //         ]);
-    // 
-    //         if ($validator->fails()) {
-    //             return redirect()->back()->withErrors($validator)->withInput();
-    //         }
-    // 
-    //         $file = $request->file('excel_file');
-    //         $rows = Excel::toArray([], $file)[0];
-    // 
-    //         unset($rows[0]);
-    //         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
-    //         // dd($page);
-    // 
-    //         if (!empty($event)) {
-    //             // dd('1');
-    //             foreach ($rows as $row) {
-    //                 $qrData   = $row[1] . '-' . $row[2];
-    //                 $qrCode   = QrCode::format('png')->size(200)->generate($qrData);
-    //                 $filename = $row[1] . '-qrcode.png';
-    // 
-    //                 Storage::disk('public')->put($filename, $qrCode);
-    // 
-    //                 $barcodeLink = url('storage/qrcodes/' . $filename);
-    //                 $barcodeNo = generateUniqueCode();
-    //                 // dd(time());
-    // 
-    //                 DB::table('tbl_visitor_event')->insert([
-    //                     'event_id'          => $event['id_event'],
-    //                     'ticket_no'         => 'NULL',
-    //                     'full_name'         => $row[1],
-    //                     'email'             => $row[2],
-    //                     'gender'            => $row[3],
-    //                     'account_instagram' => $row[4],
-    //                     'mobile'            => $row[5],
-    //                     'type_invitation'   => $row[6],
-    //                     'invitation_name'   => $row[7],
-    //                     'registration_date' => Carbon::now(),
-    //                     'address'           => 'NULL',
-    //                     'barcode_no'        => strtoupper($barcodeNo),
-    //                     'source'            => 'NULL',
-    //                     'barcode_link'      => $barcodeLink,
-    //                     'noted'             => 'NULL',
-    //                     'scan_date'         => Carbon::now(),
-    //                     'created_by'        => Auth::user()->username,
-    //                     'updated_by'        => Auth::user()->username,
-    //                 ]);
-    //             }
-    // 
-    //             return redirect()->back()->with('success', 'Data berhasil diimport');
-    //         } else {
-    //             // dd('2');
-    //             return redirect()->back()->with('error', 'Data gagal diimport, event tidak ditemukan.');
-    //         }
-    //     }
-
-    //     public function import_excel(Request $request, $page)
-    //     {
-    //         $validator = Validator::make($request->all(), [
-    //             'excel_file' => 'required|mimes:xlsx|max:2048',
-    //         ]);
-    // 
-    //         if ($validator->fails()) {
-    //             return redirect()->back()->withErrors($validator)->withInput();
-    //         }
-    // 
-    //         $file = $request->file('excel_file');
-    //         $rows = Excel::toArray([], $file)[0];
-    // 
-    //         unset($rows[0]);
-    // 
-    //         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
-    // 
-    //         if (!empty($event)) {
-    //             foreach ($rows as $row) {
-    //                 $barcodeNo = strtoupper(generateUniqueCode());
-    //                 $filename  = $barcodeNo . '-qrcode.png';
-    //                 $qrCode    = new QrCode($barcodeNo);
-    //                 $writer    = new PngWriter();
-    //                 $path      = 'qrcodes/' . $filename;
-    //                 $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path));
-    // 
-    //                 $barcodeLink = asset('storage/qrcodes/' . $filename);
-    // 
-    //                 DB::table('tbl_visitor_event')->insert([
-    //                     'event_id'          => $event['id_event'],
-    //                     'ticket_no'         => NULL,
-    //                     'full_name'         => $row[1],
-    //                     'email'             => $row[2],
-    //                     'gender'            => $row[3],
-    //                     'account_instagram' => $row[4],
-    //                     'mobile'            => $row[5],
-    //                     'type_invitation'   => $row[6],
-    //                     'invitation_name'   => $row[7],
-    //                     'registration_date' => Carbon::now(),
-    //                     'address'           => NULL,
-    //                     'barcode_no'        => strtoupper($barcodeNo),
-    //                     'source'            => NULL,
-    //                     'barcode_link'      => $barcodeLink,
-    //                     'noted'             => NULL,
-    //                     'scan_date'         => NULL,
-    //                     'created_at'        => Carbon::now(),
-    //                     'created_by'        => Auth::user()->username,
-    //                     'updated_by'        => Auth::user()->username,
-    //                 ]);
-    //             }
-    // 
-    //             return redirect()->back()->with('success', 'Data berhasil diimport');
-    //         } else {
-    //             return redirect()->back()->with('error', 'Data gagal diimport, event tidak ditemukan.');
-    //         }
-    //     }
-
-    //     public function import_excel(Request $request, $page)
-    //     {
-    //         $validator = Validator::make($request->all(), [
-    //             'excel_file' => 'required|mimes:xlsx|max:2048',
-    //         ]);
-    // 
-    //         if ($validator->fails()) {
-    //             return redirect()->back()->withErrors($validator)->withInput();
-    //         }
-    // 
-    //         $file = $request->file('excel_file');
-    //         $rows = Excel::toArray([], $file)[0];
-    // 
-    //         unset($rows[0]);
-    // 
-    //         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
-    // 
-    //         if (!empty($event)) {
-    //             foreach ($rows as $row) {
-    //                 $barcodeNo = strtoupper(generateUniqueCode());
-    //                 $filename  = $barcodeNo . '-qrcode.png';
-    //                 $qrCode    = new QrCode($barcodeNo);
-    //                 $writer    = new PngWriter();
-    //                 $path1      = 'qrcodes/' . $filename;
-    //                 $path2      = 'storage/qrcodes/' . $filename;
-    // 
-    //                 $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path1));
-    //                 $writer->write($qrCode)->saveToFile(public_path($path2)); // Simpan ke public path
-    // 
-    //                 $barcodeLink = asset('storage/qrcodes/' . $filename);
-    // 
-    //                 DB::table('tbl_visitor_event')->insert([
-    //                     'event_id'          => $event->id_event,
-    //                     'ticket_no'         => NULL,
-    //                     'full_name'         => $row[1],
-    //                     'email'             => $row[2],
-    //                     'gender'            => $row[3],
-    //                     'account_instagram' => $row[4],
-    //                     'mobile'            => $row[5],
-    //                     'type_invitation'   => $row[6],
-    //                     'invitation_name'   => $row[7],
-    //                     'registration_date' => Carbon::now(),
-    //                     'address'           => NULL,
-    //                     'barcode_no'        => strtoupper($barcodeNo),
-    //                     'source'            => NULL,
-    //                     'barcode_link'      => $barcodeLink,
-    //                     'noted'             => NULL,
-    //                     'scan_date'         => NULL,
-    //                     'created_at'        => Carbon::now(),
-    //                     'created_by'        => Auth::user()->username,
-    //                     'updated_by'        => Auth::user()->username,
-    //                 ]);
-    //             }
-    // 
-    //             return redirect()->back()->with('success', 'Data berhasil diimpor');
-    //         } else {
-    //             return redirect()->back()->with('error', 'Data gagal diimpor, event tidak ditemukan.');
-    //         }
-    //     }
-
     public function import_excel(Request $request, $page)
     {
         $validator = Validator::make($request->all(), [
@@ -513,10 +304,12 @@ class VisitorEventController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Gagal validasi file.'], 400);
+            Log::info('User gagal import excel ' . strtoupper($page), ['username' => Auth::user()->username]);
         }
 
-        $file = $request->file('excel_file');
-        $rows = Excel::toArray([], $file)[0];
+        $type_menu = 'visitor_event';
+        $file      = $request->file('excel_file');
+        $rows      = Excel::toArray([], $file)[0];
         unset($rows[0]);
 
         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
@@ -532,7 +325,7 @@ class VisitorEventController extends Controller
                 $path2     = 'storage/qrcodes/' . $filename;
 
                 $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path1));
-                $writer->write($qrCode)->saveToFile(public_path($path2)); // Simpan ke public path
+                $writer->write($qrCode)->saveToFile(public_path($path2));
 
                 $barcodeLink = asset('storage/qrcodes/' . $filename);
 

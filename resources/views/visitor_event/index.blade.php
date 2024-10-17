@@ -114,13 +114,20 @@
                                 Arrival Visitor = {{ $dataArrival }}</a>
                             <div class="article-cta"></div>
                             &emsp;
-                            @foreach ($data as $value)
-                                <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
-                                    class="btn btn-warning" id="view-link-qr" target="_blank">
+                            @if ($pages == 'cms')
+                                <a href="{{ route('landing.page', ['page' => 'cms']) }}" class="btn btn-warning"
+                                    id="view-link-qr" target="_blank">
                                     <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
                                 </a>
-                            @break
-                        @endforeach
+                            @else
+                                @foreach ($data as $value)
+                                    <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
+                                        class="btn btn-warning" id="view-link-qr" target="_blank">
+                                        <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
+                                    </a>
+                                @break
+                            @endforeach
+                        @endif
                         &emsp;
                         <div class="btn-group">
                             <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"

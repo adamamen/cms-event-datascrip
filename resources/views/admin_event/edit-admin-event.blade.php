@@ -36,7 +36,7 @@
                                             <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}"
                                                 required="" name="admin_id" id="admin_id">
 
-                                            <div class="invalid-feedback"> Username Wajib Diisi </div>
+                                            <div class="invalid-feedback"> Username is required </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Password </label>
@@ -44,22 +44,22 @@
                                                 value="{{ $value['password_encrypts'] }}" required="" name="password"
                                                 id="password">
                                             <div class="invalid-feedback">
-                                                Password Wajib Diisi
+                                                Password is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Nama Lengkap</label>
+                                            <label>Full Name</label>
                                             <input type="text" class="form-control" value="{{ $value['full_name'] }}"
                                                 required="" name="nama_lengkap" id="nama_lengkap">
                                             <div class="invalid-feedback">
-                                                Nama Lengkap Wajib Diisi
+                                                Full Name is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Event</label>
+                                            <label>Event Name</label>
                                             <select class="form-control select2" name="event" id="event"
                                                 {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
-                                                <option selected disabled>-- Silahkan Pilih --</option>
+                                                <option selected disabled>-- Please Select --</option>
                                                 @foreach ($event as $event)
                                                     <option value="{{ $event->id_event }}"
                                                         {{ $event->id_event == $value['event_id'] ? 'selected' : $event->id_event }}>
@@ -67,21 +67,21 @@
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">
-                                                Status Wajib Diisi
+                                                Status is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Status</label>
                                             <select class="form-control select2" name="status" id="status"
                                                 {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
-                                                <option selected disabled>-- Silahkan Pilih --</option>
+                                                <option selected disabled>-- Please Select --</option>
                                                 <option value="A" {{ $value['status'] == 'A' ? 'selected' : '' }}>
                                                     Aktif</option>
                                                 <option value="D" {{ $value['status'] == 'D' ? 'selected' : '' }}>
                                                     Tidak Aktif</option>
                                             </select>
                                             <div class="invalid-feedback">
-                                                Status Wajib Diisi
+                                                Status is required
                                             </div>
                                         </div>
                                     </div>
@@ -128,8 +128,8 @@
 
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -182,13 +182,13 @@
                         $("#btn_submit").show();
 
                         if (alerts == "success") {
-                            swal('Sukses', 'Data berhasil diupdate...', 'success').then(
+                            swal('Success', 'Data updated successfully', 'success').then(
                                 () => {
                                     window.location.href = "{{ url('/') }}" +
                                         "/admin-event/" + params;
                                 });
                         } else {
-                            swal('Gagal', 'Data gagal diupdate...', 'warning');
+                            swal('Failed', 'Failed to update data', 'warning');
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

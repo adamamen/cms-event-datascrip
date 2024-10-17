@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Divisi Event')
+@section('title', 'Division Event')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -19,16 +19,16 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Divisi Event</h1>
+                <h1>Division Event</h1>
             </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Divisi Event</h4>
+                            <h4>Division Event</h4>
                             <div class="article-cta">
                                 <a href="{{ route('add_company_index', ['page' => 'cms']) }}" class="btn btn-success"><i
-                                        class="fas fa-plus"></i> Add Divisi</a>
+                                        class="fas fa-plus"></i> Add Division</a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -38,7 +38,7 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama Divisi</th>
+                                            <th>Division Name</th>
                                             <th>Status</th>
                                             <th>Description</th>
                                             <th>Created By</th>
@@ -55,9 +55,9 @@
                                                 <td>{{ $value->name }}</td>
                                                 <td>
                                                     @if ($value->status == 'A')
-                                                        <span class="badge badge-success">Aktif</span>
+                                                        <span class="badge badge-success">Active</span>
                                                     @else
-                                                        <span class="badge badge-danger">Tidak Aktif</span>
+                                                        <span class="badge badge-danger">Inactive</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $value->description }}</td>
@@ -112,8 +112,8 @@
             var recordId = $(this).data('id');
 
             swal({
-                    title: 'Apakah kamu yakin?',
-                    text: 'Apakah kamu yakin ingin menghapus data ini?',
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to delete this data?',
                     icon: 'warning',
                     buttons: true,
                     dangerMode: true,
@@ -131,13 +131,13 @@
                                 var alerts = response.message
 
                                 if (alerts == "success") {
-                                    swal('Sukses', 'Data berhasil di delete...', 'success').then(
+                                    swal('Success', 'Data deleted successfully', 'success').then(
                                         () => {
                                             window.location.href = "{{ url('/') }}" +
                                                 "/company-event/cms";
                                         });
                                 } else if (alerts == "failed") {
-                                    swal('Gagal', 'Data gagal di delete...', 'warning');
+                                    swal('Failed', 'Failed to delete data', 'warning');
                                 }
                             },
                             error: function(jqXHR, textStatus, errorThrown) {

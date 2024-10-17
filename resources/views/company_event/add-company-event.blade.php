@@ -27,11 +27,11 @@
                                 <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                 <div class="row">
                                     <div class="form-group col-md-6 col-12">
-                                        <label>Nama Divisi</label>
+                                        <label>Division Name</label>
                                         <input type="text" class="form-control" value="" required=""
-                                            name="name" id="name">
+                                            name="name" id="name" autocomplete="off">
                                         <div class="invalid-feedback">
-                                            Nama Divisi Wajib Diisi
+                                            Division Name is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6 col-12">
@@ -42,16 +42,16 @@
                                             <option value="D">Tidak Aktif</option>
                                         </select>
                                         <div class="invalid-feedback">
-                                            Status Wajib Diisi
+                                            Status is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6 col-12">
                                         <div class="form-group">
-                                            <label>Deskripsi</label>
+                                            <label>Description</label>
                                             <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi"></textarea>
                                         </div>
                                         <div class="invalid-feedback">
-                                            Deskripsi Wajib Diisi
+                                            Description is required
                                         </div>
                                     </div>
                                 </div>
@@ -95,8 +95,8 @@
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -127,49 +127,43 @@
                 formData.append("deskripsi", deskripsi);
 
                 if (name == "") {
-                    var name = "Nama Divisi";
+                    var name = "Division Name";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (status == null) {
                     var name = "Status";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (deskripsi == "") {
-                    var name = "Deskripsi";
+                    var name = "Description";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else {
                     $.ajax({
@@ -187,17 +181,23 @@
                             $("#btn_submit").show();
 
                             if (alerts == "failed") {
-                                swal('Gagal',
-                                    'Nama Divisi sudah pernah digunakan sebelumnya, silahkan coba lagi...',
-                                    'warning');
+                                var name = "Division Name";
+                                var content = document.createElement('div');
+                                content.innerHTML = '<strong>' + name +
+                                    '</strong> has already been used, please try again';
+                                swal({
+                                    title: 'Warning',
+                                    content: content,
+                                    icon: "warning",
+                                })
                             } else if (alerts == "success") {
-                                swal('Sukses', 'Data berhasil disimpan...', 'success').then(
+                                swal('Success', 'Data saved successfully', 'success').then(
                                     () => {
                                         window.location.href = "{{ url('/') }}" +
                                             "/company-event/cms";
                                     });
                             } else {
-                                swal('Gagal', 'Data gagal disimpan...', 'warning');
+                                swal('Failed', 'Failed to save data', 'warning');
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {

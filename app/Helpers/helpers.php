@@ -232,6 +232,8 @@ if (!function_exists('adminEvent')) {
                 $queryMasterEvent = masterEvent_2($page);
             }
 
+            // dd();
+
             if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
                 foreach ($queryVisitorEvent as $visitor) {
                     foreach ($queryMasterEvent as $event) {

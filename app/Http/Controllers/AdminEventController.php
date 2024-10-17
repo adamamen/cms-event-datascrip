@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class AdminEventController extends Controller
 {
@@ -22,8 +21,6 @@ class AdminEventController extends Controller
         $userId      = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
-            Log::info('User ada di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
-
             return view('admin_event.index', [
                 'id'          => $userId,
                 'masterEvent' => $masterEvent,
@@ -32,8 +29,6 @@ class AdminEventController extends Controller
                 'pages'       => $page
             ]);
         } else {
-            Log::info('User gagal akses ke menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
-
             return view('error.error-404');
         }
     }
@@ -52,7 +47,6 @@ class AdminEventController extends Controller
             $data = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
         }
 
-        Log::info('User klik Add Admin di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
         return view('admin_event.add-admin-event', [
             'id'          => $userId,
             'titleUrl'    => $titleUrl,
@@ -73,19 +67,6 @@ class AdminEventController extends Controller
             return response()->json(['message' => 'failed']);
         } else {
             DB::table('tbl_user')->insert([
-                'username'          => $request->username,
-                'password'          => Hash::make($request->password),
-                'full_name'         => $request->nama_lengkap,
-                'event_id'          => $request->event,
-                'status'            => $request->status,
-                'created_at'        => now(),
-                'updated_at'        => now(),
-                'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url'         => $titleUrl->title_url
-            ]);
-
-            Log::info('User Berhasil Add Admin di menu Admin Event', [
-                'username'          => Auth::user()->username,
                 'username'          => $request->username,
                 'password'          => Hash::make($request->password),
                 'full_name'         => $request->nama_lengkap,
@@ -126,7 +107,6 @@ class AdminEventController extends Controller
             ];
         }
 
-        Log::info('User klik action Edit di menu Admin Event ' . strtoupper($page), ['username' => Auth::user()->username]);
         return view('admin_event.edit-admin-event', [
             'titleUrl'    => $page,
             'id'          => $userId,
@@ -154,18 +134,6 @@ class AdminEventController extends Controller
                     'password_encrypts' => Crypt::encryptString($request->password),
                     'title_url'         => $titleUrl->title_url,
                 ]);
-
-            Log::info('User berhasil Edit di menu Admin Event', [
-                'username_update'   => Auth::user()->username,
-                'username'          => $request->username,
-                'password'          => Hash::make($request->password),
-                'full_name'         => $request->nama_lengkap,
-                'status'            => $request->status,
-                'created_at'        => now(),
-                'updated_at'        => now(),
-                'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url'         => $titleUrl->title_url,
-            ]);
         } else {
             DB::table('tbl_user')
                 ->where('id', $request->admin_id)
@@ -180,19 +148,6 @@ class AdminEventController extends Controller
                     'password_encrypts' => Crypt::encryptString($request->password),
                     'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
                 ]);
-
-            Log::info('User berhasil Edit di menu Admin Event', [
-                'username_update'   => Auth::user()->username,
-                'event_id'          => $request->events_id == "0" ? '0' : $request->event,
-                'username'          => $request->username,
-                'password'          => Hash::make($request->password),
-                'full_name'         => $request->nama_lengkap,
-                'status'            => $request->status,
-                'created_at'        => now(),
-                'updated_at'        => now(),
-                'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
-            ]);
         }
 
         return response()->json(['message' => 'success']);
@@ -204,10 +159,8 @@ class AdminEventController extends Controller
 
         if ($data) {
             $data->delete();
-            Log::info('User Berhasil Delete di Menu Admin Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['message' => 'success']);
         } else {
-            Log::info('User Gagal Delete di Menu Admin Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['error' => 'failed'], 404);
         }
     }

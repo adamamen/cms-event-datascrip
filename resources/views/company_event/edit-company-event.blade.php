@@ -29,7 +29,7 @@
                                         <div class="form-group col-md-6 col-12">
                                             <label>Nama Divisi</label>
                                             <input type="text" class="form-control" value="{{ $value->name }}"
-                                                required="" name="name" id="name">
+                                                required="" name="name" id="name" autocomplete="off">
                                             <input type="hidden" class="form-control" value="{{ $value->id }}"
                                                 required="" name="id" id="id">
                                             <input type="hidden" value="{{ Auth::user()->username }}" id="username"
@@ -102,8 +102,8 @@
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -150,13 +150,13 @@
                         $("#btn_submit").show();
 
                         if (alerts == "success") {
-                            swal('Sukses', 'Data berhasil diupdate...', 'success').then(
+                            swal('Success', 'Data updated successfully', 'success').then(
                                 () => {
                                     window.location.href = "{{ url('/') }}" +
                                         "/company-event/cms";
                                 });
                         } else {
-                            swal('Gagal', 'Data gagal diupdate...', 'warning');
+                            swal('Failed', 'Failed to update data', 'warning');
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

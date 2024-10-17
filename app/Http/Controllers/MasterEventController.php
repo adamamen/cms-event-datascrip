@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class MasterEventController extends Controller
 {
@@ -20,8 +19,6 @@ class MasterEventController extends Controller
         $userId      = $user[0]['id'];
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
-            Log::info('User ada di menu Master Event', ['username' => Auth::user()->username]);
-
             return view('master_event.index', [
                 'id'          => $userId,
                 'masterEvent' => $masterEvent,
@@ -74,6 +71,19 @@ class MasterEventController extends Controller
         return $merge;
     }
 
+    public function add_index($page)
+    {
+        $type_menu  = 'master_event';
+        $listDivisi = listDivisi();
+
+        if ($page == "cms") {
+            return view('master_event.add_event', [
+                'type_menu'  => $type_menu,
+                'listDivisi' => !empty($listDivisi) ? $listDivisi : '',
+            ]);
+        }
+    }
+
     public function add(Request $request)
     {
         $checkTitle    = checkTitleUrl($request->title_url);
@@ -83,8 +93,6 @@ class MasterEventController extends Controller
         if (in_array($lastCharacter, $symbols)) {
             return response()->json(['message' => 'failed last character']);
         } else if (!empty($checkTitle)) {
-            Log::info('User Gagal save data di Add Master Event di menu Master Event', ['username' => Auth::user()->username]);
-
             return response()->json(['message' => 'failed']);
         } else {
             $logo      = $request->file('logo');
@@ -113,42 +121,7 @@ class MasterEventController extends Controller
                 ];
             DB::table('tbl_master_event')->insert([$array_1]);
 
-            Log::info('User Berhasil save data di Add Master Event di menu Master Event', [
-                'username'                  => Auth::user()->username,
-                'status'                    => $request->status,
-                'desc'                      => $request->deskripsi,
-                'company'                   => $request->divisi,
-                'start_event'               => $request->startEvent,
-                'end_event'                 => $request->endEvent,
-                'logo'                      => $imageName,
-                'location'                  => $request->lokasi,
-                'created_at'                => Carbon::now(),
-                'updated_at'                => Carbon::now(),
-                'updated_by'                => $request->username,
-                'createed_by'               => $request->username,
-                'title_url'                 => $request->title_url,
-                'jenis_event'               => $request->jenis_event,
-                'tanggal_terakhir_aplikasi' => $request->end_event_application,
-                'start_registrasi'          => $request->start_registrasi,
-                'end_registrasi'            => $request->end_registrasi,
-            ]);
-
             return response()->json(['message' => 'success']);
-        }
-    }
-
-    public function add_index($page)
-    {
-        $type_menu  = 'master_event';
-        $listDivisi = listDivisi();
-
-        if ($page == "cms") {
-            Log::info('User klik Add Master Event di menu Master Event', ['username' => Auth::user()->username]);
-
-            return view('master_event.add_event', [
-                'type_menu'  => $type_menu,
-                'listDivisi' => !empty($listDivisi) ? $listDivisi : '',
-            ]);
         }
     }
 
@@ -157,11 +130,9 @@ class MasterEventController extends Controller
         $data = M_MasterEvent::find($id);
 
         if ($data) {
-            Log::info('User Berhasil Delete Data di menu Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             $data->delete();
             return response()->json(['message' => 'success']);
         } else {
-            Log::info('User Gagal Delete Data di menu Master Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['error' => 'failed'], 404);
         }
     }
@@ -176,14 +147,11 @@ class MasterEventController extends Controller
         $listDivisi = listDivisi();
         $type_menu  = 'master_event';
 
-        Log::info('User klik action Edit di menu Master Event', ['username' => Auth::user()->username]);
-
         return view('master_event.edit_event', ['data' => $data, 'listDivisi' => $listDivisi, 'type_menu' => $type_menu]);
     }
 
     public function update(Request $request)
     {
-        // dd($request->all());
         $checkTitle = checkTitleUrl($request->title_url);
 
         foreach ($checkTitle as $value) {
@@ -197,7 +165,6 @@ class MasterEventController extends Controller
         if (in_array($lastCharacter, $symbols)) {
             return response()->json(['message' => 'failed last character']);
         } else if (($request->title_url_before == $title_) || empty($title['title_url'])) {
-            // dd('2');
             if ($request->file('logo') != null) {
                 $logo      = $request->file('logo');
                 $imageName = time() . '.' . $logo->getClientOriginalExtension();
@@ -223,25 +190,6 @@ class MasterEventController extends Controller
                         'end_registrasi'            => $request->end_registrasi,
                     ]);
 
-                Log::info('User Berhasil Edit Data di menu Master Event', [
-                    'username'                  => Auth::user()->username,
-                    'title'                     => preg_replace('/\s+/', ' ', $request->namaEvent),
-                    'status'                    => $request->status,
-                    'desc'                      => $request->deskripsi,
-                    'company'                   => $request->divisi,
-                    'start_event'               => $request->startEvent,
-                    'end_event'                 => $request->endEvent,
-                    'logo'                      => $imageName != "undefined" ? $imageName : '',
-                    'location'                  => $request->lokasi,
-                    'updated_at'                => Carbon::now(),
-                    'updated_by'                => $request->username,
-                    'title_url'                 => $request->title_url,
-                    'jenis_event'               => $request->jenis_event,
-                    'tanggal_terakhir_aplikasi' => $request->end_event_application,
-                    'start_registrasi'          => $request->start_registrasi,
-                    'end_registrasi'            => $request->end_registrasi,
-                ]);
-
                 return response()->json(['message' => 'success']);
             } else {
                 DB::table('tbl_master_event')
@@ -262,24 +210,6 @@ class MasterEventController extends Controller
                         'start_registrasi'          => $request->start_registrasi,
                         'end_registrasi'            => $request->end_registrasi,
                     ]);
-
-                Log::info('User Berhasil Edit Data di menu Master Event', [
-                    'username'                  => Auth::user()->username,
-                    'title'                     => preg_replace('/\s+/', ' ', $request->namaEvent),
-                    'status'                    => $request->status,
-                    'desc'                      => $request->deskripsi,
-                    'company'                   => $request->divisi,
-                    'start_event'               => $request->startEvent,
-                    'end_event'                 => $request->endEvent,
-                    'location'                  => $request->lokasi,
-                    'updated_at'                => Carbon::now(),
-                    'updated_by'                => $request->username,
-                    'title_url'                 => $request->title_url,
-                    'jenis_event'               => $request->jenis_event,
-                    'tanggal_terakhir_aplikasi' => $request->end_event_application,
-                    'start_registrasi'          => $request->start_registrasi,
-                    'end_registrasi'            => $request->end_registrasi,
-                ]);
 
                 return response()->json(['message' => 'success']);
             }

@@ -18,7 +18,7 @@
                 <h1>Edit Event</h1>
             </div>
             <div class="section-body">
-                <h2 class="section-title">Edit Events</h2>
+                <h2 class="section-title">Edit Event</h2>
                 <!-- <p class="section-lead">This article component is based on card and flexbox.</p> -->
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
@@ -221,8 +221,8 @@
         $(document).ready(function() {
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -251,7 +251,7 @@
 
             titleUrl.on('input', function() {
                 if (titleUrl.val().trim() === '' && namaEvent.val().trim() === '') {
-                    swal('Gagal', 'Silahkan isi "Nama Event" terlebih dahulu, silahkan coba lagi...',
+                    swal('Failed', 'Please fill in the "Event Name" first, please try again',
                         'warning');
                 }
             });
@@ -321,18 +321,18 @@
                         $("#btn_submit").show();
 
                         if (alerts == "failed last character") {
-                            swal('Gagal',
-                                'Title Url Tidak boleh diakhiri dengan simbol, silahkan coba lagi...',
+                            swal('Failed',
+                                'The URL Title cannot end with a symbol, please try again',
                                 'warning');
                         } else if (title_url == "") {
-                            swal('Gagal', 'Title Url harus diisi, silahkan coba lagi...',
+                            swal('Failed', 'The URL Title must be filled in, please try again',
                                 'warning');
                         } else if (alerts == "url has been input") {
-                            swal('Gagal',
-                                'Title Url sudah pernah di input, silahkan coba lagi...',
+                            swal('Failed',
+                                'The URL Title has already been input, please try again',
                                 'warning');
                         } else if (alerts == "success") {
-                            swal('Sukses', 'Data berhasil diupdate...', 'success').then(
+                            swal('Success', 'Data updated successfully.', 'success').then(
                                 () => {
                                     window.location.href = "{{ url('/') }}" +
                                         "/master-event/cms";
