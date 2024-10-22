@@ -10,7 +10,6 @@ use App\Models\M_VisitorEvent;
 use App\Models\M_MetodeBayar;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +23,7 @@ class VisitorEventController extends Controller
 {
     function index($page)
     {
+        // dd('1');
         $type_menu     = 'visitor_event';
         $data          = visitorEventandMasterEvent($page);
         $masterEvent   = masterEvent($page);
@@ -37,7 +37,6 @@ class VisitorEventController extends Controller
             ->where('event_id', $userIdSession)
             ->whereNotNull('scan_date')
             ->get();
-        // dd($data);
 
         if ($userIdSession != 0 && $page == "cms") {
             return view('error.error-403');
@@ -56,7 +55,6 @@ class VisitorEventController extends Controller
                 'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
-            Log::info('User cetak Excel di menu Data Visitor Event ' . strtoupper($page), ['username' => Auth::user()->username]);
             $this->generate_pdf($page, $userId);
         } else if ($page == "landing-page-qr") {
             $this->index_landing_page($page);
@@ -130,23 +128,6 @@ class VisitorEventController extends Controller
                 'status_pembayaran' => 'Belum Dibayar',
             ]);
 
-            Log::info('User berhasil add Data di menu Data Visitor Event ', [
-                'event_id'          => $request->namaEvent,
-                'ticket_no'         => $request->noTiket,
-                'registration_date' => $request->tanggalRegistrasi,
-                'full_name'         => $request->namaLengkap,
-                'address'           => $request->alamat,
-                'email'             => $request->email,
-                'mobile'            => $request->noHandphone,
-                'created_at'        => Carbon::now(),
-                'created_by'        => $request->username,
-                'updated_at'        => Carbon::now(),
-                'updated_by'        => $request->username,
-                'jenis_event'       => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
-                'no_invoice'        => $noInvoice,
-                'status_pembayaran' => 'Belum Dibayar',
-            ]);
-
             return response()->json(['message' => 'success']);
         }
     }
@@ -173,8 +154,6 @@ class VisitorEventController extends Controller
         }
 
         if (!empty($masterEvent) || $page == "cms") {
-            Log::info('User klik Edit di menu Data Visitor Event', ['username' => Auth::user()->username]);
-
             return view('visitor_event.edit-visitor-event', [
                 'titleUrl'    => $titleUrl,
                 'id'          => $userId,
@@ -208,18 +187,6 @@ class VisitorEventController extends Controller
                 'updated_by'        => $request->username,
             ]);
 
-        Log::info('User berhasil update di menu Data Visitor Event', [
-            'full_name'         => $request->name,
-            'email'             => $request->email,
-            'gender'            => $request->gender,
-            'account_instagram' => $request->instagramAccount,
-            'mobile'            => $request->phoneNumber,
-            'type_invitation'   => $request->invitationType,
-            'invitation_name'   => $request->nameOfAgency,
-            'updated_at'        => Carbon::now(),
-            'updated_by'        => $request->username,
-        ]);
-
         return response()->json(['message' => 'success']);
     }
 
@@ -229,7 +196,6 @@ class VisitorEventController extends Controller
 
         if ($data) {
             $data->delete();
-            Log::info('Data Berhasil di Delete di menu Data Visitor Event', ['username' => Auth::user()->username, 'data' => $data]);
             return response()->json(['message' => 'success']);
         } else {
             return response()->json(['error' => 'failed']);
@@ -304,12 +270,10 @@ class VisitorEventController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Gagal validasi file.'], 400);
-            Log::info('User gagal import excel ' . strtoupper($page), ['username' => Auth::user()->username]);
         }
 
-        $type_menu = 'visitor_event';
-        $file      = $request->file('excel_file');
-        $rows      = Excel::toArray([], $file)[0];
+        $file = $request->file('excel_file');
+        $rows = Excel::toArray([], $file)[0];
         unset($rows[0]);
 
         $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();

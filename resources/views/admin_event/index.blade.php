@@ -43,6 +43,7 @@
                                             <th>Password</th>
                                             <th>Full Name</th>
                                             <th>Event Name</th>
+                                            <th>E-mail</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -61,6 +62,7 @@
                                                 <td>{{ $value['password_encrypts'] }}</td>
                                                 <td>{{ $value['full_name'] }}</td>
                                                 <td>{{ !empty($value['title']) ? $value['title'] : '-' }}</td>
+                                                <td>{{ $value['email'] }}</td>
                                                 <td>
                                                     @if ($pages == 'cms')
                                                         <form method="POST"

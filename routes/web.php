@@ -6,7 +6,11 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MasterEventController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\CompanyEventController;
+use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\VisitorEventController;
+use App\Http\Controllers\WhatsappEventController;
+use App\Http\Controllers\EmailEventController;
+use App\Http\Controllers\ReportVisitorEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,6 +81,35 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/visitor-event/send-email', [VisitorEventController::class, 'sendEmail'])->name('send.email');
     Route::get('/visitor-event/send-email/{id}', [VisitorEventController::class, 'sendEmailId'])->name('send.email.id');
     Route::post('/visitor-event/arrival', [VisitorEventController::class, 'storeArrival'])->name('visitor.arrival');
+
+    // Master User
+    Route::get('/master-user/{page?}', [MasterUserController::class, 'index'])->name('master_user.index');
+    Route::get('/master-user/template-excel/{page?}', [MasterUserController::class, 'template_excel_master_user'])->name('template.excel.master.user');
+    Route::post('/master-user/import-excel/{page?}', [MasterUserController::class, 'import_excel'])->name('import.excel.master.user');
+    Route::post('/master-user/edit/{page?}/{id}', [MasterUserController::class, 'edit'])->name('edit-master-user');
+    Route::post('/master-user/update-master-user', [MasterUserController::class, 'update'])->name('update-master-user');
+    Route::delete('/master-user/delete-visitor/{id}', [MasterUserController::class, 'delete'])->name('delete-master-user');
+    Route::post('/master-user/delete-multiple-master-user', [MasterUserController::class, 'deleteMultipleVisitors'])->name('delete-multiple-master-user');
+    Route::post('/master-user/send-email', [MasterUserController::class, 'sendEmail'])->name('send.email.master.user');
+    Route::get('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
+
+    // Whatsapp Event
+    Route::get('/whatsapp-event/{page?}', [WhatsappEventController::class, 'index'])->name('whatsapp_event.index');
+    Route::get('/whatsapp-event/add-whatsapp-event/{page?}', [WhatsappEventController::class, 'add_index'])->name('add_whatsapp_event');
+    Route::post('/whatsapp-event/add-whatsapp-event', [WhatsappEventController::class, 'add'])->name('add-whatsapp-event');
+    Route::post('/whatsapp-event/update-whatsapp-event', [WhatsappEventController::class, 'update'])->name('update-whatsapp-event');
+    Route::post('/whatsapp-event/edit-whatsapp-event/{page?}/{id}', [WhatsappEventController::class, 'edit'])->name('edit-whatsapp-event');
+
+    // Email Event
+    Route::get('/email-event/{page?}', [EmailEventController::class, 'index'])->name('email_event.index');
+    Route::get('/email-event/add-email-event/{page?}', [EmailEventController::class, 'add_index'])->name('add_email_event');
+    Route::post('/email-event/add-email-event', [EmailEventController::class, 'add'])->name('add-email-event');
+    Route::post('/email-event/update-email-event', [EmailEventController::class, 'update'])->name('update-email-event');
+    Route::post('/email-event/edit-email-event/{page?}/{id}', [EmailEventController::class, 'edit'])->name('edit-email-event');
+
+    // Report Visitor
+    Route::get('/report-visitor/{page?}', [ReportVisitorEventController::class, 'index'])->name('report_visitor_event.index');
+    Route::get('/report-visitor/export-excel/{page?}', [ReportVisitorEventController::class, 'export_excel'])->name('export.excel.report.visitor');
 
     // Admin Event
     Route::get('/admin-event/{page?}', [AdminEventController::class, 'index'])->name('admin_event.index');

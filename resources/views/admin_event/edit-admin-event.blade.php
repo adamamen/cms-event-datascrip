@@ -56,6 +56,14 @@
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
+                                            <label>E-mail</label>
+                                            <input type="email" class="form-control" value="{{ $value['email'] }}"
+                                                required="" name="email" id="email" autocomplete="off">
+                                            <div class="invalid-feedback">
+                                                E-mail is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
                                             <label>Event Name</label>
                                             <select class="form-control select2" name="event" id="event"
                                                 {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
@@ -157,6 +165,7 @@
                 var nama_lengkap = $('#nama_lengkap').val();
                 var status = $('#status').val();
                 var events_id = $('#events_id').val();
+                var email = $('#email').val();
                 var formData = new FormData();
 
                 formData.append("admin_id", admin_id);
@@ -166,38 +175,56 @@
                 formData.append("nama_lengkap", nama_lengkap);
                 formData.append("status", status);
                 formData.append("events_id", events_id);
+                formData.append("email", email);
 
-                $.ajax({
-                    url: '{{ route('update-admin') }}',
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    success: function(response) {
-                        var alerts = response.message
+                if (email == "") {
+                    var name = "E-mail";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> cannot be empty, please try again';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(() => {
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
+                    });
+                } else {
+                    $.ajax({
+                        url: '{{ route('update-admin') }}',
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        success: function(response) {
+                            var alerts = response.message
+                            $("#btn_progress").hide();
+                            $("#btn_submit").show();
 
-                        if (alerts == "success") {
-                            swal('Success', 'Data updated successfully', 'success').then(
-                                () => {
-                                    window.location.href = "{{ url('/') }}" +
-                                        "/admin-event/" + params;
-                                });
-                        } else {
-                            swal('Failed', 'Failed to update data', 'warning');
+                            if (alerts == "success") {
+                                swal('Success',
+                                    'Data has been successfully updated and email has been sent.',
+                                    'success').then(
+                                    () => {
+                                        window.location.href = "{{ url('/') }}" +
+                                            "/admin-event/" + params;
+                                    });
+                            } else {
+                                swal('Failed', 'Failed to update data', 'warning');
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $("#btn_progress").hide();
+                            $("#btn_submit").show();
+
+                            console.log(textStatus, errorThrown);
                         }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-
-                        console.log(textStatus, errorThrown);
-                    }
-                });
+                    });
+                }
             });
         });
     </script>

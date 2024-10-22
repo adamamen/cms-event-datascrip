@@ -50,6 +50,14 @@
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
+                                        <label>E-mail</label>
+                                        <input type="email" class="form-control" value="" required=""
+                                            name="email" id="email" autocomplete="off">
+                                        <div class="invalid-feedback">
+                                            E-mail is required
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4 col-12">
                                         <label>Event Name</label>
                                         <select class="form-control select2" name="event" id="event">
                                             <option selected disabled>-- Please Select --</option>
@@ -142,6 +150,7 @@
                 var nama_lengkap = $('#nama_lengkap').val();
                 var event = $('#event').val();
                 var status = $('#status').val();
+                var email = $('#email').val();
 
                 var formData = new FormData();
                 formData.append("username", username);
@@ -149,6 +158,7 @@
                 formData.append("nama_lengkap", nama_lengkap);
                 formData.append("event", event);
                 formData.append("status", status);
+                formData.append("email", email);
 
                 if (username == "") {
                     var name = "Username";
@@ -178,6 +188,19 @@
                     });
                 } else if (nama_lengkap == "") {
                     var name = "Full Name";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> cannot be empty, please try again';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    });
+                } else if (email == "") {
+                    var name = "E-mail";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -239,7 +262,9 @@
                                     'Username is already registered, please try again',
                                     'warning');
                             } else if (alerts == "success") {
-                                swal('Success', 'Data saved successfully', 'success').then(
+                                swal('Success',
+                                    'Data saved successfully and email has been sent',
+                                    'success').then(
                                     () => {
                                         window.location.href = "{{ url('/') }}" +
                                             "/admin-event/" + params;

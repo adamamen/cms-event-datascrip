@@ -15,7 +15,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Edit Visitor Event {{ '(' . $output . ')' }}</h1>
+                <h1>Edit Master User </h1>
             </div>
             <div class="section-body">
                 <h2 class="section-title">Profile Visitor</h2>
@@ -30,62 +30,79 @@
                                     <div class="row">
                                         <div class="form-group col-md-4 col-12">
                                             <label>Name</label>
-                                            <input type="text" class="form-control" value="{{ $value->full_name }}"
-                                                required="" name="name" id="name">
+                                            <input type="text" class="form-control" value="{{ $value->name }}"
+                                                required="" name="name" id="name" autocomplete="off">
                                             <div class="invalid-feedback">
                                                 Name is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Email</label>
-                                            <input type="email" class="form-control" value="{{ $value->email }}"
-                                                required="" name="email" id="email">
-                                            <div class="invalid-feedback">
-                                                Email is required
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-md-4 col-12">
                                             <label>Gender</label>
-                                            <input type="email" class="form-control" value="{{ $value->gender }}"
-                                                required="" name="gender" id="gender">
+                                            <select class="form-control select2" name="gender" id="gender">
+                                                <option selected disabled>-- Please Choose --</option>
+                                                <option value="L" {{ $value->gender == 'L' ? 'selected' : '' }}>
+                                                    Laki-laki</option>
+                                                <option value="P" {{ $value->gender == 'P' ? 'selected' : '' }}>
+                                                    Perempuan</option>
+                                            </select>
                                             <div class="invalid-feedback">
                                                 Gender is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Instagram Account</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $value->account_instagram }}" required=""
-                                                name="instagram_account" id="instagram_account">
+                                            <label>Email</label>
+                                            <input type="email" class="form-control" value="{{ $value->email }}"
+                                                required="" name="email" id="email" autocomplete="off">
                                             <div class="invalid-feedback">
-                                                Instagram Account is required
+                                                Email is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Phone Number</label>
-                                            <input type="text" class="form-control" value="{{ $value->mobile }}"
-                                                required="" name="phone_number" id="phone_number"
+                                            <label>Institution</label>
+                                            <input type="text" class="form-control" value="{{ $value->institution }}"
+                                                required="" name="institution" id="institution" autocomplete="off">
+                                            <div class="invalid-feedback">
+                                                Institution is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Institution Name</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $value->name_institution }}" required=""
+                                                name="institution_name" id="institution_name" autocomplete="off">
+                                            <div class="invalid-feedback">
+                                                Institution Name is required
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-4 col-12">
+                                            <label>Whatsapp Number</label>
+                                            <input type="text" class="form-control" value="{{ $value->phone_no }}"
+                                                required="" name="whatsapp_number" id="whatsapp_number"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                                             <div class="invalid-feedback">
-                                                Phone Number is required
+                                                Whatsapp Number is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Invitation Type</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $value->type_invitation }}" required="" name="invitation_type"
-                                                id="invitation_type">
+                                            <label>City</label>
+                                            <input type="text" class="form-control" value="{{ $value->city }}"
+                                                required="" name="city" id="city" autocomplete="off">
                                             <div class="invalid-feedback">
-                                                Invitation Type is required
+                                                City is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Name Of Agency / Company</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $value->invitation_name }}" required="" name="name_of_agency"
-                                                id="name_of_agency">
+                                            <label>Division</label>
+                                            <select class="form-control select2" name="division" id="division">
+                                                <option selected disabled>-- Please Choose --</option>
+                                                @foreach ($listDivisi as $divisi)
+                                                    <option value="{{ $divisi->id }}"
+                                                        {{ $divisi->id == $value->id_divisi ? 'selected' : '' }}>
+                                                        {{ $divisi->name }}</option>
+                                                @endforeach
+                                            </select>
                                             <div class="invalid-feedback">
-                                                Name Of Agency / Company is required
+                                                Division is required
                                             </div>
                                         </div>
                                     </div>
@@ -143,7 +160,7 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            window.location.href = "{{ url('/') }}" + "/visitor-event/" + params;
+                            window.location.href = "{{ url('/') }}" + "/master-user/" + params;
                         }
                     });
             });
@@ -160,26 +177,28 @@
                 var id = $('#id').val();
                 var username = $('#username').val();
                 var name = $('#name').val();
-                var email = $('#email').val();
                 var gender = $('#gender').val();
-                var instagramAccount = $('#instagram_account').val();
-                var phoneNumber = $('#phone_number').val();
-                var invitationType = $('#invitation_type').val();
-                var nameOfAgency = $('#name_of_agency').val();
+                var email = $('#email').val();
+                var institution = $('#institution').val();
+                var institution_name = $('#institution_name').val();
+                var whatsapp_number = $('#whatsapp_number').val();
+                var city = $('#city').val();
+                var division = $('#division').val();
 
                 var formData = new FormData();
                 formData.append("id", id);
                 formData.append("username", username);
                 formData.append("name", name);
-                formData.append("email", email);
                 formData.append("gender", gender);
-                formData.append("instagramAccount", instagramAccount);
-                formData.append("phoneNumber", phoneNumber);
-                formData.append("invitationType", invitationType);
-                formData.append("nameOfAgency", nameOfAgency);
+                formData.append("email", email);
+                formData.append("institution", institution);
+                formData.append("institution_name", institution_name);
+                formData.append("whatsapp_number", whatsapp_number);
+                formData.append("city", city);
+                formData.append("division", division);
 
                 $.ajax({
-                    url: '{{ route('update-visitor') }}',
+                    url: '{{ route('update-master-user') }}',
                     type: "POST",
                     data: formData,
                     contentType: false,
@@ -196,7 +215,7 @@
                             .then(
                                 () => {
                                     window.location.href = "{{ url('/') }}" +
-                                        "/visitor-event/" + params;
+                                        "/master-user/" + params;
                                 });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

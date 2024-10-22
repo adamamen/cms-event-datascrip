@@ -29,12 +29,12 @@
                                     <div class="row">
                                         <input value="{{ Auth::user()->username }}" id="username" name="username" hidden>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Nama Event</label>
+                                            <label>Event Name</label>
                                             <input type="text" class="form-control" value="{{ $value->title }}"
                                                 required="" name="nama_event" id="nama_event">
                                             <input type="hidden" class="form-control" value="{{ $value->id_event }}"
                                                 required="" name="id_event" id="id_event">
-                                            <div class="invalid-feedback"> Nama Event Wajib Diisi </div>
+                                            <div class="invalid-feedback"> Event Name is required </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
                                             <label>Title Url</label>
@@ -43,11 +43,11 @@
                                             <input type="text" class="form-control" value="{{ $value->title_url }}"
                                                 required="" name="title_url_before" id="title_url_before" hidden>
                                             <div class="invalid-feedback">
-                                                Title Url Wajib Diisi
+                                                Title Url is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Jenis Event</label>
+                                            <label>Event Type</label>
                                             <select class="form-control select2" name="jenis_event" id="jenis_event">
                                                 <option value="A" {{ $value->jenis_event == 'A' ? 'selected' : '' }}>
                                                     Berbayar</option>
@@ -55,7 +55,7 @@
                                                     Non Berbayar</option>
                                             </select>
                                             <div class="invalid-feedback">
-                                                Jenis Event Wajib Diisi
+                                                Event Type is required
                                             </div>
                                         </div>
                                     </div>
@@ -71,25 +71,25 @@
                                                 </option>
                                             </select>
                                             <div class="invalid-feedback">
-                                                Status Wajib Diisi
+                                                Status is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
-                                            <label>Start Registrasi</label>
+                                            <label>Start Registration</label>
                                             <input type="text" class="form-control datetimepicker"
                                                 value="{{ $value->start_registrasi }}" required=""
                                                 name="start_registrasi" id="start_registrasi">
                                             <div class="invalid-feedback">
-                                                Start Event Wajib Diisi
+                                                Start Registration is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
-                                            <label>End Registrasi</label>
+                                            <label>End Registration</label>
                                             <input type="text" class="form-control datetimepicker"
                                                 value="{{ $value->end_registrasi }}" required="" name="end_registrasi"
                                                 id="end_registrasi">
                                             <div class="invalid-feedback">
-                                                End Event Wajib Diisi
+                                                End Registration is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
@@ -101,7 +101,7 @@
                                                 <label class="custom-file-label" for="customFile">Choose file</label>
                                             </div>
                                             <div class="invalid-feedback">
-                                                Logo Wajib Diisi
+                                                Logo is required
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +112,7 @@
                                                 value="{{ $value->start_event }}" required="" name="start_event"
                                                 id="start_event">
                                             <div class="invalid-feedback">
-                                                Start Event Wajib Diisi
+                                                Start Event is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
@@ -121,22 +121,22 @@
                                                 value="{{ $value->end_event }}" required="" name="end_event"
                                                 id="end_event">
                                             <div class="invalid-feedback">
-                                                End Event Wajib Diisi
+                                                End Event is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
-                                            <label>Tanggal Terakhir Aplikasi</label>
+                                            <label>Last Application Date</label>
                                             <input type="text" class="form-control datepicker"
                                                 value="{{ $value->end_event }}" required=""
                                                 name="end_event_application" id="end_event_application">
                                             <div class="invalid-feedback">
-                                                Tanggal Terakhir Aplikasi Wajib Diisi
+                                                Last Application Date is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-3 col-12">
-                                            <label>Divisi</label>
+                                            <label>Division</label>
                                             <select class="form-control select2" name="divisi" id="divisi">
-                                                <option selected disabled>-- Silahkan Pilih --</option>
+                                                <option selected disabled>-- Please Choose --</option>
                                                 @foreach ($listDivisi as $divisi)
                                                     <option value="{{ $divisi->id }}"
                                                         {{ $divisi->id == $value->company ? 'selected' : '' }}>
@@ -144,27 +144,27 @@
                                                 @endforeach
                                             </select>
                                             <div class="invalid-feedback">
-                                                Divisi Wajib Diisi
+                                                Division is required
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-6 col-12">
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label>Description</label>
                                                 <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi">{{ $value->desc }}</textarea>
                                             </div>
                                             <div class="invalid-feedback">
-                                                Deskripsi Wajib Diisi
+                                                Description is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-6 col-12">
                                             <div class="form-group">
-                                                <label>Lokasi</label>
+                                                <label>Location</label>
                                                 <textarea class="form-control" data-height="150" name="lokasi" id="lokasi">{{ $value->location }}</textarea>
                                             </div>
                                             <div class="invalid-feedback">
-                                                Lokasi Wajib Diisi
+                                                Location is required
                                             </div>
                                         </div>
                                     </div>

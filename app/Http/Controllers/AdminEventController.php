@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class AdminEventController extends Controller
 {
@@ -69,14 +70,68 @@ class AdminEventController extends Controller
             DB::table('tbl_user')->insert([
                 'username'          => $request->username,
                 'password'          => Hash::make($request->password),
-                'full_name'         => $request->nama_lengkap,
+                'full_name'         => trim(ucwords($request->nama_lengkap)),
                 'event_id'          => $request->event,
                 'status'            => $request->status,
                 'created_at'        => now(),
                 'updated_at'        => now(),
                 'password_encrypts' => Crypt::encryptString($request->password),
-                'title_url'         => $titleUrl->title_url
+                'title_url'         => $titleUrl->title_url,
+                'email'             => $request->email
             ]);
+
+            $body = '<html>
+                        <head>
+                        <style type="text/css">
+                            body, td {
+                                font-family: "Aptos", sans-serif;
+                                font-size: 16px;
+                            }
+                            table#info {
+                                border: 1px solid #555;
+                                border-collapse: collapse;
+                            }
+                            table#info th,
+                            table#info td {
+                                padding: 3px;
+                                border: 1px solid #555;
+                            }
+                        </style>
+                        </head>
+                        <body>Dear <strong>' . ucwords($request->nama_lengkap) . '</strong> <br />
+                        Anda telah ditambahkan sebagai administrator pada <strong>Event ' . ucwords($titleUrl->title) . '</strong>, silahkan login menggunakan<br />
+                        Username : ' . $request->username . '<br />
+                        Password : ' . $request->password . '<br /><br />
+                        Klik <a href="' . route('login_param', ['page' => $titleUrl->title_url]) . '">di sini</a> untuk menuju halaman Event.<br /><br />
+                        Terima Kasih
+                        </body>
+                    </html>';
+
+            $mail = new PHPMailer(true);
+
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true
+                )
+            );
+
+            $mail->isSMTP();
+            $mail->Host       = env('MAIL_HOST');
+            $mail->SMTPAuth   = true;
+            $mail->Username   = env('MAIL_USERNAME');
+            $mail->Password   = env('MAIL_PASSWORD');
+            $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+            $mail->Port       = env('MAIL_PORT');
+
+            $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+            $mail->addAddress($request->email, $request->full_name);
+
+            $mail->isHTML(true);
+            $mail->Subject = 'Event ' . ucwords($titleUrl->title);
+            $mail->Body    = $body;
+            $mail->send();
 
             return response()->json(['message' => 'success']);
         }
@@ -103,6 +158,7 @@ class AdminEventController extends Controller
                 'status'            => $value->status,
                 'created_at'        => $value->created_at,
                 'updated_at'        => $value->updated_at,
+                'email'             => $value->email,
                 'password_encrypts' => Crypt::decryptString($value->password_encrypts),
             ];
         }
@@ -119,36 +175,74 @@ class AdminEventController extends Controller
 
     public function update(Request $request)
     {
-        $titleUrl = M_MasterEvent::select('*')->where('id_event', $request->events_id)->first();
+        $titleUrl = M_MasterEvent::select('*')->where('id_event', $request->event == "null" ? '0' : $request->event)->first();
 
-        if ($request->event == NULL) {
-            DB::table('tbl_user')
-                ->where('id', $request->admin_id)
-                ->update([
-                    'username'          => $request->username,
-                    'password'          => Hash::make($request->password),
-                    'full_name'         => $request->nama_lengkap,
-                    'status'            => $request->status,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
-                    'password_encrypts' => Crypt::encryptString($request->password),
-                    'title_url'         => $titleUrl->title_url,
-                ]);
-        } else {
-            DB::table('tbl_user')
-                ->where('id', $request->admin_id)
-                ->update([
-                    'event_id'          => $request->events_id == "0" ? '0' : $request->event,
-                    'username'          => $request->username,
-                    'password'          => Hash::make($request->password),
-                    'full_name'         => $request->nama_lengkap,
-                    'status'            => $request->status,
-                    'created_at'        => now(),
-                    'updated_at'        => now(),
-                    'password_encrypts' => Crypt::encryptString($request->password),
-                    'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
-                ]);
-        }
+        DB::table('tbl_user')
+            ->where('id', $request->admin_id)
+            ->update([
+                'event_id'          => $request->event == "null" ? '0' : $request->event,
+                'username'          => $request->username,
+                'password'          => Hash::make($request->password),
+                'full_name'         => $request->nama_lengkap,
+                'status'            => $request->status,
+                'created_at'        => now(),
+                'updated_at'        => now(),
+                'password_encrypts' => Crypt::encryptString($request->password),
+                'title_url'         => $titleUrl == NULL ? '0' : $titleUrl->title_url,
+            ]);
+
+        $body = '<html>
+                        <head>
+                        <style type="text/css">
+                            body, td {
+                                font-family: "Aptos", sans-serif;
+                                font-size: 16px;
+                            }
+                            table#info {
+                                border: 1px solid #555;
+                                border-collapse: collapse;
+                            }
+                            table#info th,
+                            table#info td {
+                                padding: 3px;
+                                border: 1px solid #555;
+                            }
+                        </style>
+                        </head>
+                        <body>Dear <strong>' . ucwords($request->nama_lengkap) . '</strong> <br />
+                        Data anda telah di update pada <strong>Event ' . ucwords($titleUrl->title) . '</strong>, silahkan login menggunakan<br />
+                        Username : ' . $request->username . '<br />
+                        Password : ' . $request->password . '<br /><br />
+                        Klik <a href="' . route('login_param', ['page' => $titleUrl->title_url]) . '">di sini</a> untuk menuju halaman Event.<br /><br />
+                        Terima Kasih
+                        </body>
+                    </html>';
+
+        $mail = new PHPMailer(true);
+
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true
+            )
+        );
+
+        $mail->isSMTP();
+        $mail->Host       = env('MAIL_HOST');
+        $mail->SMTPAuth   = true;
+        $mail->Username   = env('MAIL_USERNAME');
+        $mail->Password   = env('MAIL_PASSWORD');
+        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+        $mail->Port       = env('MAIL_PORT');
+
+        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+        $mail->addAddress($request->email, $request->full_name);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Event ' . ucwords($titleUrl->title);
+        $mail->Body    = $body;
+        $mail->send();
 
         return response()->json(['message' => 'success']);
     }

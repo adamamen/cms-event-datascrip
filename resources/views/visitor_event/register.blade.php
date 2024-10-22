@@ -136,8 +136,8 @@
 
             $("#btn_cancel").click(function() {
                 swal({
-                        title: 'Apakah kamu yakin?',
-                        text: 'Apakah kamu yakin ingin kembali ke halaman sebelumnya?',
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to go back to the previous page?',
                         icon: 'warning',
                         buttons: true,
                         dangerMode: true,
@@ -180,7 +180,7 @@
                     var name = "Nama Lengkap";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -195,7 +195,7 @@
                     var name = "Nama Event";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -210,7 +210,7 @@
                     var name = "Email";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -225,7 +225,7 @@
                     var name = "No Handphone";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -240,7 +240,7 @@
                     var name = "No Tiket";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -255,7 +255,7 @@
                     var name = "Tanggal Registrasi";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
@@ -270,7 +270,7 @@
                     var name = "Alamat";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
-                        '</strong> tidak boleh kosong, silahkan coba lagi...';
+                        '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,

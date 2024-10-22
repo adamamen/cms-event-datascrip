@@ -56,7 +56,19 @@
                         <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
                             <a class="nav-link"
                                 href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}"><i
-                                    class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
+                                    class="fas fa-eye"></i> <span>Data Visitor Event </span></a>
+                        </li>
+                        <li class="{{ $type_menu == 'whatsapp_event' ? 'active' : '' }}">
+                            <a class="nav-link"
+                                href="{{ route('whatsapp_event.index', ['page' => $value['title_url']]) }}">
+                                <i class="fab fa-whatsapp"></i> <span>WhatsApp Event </span>
+                            </a>
+                        </li>
+                        <li class="{{ $type_menu == 'email_event' ? 'active' : '' }}">
+                            <a class="nav-link"
+                                href="{{ route('email_event.index', ['page' => $value['title_url']]) }}">
+                                <i class="fas fa-envelope"></i> <span>E-mail Event</span>
+                            </a>
                         </li>
                     @endif
 
@@ -130,10 +142,30 @@
                         <a class="nav-link" href="{{ route('visitor_event.index', ['page' => 'cms']) }}"><i
                                 class="fas fa-eye"></i> <span>Data Visitor Event</span></a>
                     </li>
+                    <li class="{{ $type_menu == 'whatsapp_event' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('whatsapp_event.index', ['page' => 'cms']) }}">
+                            <i class="fab fa-whatsapp"></i> <span>WhatsApp Event</span>
+                        </a>
+                    </li>
+                    <li class="{{ $type_menu == 'email_event' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('email_event.index', ['page' => 'cms']) }}">
+                            <i class="fas fa-envelope"></i> <span>E-mail Event</span>
+                        </a>
+                    </li>
+                    <li class="{{ $type_menu == 'report_visitor_event' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('report_visitor_event.index', ['page' => 'cms']) }}"><i
+                                class="fas fa-file-excel"></i>
+                            <span>Report Visitor Event</span></a>
+                    </li>
+                    <li class="menu-header">Master</li>
+                    <li class="{{ $type_menu == 'master_user' ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('master_user.index', ['page' => 'cms']) }}"><i
+                                class="fas fa-user-circle"></i> <span>Master User</span></a>
+                    </li>
                     <li class="menu-header">Admin</li>
                     <li class="{{ $type_menu == 'admin_event' ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin_event.index', ['page' => 'cms']) }}"><i
-                                class="fas fa-user"></i> <span>Admin Event</span></a>
+                                class="fas fa-user-shield"></i> <span>Admin Event</span></a>
                     </li>
                 @endif
             @endif

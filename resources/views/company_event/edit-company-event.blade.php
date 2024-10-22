@@ -27,7 +27,7 @@
                                     <meta name="csrf-token" content="{{ csrf_token() }}">
                                     <div class="row">
                                         <div class="form-group col-md-6 col-12">
-                                            <label>Nama Divisi</label>
+                                            <label>Division Name</label>
                                             <input type="text" class="form-control" value="{{ $value->name }}"
                                                 required="" name="name" id="name" autocomplete="off">
                                             <input type="hidden" class="form-control" value="{{ $value->id }}"
@@ -35,7 +35,7 @@
                                             <input type="hidden" value="{{ Auth::user()->username }}" id="username"
                                                 name="username">
                                             <div class="invalid-feedback">
-                                                Nama Divisi Wajib Diisi
+                                                Division Name is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-6 col-12">
@@ -48,16 +48,16 @@
                                                     Tidak Aktif</option>
                                             </select>
                                             <div class="invalid-feedback">
-                                                Status Wajib Diisi
+                                                Status is required
                                             </div>
                                         </div>
                                         <div class="form-group col-md-6 col-12">
                                             <div class="form-group">
-                                                <label>Deskripsi</label>
+                                                <label>Description</label>
                                                 <textarea class="form-control" data-height="150" name="deskripsi" id="deskripsi">{{ $value->description }}</textarea>
                                             </div>
                                             <div class="invalid-feedback">
-                                                Deskripsi Wajib Diisi
+                                                Description is required
                                             </div>
                                         </div>
                                     </div>
