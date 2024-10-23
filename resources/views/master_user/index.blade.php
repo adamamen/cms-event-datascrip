@@ -171,7 +171,7 @@
                                                                 data-id="{{ $value['id'] }}" title="Delete">
                                                                 <i class="fas fa-trash"></i>&emsp; Delete
                                                             </a>
-                                                            <a class="send-email-btn-id dropdown-item"
+                                                            <a class="send-whatsapp-btn-id dropdown-item"
                                                                 data-id="{{ $value['id'] }}" title="Send Whatsapp">
                                                                 <i class="fa-brands fa-whatsapp"
                                                                     style="margin-left: 2%;"></i>&emsp; Send Whatsapp
@@ -279,13 +279,13 @@
         });
 
 
-        // Email Satuan 
         $(document).ready(function() {
+            // Email Satuan 
             $('.send-email-btn-id').on('click', function() {
                 const id = $(this).data('id');
                 const url = "{{ route('send.email.id.master.user', ['id' => '__ID__']) }}".replace(
-                    '__ID__',
-                    id);
+                    '__ID__', id
+                );
 
                 swal({
                     title: "Are you sure you want to send the email?",
@@ -308,15 +308,15 @@
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                 }
                             })
-                            .then(response => response.json())
+                            .then(response => {
+                                return response.json();
+                            })
                             .then(data => {
-                                const emailsSent = data.emails_sent ||
-                                    0;
+                                const emailsSent = data.emails_sent || 0;
 
                                 if (emailsSent > 0) {
                                     var content = document.createElement('div');
-                                    content.innerHTML =
-                                        "Email has been successfully sent";
+                                    content.innerHTML = "Email has been successfully sent";
 
                                     swal({
                                         title: "Success!",
@@ -329,7 +329,8 @@
                                     swal("Failed!", "Emails failed to send.", "error").then(
                                         () => {
                                             window.location.reload();
-                                        });
+                                        }
+                                    );
                                 }
                             })
                             .catch((error) => {
@@ -337,7 +338,73 @@
                                     "error").then(
                                     () => {
                                         window.location.reload();
+                                    }
+                                );
+                            });
+                    }
+                });
+            });
+
+            // Whatsapp Satuan
+            $('.send-whatsapp-btn-id').on('click', function() {
+                const id = $(this).data('id');
+                const url = "{{ route('send.whatsapp.id.master.user', ['id' => '__ID__']) }}".replace(
+                    '__ID__', id
+                );
+
+                swal({
+                    title: "Are you sure you want to send the whatsapp?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willSend) => {
+                    if (willSend) {
+                        swal({
+                            title: "Sending whatsapp, please wait...",
+                            text: "The process is ongoing.",
+                            icon: "info",
+                            buttons: false,
+                            closeOnClickOutside: false,
+                        });
+
+                        fetch(url, {
+                                method: 'GET',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(response => {
+                                return response.json();
+                            })
+                            .then(data => {
+                                const whatsappSent = data.whatsapp_sent || 0;
+
+                                if (whatsappSent > 0) {
+                                    var content = document.createElement('div');
+                                    content.innerHTML = "Whatsapp has been successfully sent";
+
+                                    swal({
+                                        title: "Success!",
+                                        content: content,
+                                        icon: "success",
+                                    }).then(() => {
+                                        window.location.reload();
                                     });
+                                } else {
+                                    swal("Failed!", "Whatsapp failed to send.", "error").then(
+                                        () => {
+                                            window.location.reload();
+                                        }
+                                    );
+                                }
+                            })
+                            .catch((error) => {
+                                swal("Failed!", "An error occurred while sending the Whatsapp.",
+                                    "error").then(
+                                    () => {
+                                        window.location.reload();
+                                    }
+                                );
                             });
                     }
                 });
@@ -665,6 +732,79 @@
                                 })
                                 .catch((error) => {
                                     swal("Failed!", "An error occurred while sending the email.",
+                                        "error").then(
+                                        () => {
+                                            window.location.reload();
+                                        });
+                                });
+                        }
+                    });
+            });
+
+            // Send Whatsapp Selected
+            document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (selectedCheckboxes.length === 0) {
+                    swal('No data selected.', 'Please select at least one item to send the whatsapp.',
+                        'warning');
+                    return;
+                }
+
+                swal({
+                        title: "Are you sure you want to send the whatsapp?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    })
+                    .then((willSend) => {
+                        if (willSend) {
+                            swal({
+                                title: "Sending whatsapp, please wait...",
+                                text: "The process is ongoing.",
+                                icon: "info",
+                                buttons: false,
+                                closeOnClickOutside: false,
+                            });
+
+                            fetch("{{ route('send.whatsapp.master.user') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({
+                                        ids: selectedCheckboxes
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    const whatsappSent = data.whatsapp_sent;
+                                    const totalSelected = data.total_selected;
+
+                                    if (whatsappSent > 0) {
+                                        var content = document.createElement('div');
+                                        content.innerHTML =
+                                            "Whatsapp has been successfully sent to <b>" +
+                                            whatsappSent +
+                                            " out of " + totalSelected + " people.</b>";
+
+                                        swal({
+                                            title: "Success!",
+                                            content: content,
+                                            icon: "success",
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        swal("Failed!", "Whatsapp failed to send.", "error").then(
+                                            () => {
+                                                window.location.reload();
+                                            });
+                                    }
+                                })
+                                .catch((error) => {
+                                    swal("Failed!", "An error occurred while sending the Whatsapp.",
                                         "error").then(
                                         () => {
                                             window.location.reload();

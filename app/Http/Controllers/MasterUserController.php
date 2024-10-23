@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\M_MasterUser;
 use App\Models\M_CompanyEvent;
-use App\Models\M_VisitorEvent;
+use App\Models\M_SendEmailCust;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -102,118 +102,60 @@ class MasterUserController extends Controller
 
     public function sendEmailId($id)
     {
-        $ids        = explode(',', $id);
-        $emailsSent = 0;
+        $emailEvent = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->first();
+        $masterUser = M_MasterUser::select('*')->where('id', $id)->first();
 
-        if (!empty($ids)) {
-            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
-            $masterEvent = DB::table('tbl_master_event')
-                ->select("*")
-                ->get();
-
-            foreach ($visitors as $visitor) {
-                foreach ($masterEvent as $event) {
-                    if ($event->id_event == $visitor->event_id) {
-                        $judul           = ucwords($event->title);
-                        $nama            = $visitor->full_name;
-                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
-                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
-                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
-                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
-                        $encryptedId     = encrypt($visitor->id);
-                        $email           = $visitor->email;
-                        $domain          = explode("@", $email)[1];
-                        $ipAddress       = gethostbyname($domain);
-
-                        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
-                            $body = '<html>
-                                        <head>
-                                        <style type="text/css">
-                                            body, td {
-                                                font-family: "Aptos", sans-serif;
-                                                font-size: 16px;
-                                            }
-                                            table#info {
-                                                border: 1px solid #555;
-                                                border-collapse: collapse;
-                                            }
-                                            table#info th,
-                                            table#info td {
-                                                padding: 3px;
-                                                border: 1px solid #555;
-                                            }
-                                        </style>
-                                        </head>
-                                        <body>Bapak/Ibu, <br />
-                                        <strong>' . $nama . '</strong><br />
-                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
-                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
-                                        
-                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
-                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
-                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
-    
-                                        <strong>Syarat & Ketentuan</strong><br />
-                                        - QR Code hanya bisa digunakan 1x pada event. <br />
-                                        - QR Code Tidak boleh diperjual-belikan. <br />
-                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
-                                        </body>
-                                    </html>';
-
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->SMTPOptions = array(
-                                    'ssl' => array(
-                                        'verify_peer'       => false,
-                                        'verify_peer_name'  => false,
-                                        'allow_self_signed' => true
-                                    )
-                                );
-
-                                $mail->isSMTP();
-                                $mail->Host       = env('MAIL_HOST');
-                                $mail->SMTPAuth   = true;
-                                $mail->Username   = env('MAIL_USERNAME');
-                                $mail->Password   = env('MAIL_PASSWORD');
-                                $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                                $mail->Port       = env('MAIL_PORT');
-
-                                $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                                $mail->addAddress($email, $nama);
-
-                                $mail->isHTML(true);
-                                $mail->Subject = 'Event ' . $judul;
-                                $mail->Body = $body;
-
-                                // $mail->SMTPDebug = 2;
-
-                                if ($mail->send()) {
-                                    $visitor->flag_email = 1;
-                                    $emailsSent++;
-                                } else {
-                                    $visitor->flag_email = 0;
-                                }
-                            } catch (Exception $e) {
-                                $visitor->flag_email = 0;
+        $body = '<html>
+                    <head>
+                        <style type="text/css">
+                            body, td {
+                                font-family: "Aptos", sans-serif;
+                                font-size: 16px;
                             }
+                            table#info {
+                                border: 1px solid #555;
+                                border-collapse: collapse;
+                            }
+                            table#info th,
+                            table#info td {
+                                padding: 3px;
+                                border: 1px solid #555;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        Dear <strong>' . ucwords($masterUser['name']) . '</strong> <br /><br />
+                        ' . $emailEvent['content'] . '
+                    </body>
+                </html>';
 
-                            $visitor->save();
-                        } else {
-                            $visitor->flag_email = 0;
-                            $visitor->save();
-                        }
-                    }
-                }
-            }
+        $mail = new PHPMailer(true);
 
-            return response()->json([
-                'message'        => 'Emails processed!',
-                'emails_sent'    => $emailsSent
-            ], 200);
-        }
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true
+            )
+        );
 
-        return response()->json(['message' => 'No visitors selected'], 400);
+        $mail->isSMTP();
+        $mail->Host       = env('MAIL_HOST');
+        $mail->SMTPAuth   = true;
+        $mail->Username   = env('MAIL_USERNAME');
+        $mail->Password   = env('MAIL_PASSWORD');
+        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+        $mail->Port       = env('MAIL_PORT');
+
+        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+        $mail->addAddress($masterUser->email, ucwords($masterUser->name));
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Menu Master User Testing Email ';
+        $mail->Body    = $body;
+        $mail->send();
+
+        return response()->json(['emails_sent' => 1, 'message' => 'success']);
     }
 
     public function sendEmail(Request $request)
@@ -223,103 +165,65 @@ class MasterUserController extends Controller
         $totalSelected = count($ids);
 
         if (!empty($ids)) {
-            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
-            $masterEvent = DB::table('tbl_master_event')
-                ->select("*")
-                ->get();
+            $masterUser = M_MasterUser::select('*')->whereIn('id', $ids)->get();
+            $emailEvent = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
 
-            foreach ($visitors as $visitor) {
-                foreach ($masterEvent as $event) {
-                    if ($event->id_event == $visitor->event_id) {
-                        $judul           = ucwords($event->title);
-                        $nama            = $visitor->full_name;
-                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
-                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
-                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
-                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
-                        $encryptedId     = encrypt($visitor->id);
-                        $email           = $visitor->email;
-                        $domain          = explode("@", $email)[1];
-                        $ipAddress       = gethostbyname($domain);
+            foreach ($masterUser as $user) {
+                foreach ($emailEvent as $event) {
+                    $body = '<html>
+                                <head>
+                                    <style type="text/css">
+                                        body, td {
+                                            font-family: "Aptos", sans-serif;
+                                            font-size: 16px;
+                                        }
+                                        table#info {
+                                            border: 1px solid #555;
+                                            border-collapse: collapse;
+                                        }
+                                        table#info th,
+                                        table#info td {
+                                            padding: 3px;
+                                            border: 1px solid #555;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    Dear <strong>' . ucwords($user['name']) . '</strong> <br /><br />
+                                    ' . $event['content'] . '
+                                </body>
+                            </html>';
 
-                        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
-                            $body = '<html>
-                                        <head>
-                                        <style type="text/css">
-                                            body, td {
-                                                font-family: "Aptos", sans-serif;
-                                                font-size: 16px;
-                                            }
-                                            table#info {
-                                                border: 1px solid #555;
-                                                border-collapse: collapse;
-                                            }
-                                            table#info th,
-                                            table#info td {
-                                                padding: 3px;
-                                                border: 1px solid #555;
-                                            }
-                                        </style>
-                                        </head>
-                                        <body>Bapak/Ibu, <br />
-                                        <strong>' . $nama . '</strong><br />
-                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
-                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
-                                        
-                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
-                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
-                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
-    
-                                        <strong>Syarat & Ketentuan</strong><br />
-                                        - QR Code hanya bisa digunakan 1x pada event. <br />
-                                        - QR Code Tidak boleh diperjual-belikan. <br />
-                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
-                                        </body>
-                                    </html>';
+                    try {
+                        $mail = new PHPMailer(true);
 
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->SMTPOptions = array(
-                                    'ssl' => array(
-                                        'verify_peer'       => false,
-                                        'verify_peer_name'  => false,
-                                        'allow_self_signed' => true
-                                    )
-                                );
+                        $mail->SMTPOptions = array(
+                            'ssl' => array(
+                                'verify_peer'       => false,
+                                'verify_peer_name'  => false,
+                                'allow_self_signed' => true
+                            )
+                        );
 
-                                $mail->isSMTP();
-                                $mail->Host       = env('MAIL_HOST');
-                                $mail->SMTPAuth   = true;
-                                $mail->Username   = env('MAIL_USERNAME');
-                                $mail->Password   = env('MAIL_PASSWORD');
-                                $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                                $mail->Port       = env('MAIL_PORT');
+                        $mail->isSMTP();
+                        $mail->Host       = env('MAIL_HOST');
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = env('MAIL_USERNAME');
+                        $mail->Password   = env('MAIL_PASSWORD');
+                        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                        $mail->Port       = env('MAIL_PORT');
 
-                                $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                                $mail->addAddress($email, $nama);
+                        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                        $mail->addAddress($user['email'], $user['name']);
 
-                                $mail->isHTML(true);
-                                $mail->Subject = 'Event ' . $judul;
-                                $mail->Body = $body;
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Menu Master User Testing Email Selected';
+                        $mail->Body = $body;
 
-                                // $mail->SMTPDebug = 2;
-
-                                if ($mail->send()) {
-                                    $visitor->flag_email = 1;
-                                    $emailsSent++;
-                                } else {
-                                    $visitor->flag_email = 0;
-                                }
-                            } catch (Exception $e) {
-                                $visitor->flag_email = 0;
-                            }
-
-                            $visitor->save();
-                        } else {
-                            $visitor->flag_email = 0;
-                            $visitor->save();
+                        if ($mail->send()) {
+                            $emailsSent++;
                         }
+                    } catch (Exception $e) {
                     }
                 }
             }
@@ -333,6 +237,12 @@ class MasterUserController extends Controller
 
         return response()->json(['message' => 'No visitors selected'], 400);
     }
+
+    public function sendWhatsapp(Request $request)
+    {
+        //
+    }
+
 
     public function template_excel_master_user()
     {

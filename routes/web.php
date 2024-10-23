@@ -92,6 +92,8 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/master-user/delete-multiple-master-user', [MasterUserController::class, 'deleteMultipleVisitors'])->name('delete-multiple-master-user');
     Route::post('/master-user/send-email', [MasterUserController::class, 'sendEmail'])->name('send.email.master.user');
     Route::get('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
+    Route::post('/master-user/send-whatsapp', [MasterUserController::class, 'sendWhatsapp'])->name('send.whatsapp.master.user');
+    Route::post('/master-user/send-whatsapp/{id}', [MasterUserController::class, 'sendWhatsappId'])->name('send.whatsapp.id.master.user');
 
     // Whatsapp Event
     Route::get('/whatsapp-event/{page?}', [WhatsappEventController::class, 'index'])->name('whatsapp_event.index');

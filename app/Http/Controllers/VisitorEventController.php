@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
+use App\Models\M_SendEmailCust;
 use App\Models\M_MetodeBayar;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,6 @@ class VisitorEventController extends Controller
 {
     function index($page)
     {
-        // dd('1');
         $type_menu     = 'visitor_event';
         $data          = visitorEventandMasterEvent($page);
         $masterEvent   = masterEvent($page);
@@ -441,9 +441,8 @@ class VisitorEventController extends Controller
 
         if (!empty($ids)) {
             $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
-            $masterEvent = DB::table('tbl_master_event')
-                ->select("*")
-                ->get();
+            $masterEvent = DB::table('tbl_master_event')->select("*")->get();
+            $emailEvent  = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
 
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
@@ -458,6 +457,7 @@ class VisitorEventController extends Controller
                         $email           = $visitor->email;
                         $domain          = explode("@", $email)[1];
                         $ipAddress       = gethostbyname($domain);
+                        $whatsappEvent   = '';
 
                         if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
                             $body = '<html>
@@ -558,9 +558,8 @@ class VisitorEventController extends Controller
 
         if (!empty($ids)) {
             $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
-            $masterEvent = DB::table('tbl_master_event')
-                ->select("*")
-                ->get();
+            $masterEvent = DB::table('tbl_master_event')->select("*")->get();
+            $emailEvent  = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
 
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {

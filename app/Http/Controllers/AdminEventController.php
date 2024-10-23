@@ -192,31 +192,31 @@ class AdminEventController extends Controller
             ]);
 
         $body = '<html>
-                        <head>
-                        <style type="text/css">
-                            body, td {
-                                font-family: "Aptos", sans-serif;
-                                font-size: 16px;
-                            }
-                            table#info {
-                                border: 1px solid #555;
-                                border-collapse: collapse;
-                            }
-                            table#info th,
-                            table#info td {
-                                padding: 3px;
-                                border: 1px solid #555;
-                            }
-                        </style>
-                        </head>
-                        <body>Dear <strong>' . ucwords($request->nama_lengkap) . '</strong> <br />
-                        Data anda telah di update pada <strong>Event ' . ucwords($titleUrl->title) . '</strong>, silahkan login menggunakan<br />
-                        Username : ' . $request->username . '<br />
-                        Password : ' . $request->password . '<br /><br />
-                        Klik <a href="' . route('login_param', ['page' => $titleUrl->title_url]) . '">di sini</a> untuk menuju halaman Event.<br /><br />
-                        Terima Kasih
-                        </body>
-                    </html>';
+                    <head>
+                    <style type="text/css">
+                        body, td {
+                            font-family: "Aptos", sans-serif;
+                            font-size: 16px;
+                        }
+                        table#info {
+                            border: 1px solid #555;
+                            border-collapse: collapse;
+                        }
+                        table#info th,
+                        table#info td {
+                            padding: 3px;
+                            border: 1px solid #555;
+                        }
+                    </style>
+                    </head>
+                    <body>Dear <strong>' . ucwords($request->nama_lengkap) . '</strong> <br />
+                    Data anda telah di update pada <strong>Event ' . ucwords($titleUrl->title) . '</strong>, silahkan login menggunakan<br />
+                    Username : ' . $request->username . '<br />
+                    Password : ' . $request->password . '<br /><br />
+                    Klik <a href="' . route('login_param', ['page' => $titleUrl->title_url]) . '">di sini</a> untuk menuju halaman Event.<br /><br />
+                    Terima Kasih
+                    </body>
+                </html>';
 
         $mail = new PHPMailer(true);
 
