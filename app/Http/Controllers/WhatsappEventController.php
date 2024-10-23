@@ -17,6 +17,8 @@ class WhatsappEventController extends Controller
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $user        = userAdmin();
         $userId      = $user[0]['id'];
+        $title       = str_replace('-', ' ', $titleUrl);
+        $output      = ucwords($title);
         if ($page == "cms") {
             $data = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->get();
         } else {
@@ -30,6 +32,7 @@ class WhatsappEventController extends Controller
             'data'        => $data,
             'titleUrl'    => $titleUrl,
             'masterEvent' => $masterEvent,
+            'output'      => $output,
         ]);
     }
 

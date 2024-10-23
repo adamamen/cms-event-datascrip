@@ -17,6 +17,9 @@ class EmailEventController extends Controller
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $user        = userAdmin();
         $userId      = $user[0]['id'];
+        $title       = str_replace('-', ' ', $titleUrl);
+        $output      = ucwords($title);
+
         if ($page == "cms") {
             $data = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
         } else {
@@ -30,6 +33,7 @@ class EmailEventController extends Controller
             'data'        => $data,
             'titleUrl'    => $titleUrl,
             'masterEvent' => $masterEvent,
+            'output'      => $output,
         ]);
     }
 

@@ -20,7 +20,7 @@
                 </div>
             @else
                 <div class="section-header">
-                    <h1>Data WhatsApp Event</h1>
+                    <h1>Data WhatsApp Event {{ '(' . $output . ')' }}</h1>
                 </div>
             @endif
 

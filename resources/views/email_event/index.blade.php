@@ -20,7 +20,7 @@
                 </div>
             @else
                 <div class="section-header">
-                    <h1>Data E-mail Event</h1>
+                    <h1>Data E-mail Event {{ '(' . $output . ')' }}</h1>
                 </div>
             @endif
 
