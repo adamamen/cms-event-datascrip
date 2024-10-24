@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="{{ asset('library/codemirror/lib/codemirror.css') }}">
     <link rel="stylesheet" href="{{ asset('library/codemirror/theme/duotone-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
+    <style>
+        /* #content p {
+                    font-weight: normal !important;
+                } */
+    </style>
 @endpush
 
 @section('main')
@@ -144,6 +149,7 @@
                     onChange: function(contents, $editable) {
                         var content = $editable.html();
 
+                        $editable.find('p').css('font-weight', 'normal');
                         if (!content.includes('#NamaUser') || !content.includes('#NamaEvent') || !
                             content.includes('#LinkRegistrasi')) {
                             $('#content').summernote('code', template);

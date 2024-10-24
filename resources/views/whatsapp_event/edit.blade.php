@@ -111,6 +111,20 @@
         $(document).ready(function() {
             var params = "<?php echo $titleUrl; ?>";
 
+            $('#content').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['para', ['paragraph']]
+                ],
+                callbacks: {
+                    onChange: function(contents, $editable) {
+                        $editable.find('p').css('font-weight', 'normal');
+                    }
+                }
+            });
+
             $("#btn_progress").hide();
 
             $("#btn_cancel").click(function() {
