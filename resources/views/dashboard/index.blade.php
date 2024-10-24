@@ -28,7 +28,7 @@
                                     </div>
                                     <h4>{{ !empty($totalVisitor) ? $totalVisitor : '0' }}</h4>
                                     <a href="{{ route('visitor_event.index', ['page' => $value['title_url']]) }}">
-                                        <div class="card-description" style="color:white">Total Visitor</div>
+                                        <div class="card-description" style="color:white">Total Data Visitor Event</div>
                                     </a>
                                 </div>
                             </div>
@@ -41,7 +41,7 @@
                                     </div>
                                     <h4>{{ $totalAdmin }}</h4>
                                     <a href="{{ route('admin_event.index', ['page' => $value['title_url']]) }}">
-                                        <div class="card-description" style="color:white">Total Admin</div>
+                                        <div class="card-description" style="color:white">Total Admin Event</div>
                                     </a>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
                                 </div>
                                 <h4>{{ $totalDivisi }}</h4>
                                 <a href="{{ route('company_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total Divisi</div>
+                                    <div class="card-description" style="color:white">Total Division Event</div>
                                 </a>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                                 </div>
                                 <h4>{{ $totalEvent }}</h4>
                                 <a href="{{ route('index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total Event</div>
+                                    <div class="card-description" style="color:white">Total Master Event</div>
                                 </a>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                                 </div>
                                 <h4>{{ $totalVisitor }}</h4>
                                 <a href="{{ route('visitor_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total Visitor</div>
+                                    <div class="card-description" style="color:white">Total Data Visitor Event</div>
                                 </a>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                 </div>
                                 <h4>{{ $totalAdmin }}</h4>
                                 <a href="{{ route('admin_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total Admin</div>
+                                    <div class="card-description" style="color:white">Total Admin Event</div>
                                 </a>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
                                 </div>
                                 <h4>{{ $totalWhatsapp }}</h4>
                                 <a href="{{ route('whatsapp_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total WhatsApp</div>
+                                    <div class="card-description" style="color:white">Total WhatsApp Event</div>
                                 </a>
                             </div>
                         </div>
@@ -121,7 +121,7 @@
                                 </div>
                                 <h4>{{ $totalEmail }}</h4>
                                 <a href="{{ route('email_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total E-mail</div>
+                                    <div class="card-description" style="color:white">Total E-mail Event</div>
                                 </a>
                             </div>
                         </div>
@@ -134,7 +134,7 @@
                                 </div>
                                 <h4>{{ $totalReportVisitor }}</h4>
                                 <a href="{{ route('report_visitor_event.index', ['page' => 'cms']) }}">
-                                    <div class="card-description" style="color:white">Total Report Visitor</div>
+                                    <div class="card-description" style="color:white">Total Report Visitor Event</div>
                                 </a>
                             </div>
                         </div>

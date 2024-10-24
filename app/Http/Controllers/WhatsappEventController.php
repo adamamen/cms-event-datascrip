@@ -42,7 +42,6 @@ class WhatsappEventController extends Controller
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
-        // if ($page == "cms") {
         return view('whatsapp_event.add', [
             'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
@@ -50,7 +49,6 @@ class WhatsappEventController extends Controller
             'page'        => $page,
             'masterEvent' => $masterEvent,
         ]);
-        // }
     }
 
     function add(Request $request)

@@ -14,6 +14,14 @@ class LoginController extends Controller
 {
     public function index()
     {
+        $checkId = M_User::select('*')->where('id', Auth::user()->id)->first();
+
+        if ($checkId->event_id == 0) {
+            if (Auth::check()) {
+                return redirect()->route('dashboard', ['page' => 'cms']);
+            }
+        }
+
         return view('login.index');
     }
 
@@ -29,6 +37,10 @@ class LoginController extends Controller
                 ->where('status', 'A')
                 ->where('title_url', $page)
                 ->get()->toArray();
+        }
+
+        if (Auth::check()) {
+            return redirect()->route('visitor_event.index', ['page' => $page]);
         }
 
         if ($page == "dashboard") {

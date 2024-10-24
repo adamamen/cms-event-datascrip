@@ -53,7 +53,11 @@ class EmailEventController extends Controller
         $type_menu   = 'email_event';
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+        if ($page == "cms") {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+        } else {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+        }
 
         return view('email_event.add', [
             'type_menu'   => $type_menu,
@@ -95,7 +99,11 @@ class EmailEventController extends Controller
         $data        = M_SendEmailCust::select('*')->where('id', $id)->first();
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+        if ($page == "cms") {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+        } else {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+        }
 
         return view('email_event.edit', [
             'type_menu'   => $type_menu,
