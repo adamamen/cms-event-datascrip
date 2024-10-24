@@ -25,7 +25,7 @@ use App\Http\Controllers\ReportVisitorEventController;
 
 // Register Visitor
 Route::get('/register-visitor/{page}', [VisitorEventController::class, 'index_register'])->name('index_register');
-Route::post('/add-visitor', [VisitorEventController::class, 'add'])->name('add-visitor');
+Route::post('/add-visitor/{page}', [VisitorEventController::class, 'add'])->name('add-visitor');
 
 // Login
 Route::get('/', [LoginController::class, 'index'])->name('login');

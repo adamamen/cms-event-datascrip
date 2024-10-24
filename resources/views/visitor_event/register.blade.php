@@ -29,70 +29,68 @@
                                 <meta name="csrf-token" content="{{ csrf_token() }}">
                                 <div class="row">
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Nama Lengkap</label>
+                                        <label>Name</label>
                                         <input type="text" class="form-control" value="" required=""
-                                            name="nama_lengkap" id="nama_lengkap">
+                                            name="name" id="name" autocomplete="off">
                                         <div class="invalid-feedback">
-                                            Nama Lengkap Wajib Diisi
+                                            Name is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Event</label>
-                                        <select class="form-control select2" name="nama_event" id="nama_event">
-                                            <option selected disabled>-- Silahkan Pilih --</option>
-                                            @foreach ($data as $value)
-                                                <option value="{{ $value->id_event }}">{{ $value->title }}</option>
-                                            @endforeach
+                                        <label>Gender</label>
+                                        <select class="form-control select2" name="gender" id="gender">
+                                            <option selected disabled>-- Please Select --</option>
+                                            <option value="L">Laki-laki</option>
+                                            <option value="P">Perempuan</option>
                                         </select>
                                         <div class="invalid-feedback">
-                                            Status Wajib Diisi
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-4 col-12">
-                                        <label>No Handphone</label>
-                                        <input type="text" class="form-control" value="" required=""
-                                            name="no_handphone" id="no_handphone"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
-                                        <div class="invalid-feedback">
-                                            No Handphone Wajib Diisi
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-4 col-12">
-                                        <label>No Tiket</label>
-                                        <input type="text" class="form-control" value="" required=""
-                                            name="no_tiket" id="no_tiket"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
-                                        <div class="invalid-feedback">
-                                            No Tiket Wajib Diisi
+                                            Gender is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
                                         <label>Email</label>
                                         <input type="email" class="form-control" value="" required=""
-                                            name="email" id="email">
+                                            name="email" id="email" autocomplete="off">
                                         <div class="invalid-feedback">
-                                            Email Wajib Diisi
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-4 col-12">
-                                        <label>Tanggal Registrasi</label>
-                                        <input type="text" class="form-control datepicker" value="" required=""
-                                            name="tanggal_registrasi" id="tanggal_registrasi">
-                                        <div class="invalid-feedback">
-                                            Tanggal Registrasi Wajib Diisi
+                                            Email is required
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-6 col-12">
-                                        <div class="form-group">
-                                            <label>Alamat</label>
-                                            <textarea class="form-control" data-height="150" name="alamat" id="alamat"></textarea>
-                                        </div>
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Instagram Account</label>
+                                        <input type="text" class="form-control" value="" required=""
+                                            name="instagram_account" id="instagram_account" autocomplete="off">
                                         <div class="invalid-feedback">
-                                            Alamat Wajib Diisi
+                                            Instagram Account is required
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Phone Number</label>
+                                        <input type="text" class="form-control" value="" required=""
+                                            name="phone_number" id="phone_number"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                            autocomplete="off">
+                                        <div class="invalid-feedback">
+                                            Phone Number is required
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Invitation Type</label>
+                                        <input type="text" class="form-control" value="" required=""
+                                            name="invitation_type" id="invitation_type" autocomplete="off">
+                                        <div class="invalid-feedback">
+                                            Invitation Type is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Name Of Agency / Company</label>
+                                        <input type="text" class="form-control" value="" required=""
+                                            name="name_of_agency" id="name_of_agency" autocomplete="off">
+                                        <div class="invalid-feedback">
+                                            Name Of Agency / Company is required
                                         </div>
                                     </div>
                                 </div>
@@ -100,8 +98,8 @@
                                     name="btn_submit"><i class="fas fa-check"></i> Submit</a>
                                 <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
                                     name="btn_progress">Submit</a>
-                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel" name="btn_cancel"><i
-                                        class="fas fa-xmark"></i> Cancel</a>
+                                <a href="#" class="btn btn-danger" type="submit" id="btn_cancel"
+                                    name="btn_cancel"><i class="fas fa-xmark"></i> Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -157,42 +155,41 @@
                 $("#btn_submit").hide();
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
-                var namaLengkap = $('#nama_lengkap').val();
-                var namaEvent = $('#nama_event').val();
+                var name = $('#name').val();
+                var gender = $('#gender').val();
                 var email = $('#email').val();
-                var noHandphone = $('#no_handphone').val();
-                var noTiket = $('#no_tiket').val();
-                var tanggalRegistrasi = $('#tanggal_registrasi').val();
-                var alamat = $('#alamat').val();
-                var username = $('#username').val();
+                var instagram_account = $('#instagram_account').val();
+                var phone_number = $('#phone_number').val();
+                var invitation_type = $('#invitation_type').val();
+                var name_of_agency = $('#name_of_agency').val();
+
+                var pathArray = window.location.pathname.split('/');
+                var page = pathArray[pathArray.length - 1];
 
                 var formData = new FormData();
-                formData.append("namaLengkap", namaLengkap);
-                formData.append("namaEvent", namaEvent);
+                formData.append("name", name);
+                formData.append("gender", gender);
                 formData.append("email", email);
-                formData.append("noHandphone", noHandphone);
-                formData.append("noTiket", noTiket);
-                formData.append("tanggalRegistrasi", tanggalRegistrasi);
-                formData.append("alamat", alamat);
-                formData.append("username", username);
+                formData.append("instagram_account", instagram_account);
+                formData.append("phone_number", phone_number);
+                formData.append("invitation_type", invitation_type);
+                formData.append("name_of_agency", name_of_agency);
 
-                if (namaLengkap == "") {
-                    var name = "Nama Lengkap";
+                if (name == "") {
+                    var names = "Name";
                     var content = document.createElement('div');
-                    content.innerHTML = '<strong>' + name +
+                    content.innerHTML = '<strong>' + names +
                         '</strong> cannot be empty, please try again';
                     swal({
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
-                } else if (namaEvent == null) {
-                    var name = "Nama Event";
+                } else if (gender == null) {
+                    var name = "Gender";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -200,11 +197,9 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else if (email == "") {
                     var name = "Email";
@@ -215,14 +210,12 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
-                } else if (noHandphone == "") {
-                    var name = "No Handphone";
+                } else if (instagram_account == "") {
+                    var name = "Instagram Account";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -230,14 +223,12 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
-                } else if (noTiket == "") {
-                    var name = "No Tiket";
+                } else if (phone_number == "") {
+                    var name = "Phone Number";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -245,14 +236,12 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
-                } else if (tanggalRegistrasi == "") {
-                    var name = "Tanggal Registrasi";
+                } else if (invitation_type == "") {
+                    var name = "Invitation Type";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -260,14 +249,12 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
-                } else if (alamat == "") {
-                    var name = "Alamat";
+                } else if (name_of_agency == "") {
+                    var name = "Name Of Agency / Company";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -275,15 +262,14 @@
                         title: 'Warning',
                         content: content,
                         icon: "warning",
-                    }).then(okay => {
-                        if (okay) {
-                            $("#btn_progress").hide();
-                            $("#btn_submit").show();
-                        }
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
                     });
                 } else {
                     $.ajax({
-                        url: '{{ route('add-visitor') }}',
+                        url: '{{ route('add-visitor', ['page' => ':page']) }}'.replace(':page',
+                            page),
                         type: "POST",
                         data: formData,
                         contentType: false,
@@ -296,17 +282,14 @@
                             $("#btn_progress").hide();
                             $("#btn_submit").show();
 
-                            if (alerts == "failed") {
-                                swal('Gagal',
-                                    'No Ticket sudah pernah digunakan, silahkan coba lagi...',
-                                    'warning');
-                            } else if (alerts == "success") {
-                                swal('Sukses', 'Data berhasil disimpan...', 'success').then(
-                                    () => {
-                                        location.reload(true)
-                                    });
+                            if (alerts == "success") {
+                                swal('Success', 'Data has been successfully saved', 'success')
+                                    .then(
+                                        () => {
+                                            location.reload(true)
+                                        });
                             } else {
-                                swal('Gagal', 'Data gagal disimpan...', 'warning');
+                                swal('Failed', 'Data failed to save', 'warning');
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {

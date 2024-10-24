@@ -162,7 +162,7 @@
                                         <th>Instagram Account</th>
                                         <th>Phone Number</th>
                                         <th>Invitation Type</th>
-                                        <th>Nama Of Agency / Company</th>
+                                        <th>Name Of Agency / Company</th>
                                         <th>Barcode No</th>
                                         <th>Date Arrival</th>
                                         <th>E-mail Status</th>

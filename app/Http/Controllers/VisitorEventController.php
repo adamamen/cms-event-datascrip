@@ -95,41 +95,40 @@ class VisitorEventController extends Controller
         return $ret;
     }
 
-    public function add(Request $request)
+    public function add(Request $request, $page)
     {
-        $query = M_VisitorEvent::select('*')
-            ->where('event_id', $request->namaEvent)
-            ->where('ticket_no', $request->noTiket)
-            ->get();
-        $masterEvent = M_MasterEvent::select('*')->where('id_event', $request->namaEvent)->where('jenis_event', 'A')->first();
-        if ($masterEvent != null) {
-            $noInvoice = 'INV' . date("y") . '/' . $this->initials($masterEvent->title_url) . date("md") . '/' . str_repeat("0", (5 - strlen($request->noTiket))) . $request->noTiket;
-        } else {
-            $noInvoice = '';
-        }
+        $getIdEvent = M_MasterEvent::select('*')->where('title_url', trim($page))->first();
+        $barcodeNo = strtoupper(generateUniqueCode());
+        $filename  = $barcodeNo . '-qrcode.png';
+        $qrCode    = new QrCode($barcodeNo);
+        $writer    = new PngWriter();
+        $path1     = 'qrcodes/' . $filename;
+        $path2     = 'storage/qrcodes/' . $filename;
 
-        if (!$query->isEmpty()) {
-            return response()->json(['message' => 'failed']);
-        } else {
-            DB::table('tbl_visitor_event')->insert([
-                'event_id'          => $request->namaEvent,
-                'ticket_no'         => $request->noTiket,
-                'registration_date' => $request->tanggalRegistrasi,
-                'full_name'         => $request->namaLengkap,
-                'address'           => $request->alamat,
-                'email'             => $request->email,
-                'mobile'            => $request->noHandphone,
-                'created_at'        => Carbon::now(),
-                'created_by'        => $request->username,
-                'updated_at'        => Carbon::now(),
-                'updated_by'        => $request->username,
-                'jenis_event'       => !empty($masterEvent->jenis_event) ? $masterEvent->jenis_event : '',
-                'no_invoice'        => $noInvoice,
-                'status_pembayaran' => 'Belum Dibayar',
-            ]);
+        $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path1));
+        $writer->write($qrCode)->saveToFile(public_path($path2));
 
-            return response()->json(['message' => 'success']);
-        }
+        $barcodeLink = asset('storage/qrcodes/' . $filename);
+
+        DB::table('tbl_visitor_event')->insert([
+            'event_id'          => $getIdEvent->id_event,
+            'full_name'         => $request->name,
+            'gender'            => $request->gender,
+            'email'             => $request->email,
+            'account_instagram' => $request->instagram_account,
+            'mobile'            => $request->phone_number,
+            'type_invitation'   => $request->invitation_type,
+            'invitation_name'   => $request->name_of_agency,
+            'created_at'        => Carbon::now(),
+            'created_by'        => $request->name,
+            'updated_by'        => $request->name,
+            'registration_date' => Carbon::now(),
+            'barcode_no'        => strtoupper($barcodeNo),
+            'source'            => NULL,
+            'barcode_link'      => $barcodeLink,
+        ]);
+
+        return response()->json(['message' => 'success']);
     }
 
     public function edit()

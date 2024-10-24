@@ -208,7 +208,7 @@ class MasterUserController extends Controller
                     [
                         ucwords($user->name),
                         ucwords($emailEvent->title),
-                        url('/' . $emailEvent->title_url)
+                        url('/register-visitor/' .  $emailEvent->title_url),
                     ],
                     $bodyContent
                 );

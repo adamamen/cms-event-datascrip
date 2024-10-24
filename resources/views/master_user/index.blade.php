@@ -269,6 +269,7 @@
     @endif
 
     <script>
+        // Modal tidak blank page
         $("body").children().first().before($(".modal"));
 
         document.getElementById('save-btn').addEventListener('click', function() {
