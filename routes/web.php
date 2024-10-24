@@ -91,7 +91,8 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::delete('/master-user/delete-visitor/{id}', [MasterUserController::class, 'delete'])->name('delete-master-user');
     Route::post('/master-user/delete-multiple-master-user', [MasterUserController::class, 'deleteMultipleVisitors'])->name('delete-multiple-master-user');
     Route::post('/master-user/send-email', [MasterUserController::class, 'sendEmail'])->name('send.email.master.user');
-    Route::get('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
+    // Route::get('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
+    Route::post('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
     Route::post('/master-user/send-whatsapp', [MasterUserController::class, 'sendWhatsapp'])->name('send.whatsapp.master.user');
     Route::post('/master-user/send-whatsapp/{id}', [MasterUserController::class, 'sendWhatsappId'])->name('send.whatsapp.id.master.user');
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\M_MasterUser;
 use App\Models\M_CompanyEvent;
 use App\Models\M_SendEmailCust;
+use App\Models\M_MasterEvent;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -22,12 +23,17 @@ class MasterUserController extends Controller
         $data        = M_MasterUser::select('*')->get();
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $listEvent   = M_SendEmailCust::select('tbl_master_event.id_event', 'tbl_master_event.title')
+            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+            ->where('tbl_send_email_cust.type', 'CMS_Admin')
+            ->get();
 
         return view('master_user.index', [
             'type_menu' => $type_menu,
             'page'      => $page,
             'data'      => $data,
             'titleUrl'  => $titleUrl,
+            'listEvent' => $listEvent,
         ]);
     }
 
@@ -100,62 +106,80 @@ class MasterUserController extends Controller
         return response()->json(['success' => false, 'message' => 'No IDs selected']);
     }
 
-    public function sendEmailId($id)
+    public function sendEmailId(Request $request, $id)
     {
-        $emailEvent = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->first();
-        $masterUser = M_MasterUser::select('*')->where('id', $id)->first();
+        $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+            ->where('tbl_send_email_cust.type', 'CMS_Admin')
+            ->where('tbl_send_email_cust.id_event', $request->division)
+            ->first();
+        $masterUser  = M_MasterUser::select('*')->where('id', $id)->first();
+
+        $bodyContent = $emailEvent['content'];
+        $bodyContent = str_replace(
+            ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
+            [
+                ucwords($masterUser['name']),
+                ucwords($emailEvent['title']),
+                url('/' . $emailEvent['title_url'])
+            ],
+            $bodyContent
+        );
 
         $body = '<html>
-                    <head>
-                        <style type="text/css">
-                            body, td {
-                                font-family: "Aptos", sans-serif;
-                                font-size: 16px;
-                            }
-                            table#info {
-                                border: 1px solid #555;
-                                border-collapse: collapse;
-                            }
-                            table#info th,
-                            table#info td {
-                                padding: 3px;
-                                border: 1px solid #555;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        Dear <strong>' . ucwords($masterUser['name']) . '</strong> <br /><br />
-                        ' . $emailEvent['content'] . '
-                    </body>
-                </html>';
+                <head>
+                    <style type="text/css">
+                        body, td {
+                            font-family: "Aptos", sans-serif;
+                            font-size: 16px;
+                        }
+                        table#info {
+                            border: 1px solid #555;
+                            border-collapse: collapse;
+                        }
+                        table#info th,
+                        table#info td {
+                            padding: 3px;
+                            border: 1px solid #555;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ' . $bodyContent . '
+                </body>
+            </html>';
 
         $mail = new PHPMailer(true);
 
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
-                'allow_self_signed' => true
-            )
-        );
+        try {
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true
+                )
+            );
 
-        $mail->isSMTP();
-        $mail->Host       = env('MAIL_HOST');
-        $mail->SMTPAuth   = true;
-        $mail->Username   = env('MAIL_USERNAME');
-        $mail->Password   = env('MAIL_PASSWORD');
-        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-        $mail->Port       = env('MAIL_PORT');
+            $mail->isSMTP();
+            $mail->Host       = env('MAIL_HOST');
+            $mail->SMTPAuth   = true;
+            $mail->Username   = env('MAIL_USERNAME');
+            $mail->Password   = env('MAIL_PASSWORD');
+            $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+            $mail->Port       = env('MAIL_PORT');
 
-        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-        $mail->addAddress($masterUser->email, ucwords($masterUser->name));
+            $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+            $mail->addAddress($masterUser->email, ucwords($masterUser->name));
 
-        $mail->isHTML(true);
-        $mail->Subject = 'Menu Master User Testing Email ';
-        $mail->Body    = $body;
-        $mail->send();
+            $mail->isHTML(true);
+            $mail->Subject = 'Menu Master User Testing Email';
+            $mail->Body    = $body;
+            $mail->send();
 
-        return response()->json(['emails_sent' => 1, 'message' => 'success']);
+            return response()->json(['emails_sent' => 1, 'message' => 'success']);
+        } catch (Exception $e) {
+            return response()->json(['emails_sent' => 0, 'message' => 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo], 500);
+        }
     }
 
     public function sendEmail(Request $request)
@@ -165,66 +189,83 @@ class MasterUserController extends Controller
         $totalSelected = count($ids);
 
         if (!empty($ids)) {
-            $masterUser = M_MasterUser::select('*')->whereIn('id', $ids)->get();
-            $emailEvent = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
+            $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_email_cust.type', 'CMS_Admin')
+                ->where('tbl_send_email_cust.id_event', $request->division_id)
+                ->first();
 
-            foreach ($masterUser as $user) {
-                foreach ($emailEvent as $event) {
-                    $body = '<html>
-                                <head>
-                                    <style type="text/css">
-                                        body, td {
-                                            font-family: "Aptos", sans-serif;
-                                            font-size: 16px;
-                                        }
-                                        table#info {
-                                            border: 1px solid #555;
-                                            border-collapse: collapse;
-                                        }
-                                        table#info th,
-                                        table#info td {
-                                            padding: 3px;
-                                            border: 1px solid #555;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    Dear <strong>' . ucwords($user['name']) . '</strong> <br /><br />
-                                    ' . $event['content'] . '
-                                </body>
-                            </html>';
+            if (!$emailEvent) {
+                return response()->json(['message' => 'Email event not found.'], 404);
+            }
 
-                    try {
-                        $mail = new PHPMailer(true);
+            $masterUsers = M_MasterUser::select('*')->whereIn('id', $ids)->get();
 
-                        $mail->SMTPOptions = array(
-                            'ssl' => array(
-                                'verify_peer'       => false,
-                                'verify_peer_name'  => false,
-                                'allow_self_signed' => true
-                            )
-                        );
+            foreach ($masterUsers as $user) {
+                $bodyContent = $emailEvent->content;
+                $bodyContent = str_replace(
+                    ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
+                    [
+                        ucwords($user->name),
+                        ucwords($emailEvent->title),
+                        url('/' . $emailEvent->title_url)
+                    ],
+                    $bodyContent
+                );
 
-                        $mail->isSMTP();
-                        $mail->Host       = env('MAIL_HOST');
-                        $mail->SMTPAuth   = true;
-                        $mail->Username   = env('MAIL_USERNAME');
-                        $mail->Password   = env('MAIL_PASSWORD');
-                        $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                        $mail->Port       = env('MAIL_PORT');
+                $body = '<html>
+                        <head>
+                            <style type="text/css">
+                                body, td {
+                                    font-family: "Aptos", sans-serif;
+                                    font-size: 16px;
+                                }
+                                table#info {
+                                    border: 1px solid #555;
+                                    border-collapse: collapse;
+                                }
+                                table#info th,
+                                table#info td {
+                                    padding: 3px;
+                                    border: 1px solid #555;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ' . $bodyContent . '
+                        </body>
+                    </html>';
 
-                        $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                        $mail->addAddress($user['email'], $user['name']);
+                $mail = new PHPMailer(true);
 
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Menu Master User Testing Email Selected';
-                        $mail->Body = $body;
+                try {
+                    $mail->SMTPOptions = array(
+                        'ssl' => array(
+                            'verify_peer'       => false,
+                            'verify_peer_name'  => false,
+                            'allow_self_signed' => true
+                        )
+                    );
 
-                        if ($mail->send()) {
-                            $emailsSent++;
-                        }
-                    } catch (Exception $e) {
-                    }
+                    $mail->isSMTP();
+                    $mail->Host       = env('MAIL_HOST');
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = env('MAIL_USERNAME');
+                    $mail->Password   = env('MAIL_PASSWORD');
+                    $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                    $mail->Port       = env('MAIL_PORT');
+
+                    $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                    $mail->addAddress($user->email, ucwords($user->name));
+
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Menu Master User Testing Email';
+                    $mail->Body    = $body;
+                    $mail->send();
+
+                    $emailsSent++;
+                } catch (Exception $e) {
+                    return response()->json(['emails_sent' => 0, 'message' => 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo], 500);
                 }
             }
 

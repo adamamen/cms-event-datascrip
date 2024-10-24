@@ -49,6 +49,21 @@
                                                 </div>
                                                 <div class="form-group row mb-4">
                                                     <label
+                                                        class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Event
+                                                        Name</label>
+                                                    <div class="col-sm-12 col-md-7">
+                                                        <select class="form-control select2" name="event" id="event">
+                                                            <option selected disabled>-- Please Select --</option>
+                                                            @foreach ($listEvent as $event)
+                                                                <option value="{{ $event->id_event }}">
+                                                                    {{ ucwords($event->title) }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row mb-4">
+                                                    <label
                                                         class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Content</label>
                                                     <div class="col-sm-12 col-md-7">
                                                         <textarea class="summernote-simple" id="content" name="content"></textarea>
@@ -108,6 +123,36 @@
     <script>
         $(document).ready(function() {
             var params = "<?php echo $titleUrl; ?>";
+            var template = `
+                Dear <strong>#NamaUser</strong>, <br><br>
+
+                Anda telah diundang pada acara event <strong>#NamaEvent</strong>. <br><br>
+
+                Mohon registrasikan diri Anda pada link berikut: <strong>#LinkRegistrasi</strong> <br><br>
+
+                Thanks & Regards,<br>
+                Admin Event.`;
+
+            $('#content').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['para', ['paragraph']]
+                ],
+                callbacks: {
+                    onChange: function(contents, $editable) {
+                        var content = $editable.html();
+
+                        if (!content.includes('#NamaUser') || !content.includes('#NamaEvent') || !
+                            content.includes('#LinkRegistrasi')) {
+                            $('#content').summernote('code', template);
+                        }
+                    }
+                }
+            });
+
+            $('#content').summernote('code', template);
 
             $("#btn_progress").hide();
 
@@ -134,13 +179,28 @@
                 var type = $('#type').val();
                 var content = $('#content').val();
                 var page = $('#page').val();
+                var event = $('#event').val();
 
                 var formData = new FormData();
                 formData.append("type", type);
                 formData.append("content", content);
                 formData.append("page", page);
+                formData.append("event", event);
 
-                if (content == "") {
+                if (event == null) {
+                    var name = "Event Name";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> cannot be empty, please try again';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    });
+                } else if (content == "") {
                     var name = "Content";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +

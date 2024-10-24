@@ -51,6 +51,21 @@
                                                 </div>
                                                 <div class="form-group row mb-4">
                                                     <label
+                                                        class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Event
+                                                        Name</label>
+                                                    <div class="col-sm-12 col-md-7">
+                                                        <select class="form-control select2" name="event" id="event">
+                                                            <option selected disabled>-- Please Select --</option>
+                                                            @foreach ($listEvent as $event)
+                                                                <option value="{{ $event->id_event }}"
+                                                                    {{ $event->id_event == $data->id_event ? 'selected' : $event->id_event }}>
+                                                                    {{ ucwords($event->title) }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row mb-4">
+                                                    <label
                                                         class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Content</label>
                                                     <div class="col-sm-12 col-md-7">
                                                         <textarea class="summernote-simple" id="content" name="content">{{ $data->content }}</textarea>
@@ -137,14 +152,29 @@
                 var type = $('#type').val();
                 var content = $('#content').val();
                 var page = $('#page').val();
+                var event = $('#event').val();
 
                 var formData = new FormData();
                 formData.append("id", id);
                 formData.append("type", type);
                 formData.append("content", content);
                 formData.append("page", page);
+                formData.append("event", event);
 
-                if (content == "") {
+                if (event == null) {
+                    var name = "Event Name";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> cannot be empty, please try again';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    });
+                } else if (content == "") {
                     var name = "Content";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +

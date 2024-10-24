@@ -6,33 +6,44 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\M_MasterEvent;
 use App\Models\M_CompanyEvent;
+use App\Models\M_SendWaCust;
+use App\Models\M_SendEmailCust;
+use App\Models\M_MasterUser;
 
 class DashboardController extends Controller
 {
     public function index($page)
     {
-        $page           = strtolower($page);
-        $type_menu      = 'dashboard';
-        $totalVisitor   = $this->query($page);
-        $divisiEvent    = $this->divisiEvent($page);
-        $divisiEventCms = M_CompanyEvent::count();
-        $totalDivisi    = $page == "cms" ? $divisiEventCms : count($divisiEvent);
-        $masterEvent    = masterEvent($page);
-        $masterEventCms = M_MasterEvent::count();
-        $totalEvent     = $page == "cms" ? $masterEventCms : count($masterEvent);
-        $user           = userAdmin();
-        $totalAdmin     = count(adminEvent($page));
-        $userId         = $user[0]['id'];
+        $page               = strtolower($page);
+        $type_menu          = 'dashboard';
+        $totalVisitor       = $this->query($page);
+        $divisiEvent        = $this->divisiEvent($page);
+        $divisiEventCms     = M_CompanyEvent::count();
+        $totalDivisi        = $page == "cms" ? $divisiEventCms : count($divisiEvent);
+        $masterEvent        = masterEvent($page);
+        $masterEventCms     = M_MasterEvent::count();
+        $totalEvent         = $page == "cms" ? $masterEventCms : count($masterEvent);
+        $user               = userAdmin();
+        $totalAdmin         = count(adminEvent($page));
+        $userId             = $user[0]['id'];
+        $totalWhatsapp      = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->count();
+        $totalEmail         = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->count();
+        $totalReportVisitor = '0';
+        $totalMasterUser    = M_MasterUser::select('*')->count();
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('dashboard.index', [
-                'id'           => $userId,
-                'masterEvent'  => empty($masterEvent) ? '' : $masterEvent,
-                'type_menu'    => $type_menu,
-                'totalEvent'   => $totalEvent,
-                'totalDivisi'  => $totalDivisi,
-                'totalVisitor' => count($totalVisitor),
-                'totalAdmin'   => $totalAdmin
+                'id'                 => $userId,
+                'masterEvent'        => empty($masterEvent) ? '' : $masterEvent,
+                'type_menu'          => $type_menu,
+                'totalEvent'         => $totalEvent,
+                'totalDivisi'        => $totalDivisi,
+                'totalVisitor'       => count($totalVisitor),
+                'totalAdmin'         => $totalAdmin,
+                'totalWhatsapp'      => $totalWhatsapp,
+                'totalEmail'         => $totalEmail,
+                'totalReportVisitor' => $totalReportVisitor,
+                'totalMasterUser'    => $totalMasterUser,
             ]);
         } else {
             return view('error.error-404');

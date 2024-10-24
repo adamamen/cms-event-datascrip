@@ -100,6 +100,58 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <h4>{{ $totalWhatsapp }}</h4>
+                                <a href="{{ route('whatsapp_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total WhatsApp</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h4>{{ $totalEmail }}</h4>
+                                <a href="{{ route('email_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total E-mail</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                                <h4>{{ $totalReportVisitor }}</h4>
+                                <a href="{{ route('report_visitor_event.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total Report Visitor</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-hero">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h4>{{ $totalMasterUser }}</h4>
+                                <a href="{{ route('master_user.index', ['page' => 'cms']) }}">
+                                    <div class="card-description" style="color:white">Total Master User</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 @endif
             </div>
         </section>

@@ -194,6 +194,35 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="divisionModal" tabindex="-1" role="dialog"
+                aria-labelledby="divisionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="divisionModalLabel">Select Division</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="divisionSelect">Choose a division:</label>
+                            <select class="form-control select2" name="divisionSelect" id="divisionSelect">
+                                <option selected disabled>-- Please Select --</option>
+                                @foreach ($listEvent as $event)
+                                    <option value="{{ $event->id_event }}">
+                                        {{ ucwords($event->title) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="sendEmailButton">Send Email</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
     </div>
 @endsection
@@ -209,6 +238,7 @@
     <script src="{{ asset('library/jquery-ui-dist/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('library/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    <script src="{{ asset('library/select2/dist/js/select2.full.min.js') }}"></script>
 
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/modules-datatables.js') }}"></script>
@@ -239,6 +269,8 @@
     @endif
 
     <script>
+        $("body").children().first().before($(".modal"));
+
         document.getElementById('save-btn').addEventListener('click', function() {
             $('#btn_progress').show();
             $('#save-btn').hide();
@@ -278,70 +310,101 @@
                 });
         });
 
+        $(document).ready(function() {
+            $('#divisionModal').on('shown.bs.modal', function() {
+                $('#divisionSelect').select2({
+                    dropdownParent: $(
+                        '#divisionModal'),
+                    placeholder: "-- Please Select --",
+                    allowClear: true
+                });
+            });
+        });
 
         $(document).ready(function() {
             // Email Satuan 
             $('.send-email-btn-id').on('click', function() {
                 const id = $(this).data('id');
-                const url = "{{ route('send.email.id.master.user', ['id' => '__ID__']) }}".replace(
-                    '__ID__', id
-                );
+                $('#divisionModal').modal('show');
 
-                swal({
-                    title: "Are you sure you want to send the email?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                }).then((willSend) => {
-                    if (willSend) {
-                        swal({
-                            title: "Sending email, please wait...",
-                            text: "The process is ongoing.",
-                            icon: "info",
-                            buttons: false,
-                            closeOnClickOutside: false,
-                        });
+                $('#sendEmailButton').off('click').on('click', function() {
+                    const selectedDivision = $('#divisionSelect').val();
 
-                        fetch(url, {
-                                method: 'GET',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                            .then(response => {
-                                return response.json();
-                            })
-                            .then(data => {
-                                const emailsSent = data.emails_sent || 0;
+                    if (!selectedDivision) {
+                        swal("Warning!", "Please select a division.", "warning");
+                        return;
+                    }
 
-                                if (emailsSent > 0) {
-                                    var content = document.createElement('div');
-                                    content.innerHTML = "Email has been successfully sent";
+                    const url = "{{ route('send.email.id.master.user', ['id' => '__ID__']) }}"
+                        .replace('__ID__', id);
 
-                                    swal({
-                                        title: "Success!",
-                                        content: content,
-                                        icon: "success",
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
-                                } else {
-                                    swal("Failed!", "Emails failed to send.", "error").then(
+                    swal({
+                        title: "Are you sure you want to send the email?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willSend) => {
+                        if (willSend) {
+                            swal({
+                                title: "Sending email, please wait...",
+                                text: "The process is ongoing.",
+                                icon: "info",
+                                buttons: false,
+                                closeOnClickOutside: false,
+                            });
+
+                            fetch(url, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({
+                                        division: selectedDivision
+                                    }),
+                                })
+                                .then(response => {
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    const emailsSent = data.emails_sent || 0;
+
+                                    if (emailsSent > 0) {
+                                        var content = document.createElement('div');
+                                        content.innerHTML =
+                                            "Email has been successfully sent";
+
+                                        swal({
+                                            title: "Success!",
+                                            content: content,
+                                            icon: "success",
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        swal("Failed!", "Emails failed to send.",
+                                            "error").then(
+                                            () => {
+                                                window.location.reload();
+                                            }
+                                        );
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error(
+                                        error
+                                    );
+                                    swal("Failed!",
+                                        "An error occurred while sending the email.",
+                                        "error").then(
                                         () => {
                                             window.location.reload();
                                         }
                                     );
-                                }
-                            })
-                            .catch((error) => {
-                                swal("Failed!", "An error occurred while sending the email.",
-                                    "error").then(
-                                    () => {
-                                        window.location.reload();
-                                    }
-                                );
-                            });
-                    }
+                                });
+                        }
+                        $('#divisionModal').modal('hide');
+                    });
                 });
             });
 
@@ -669,13 +732,26 @@
                 $('#send-email-btn').prop('disabled', !anyChecked);
             }
 
-            // Send Email Selected
             document.getElementById('send-email-btn').addEventListener('click', function(e) {
                 e.preventDefault();
 
                 if (selectedCheckboxes.length === 0) {
                     swal('No data selected.', 'Please select at least one item to send the email.',
                         'warning');
+                    return;
+                }
+
+                $('#divisionModal').modal('show');
+            });
+
+            // Send Email Selected
+            document.getElementById('sendEmailButton').addEventListener('click', function() {
+                const selectedDivision = $('#divisionSelect').val();
+
+                console.log(selectedDivision)
+
+                if (!selectedDivision) {
+                    swal("Warning!", "Please select a division.", "warning");
                     return;
                 }
 
@@ -702,7 +778,8 @@
                                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                     },
                                     body: JSON.stringify({
-                                        ids: selectedCheckboxes
+                                        ids: selectedCheckboxes,
+                                        division_id: selectedDivision
                                     })
                                 })
                                 .then(response => response.json())
