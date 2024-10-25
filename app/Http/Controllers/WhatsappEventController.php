@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\M_SendWaCust;
+use App\Models\M_MasterEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,13 +45,23 @@ class WhatsappEventController extends Controller
         $user        = userAdmin();
         $userId      = $user[0]['id'];
 
+        if ($page == "cms") {
+            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->get();
+            $status = 0;
+        } else {
+            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+            $status = 1;
+        }
+
         return view('whatsapp_event.add', [
+            'status'      => $status,
             'id'          => $userId,
             'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
             'titleUrl'    => $titleUrl,
             'page'        => $page,
             'masterEvent' => $masterEvent,
+            'listEvent'   => $listEvent,
         ]);
     }
 
@@ -72,6 +83,7 @@ class WhatsappEventController extends Controller
                 'created_by' => Auth::user()->username,
                 'updated_at' => NULL,
                 'updated_by' => NULL,
+                'id_event'   => $request->event,
             ]);
 
             return response()->json(['message' => 'success']);
@@ -86,6 +98,11 @@ class WhatsappEventController extends Controller
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $user        = userAdmin();
         $userId      = $user[0]['id'];
+        if ($page == "cms") {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+        } else {
+            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+        }
 
         return view('whatsapp_event.edit', [
             'id'          => $userId,
@@ -95,6 +112,7 @@ class WhatsappEventController extends Controller
             'page'        => $page,
             'data'        => $data,
             'masterEvent' => $masterEvent,
+            'listEvent'   => $listEvent,
         ]);
     }
 
@@ -104,6 +122,7 @@ class WhatsappEventController extends Controller
             ->where('id', $request->id)
             ->update([
                 'content'    => $request->content,
+                'id_event'   => $request->event,
                 'type'       => $request->type == "Registrasi" ? 'CMS_Admin' : 'Event_Admin',
                 'updated_at' => Carbon::now(),
                 'updated_by' => Auth::user()->username,

@@ -49,6 +49,21 @@
                                                 </div>
                                                 <div class="form-group row mb-4">
                                                     <label
+                                                        class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Event
+                                                        Name</label>
+                                                    <div class="col-sm-12 col-md-7">
+                                                        <select class="form-control select2" name="event" id="event">
+                                                            <option selected disabled>-- Please Select --</option>
+                                                            @foreach ($listEvent as $event)
+                                                                <option value="{{ $event->id_event }}">
+                                                                    {{ ucwords($event->title) }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row mb-4">
+                                                    <label
                                                         class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Content</label>
                                                     <div class="col-sm-12 col-md-7">
                                                         <textarea class="summernote-simple" id="content" name="content"></textarea>
@@ -108,6 +123,90 @@
     <script>
         $(document).ready(function() {
             var params = "<?php echo $titleUrl; ?>";
+            var status = "<?php echo $status; ?>";
+            var isUpdating = false;
+
+            if (status == 0) {
+                var template = `
+                    Dear <strong>#NamaUser</strong>, <br><br>
+
+                    Anda telah diundang pada acara event <strong>#NamaEvent</strong>. <br><br>
+
+                    Mohon registrasikan diri Anda pada link berikut: <strong>#LinkRegistrasi</strong> <br><br>
+
+                    Thanks & Regards,<br>
+                    Admin Event.`;
+            } else {
+                var template = `
+                    Bapak/Ibu,<br>
+                    <strong>#NamaUser</strong><br><br>
+
+                    ini tes<br><br>
+
+                    Terima kasih sudah melakukan Registrasi pada acara <strong>#NamaEvent</strong>. <br>
+                    Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik #LinkBarcode untuk melihat QR Code. <br><br>
+
+                    <strong>Tanggal Acara</strong>       : #StartEvent s/d #EndEvent <br>
+                    <strong>Mulai Registrasi</strong>    : #StartRegistrasi <br>
+                    <strong>Selesai Registrasi</strong>  : #EndRegistrasi <br>
+                    <strong>Tempat</strong>              : #AlamatEvent <br><br>
+
+                    Syarat & Ketentuan <br>
+                    - QR Code hanya bisa digunakan 1x pada event. <br>
+                    - QR Code Tidak boleh diperjual-belikan. <br>
+                    - Segala tindak kecurangan bukan tanggung jawab penyelenggara event.`;
+            }
+
+            $('#content').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['para', ['paragraph']]
+                ],
+                callbacks: {
+                    onChange: function(contents, $editable) {
+                        if (isUpdating)
+                            return;
+                        var content = $editable.html();
+                        var missingPlaceholders = [];
+
+                        if (status == 0) {
+                            if (!content.includes('#NamaUser')) missingPlaceholders.push('#NamaUser');
+                            if (!content.includes('#NamaEvent')) missingPlaceholders.push('#NamaEvent');
+                            if (!content.includes('#LinkRegistrasi')) missingPlaceholders.push(
+                                '#LinkRegistrasi');
+                        } else {
+                            if (!content.includes('#NamaUser')) missingPlaceholders.push('#NamaUser');
+                            if (!content.includes('#NamaEvent')) missingPlaceholders.push('#NamaEvent');
+                            if (!content.includes('#LinkBarcode')) missingPlaceholders.push(
+                                '#LinkBarcode');
+                            if (!content.includes('#StartEvent')) missingPlaceholders.push(
+                                '#StartEvent');
+                            if (!content.includes('#EndEvent')) missingPlaceholders.push('#EndEvent');
+                            if (!content.includes('#StartRegistrasi')) missingPlaceholders.push(
+                                '#StartRegistrasi');
+                            if (!content.includes('#EndRegistrasi')) missingPlaceholders.push(
+                                '#EndRegistrasi');
+                            if (!content.includes('#AlamatEvent')) missingPlaceholders.push(
+                                '#AlamatEvent');
+                        }
+
+                        if (missingPlaceholders.length > 0) {
+                            swal({
+                                icon: 'warning',
+                                title: 'Placeholder Removed!',
+                                text: 'The following placeholders were removed: ' +
+                                    missingPlaceholders.join(', '),
+                                confirmButtonText: 'OK'
+                            });
+                        }
+
+                        $editable.find('p').css('font-weight', 'normal');
+                    }
+                }
+            });
+            $('#content').summernote('code', template);
 
             $('#content').summernote({
                 height: 300,
@@ -148,13 +247,28 @@
                 var type = $('#type').val();
                 var content = $('#content').val();
                 var page = $('#page').val();
+                var event = $('#event').val();
 
                 var formData = new FormData();
                 formData.append("type", type);
                 formData.append("content", content);
                 formData.append("page", page);
+                formData.append("event", event);
 
-                if (content == "") {
+                if (event == null) {
+                    var name = "Event Name";
+                    var content = document.createElement('div');
+                    content.innerHTML = '<strong>' + name +
+                        '</strong> cannot be empty, please try again';
+                    swal({
+                        title: 'Warning',
+                        content: content,
+                        icon: "warning",
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    });
+                } else if (content == "") {
                     var name = "Content";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +

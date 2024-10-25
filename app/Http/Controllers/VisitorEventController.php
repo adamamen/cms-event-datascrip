@@ -127,6 +127,9 @@ class VisitorEventController extends Controller
             'barcode_no'        => strtoupper($barcodeNo),
             'source'            => NULL,
             'barcode_link'      => $barcodeLink,
+            'scan_date'         => NULL,
+            'flag_qr'           => '0',
+            'flag_email'        => '0',
         ]);
 
         return response()->json(['message' => 'success']);
@@ -442,7 +445,6 @@ class VisitorEventController extends Controller
         if (!empty($ids)) {
             $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
             $masterEvent = DB::table('tbl_master_event')->select("*")->get();
-            $emailEvent  = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
 
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
