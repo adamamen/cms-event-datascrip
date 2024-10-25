@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\M_MasterUser;
 use App\Models\M_CompanyEvent;
 use App\Models\M_SendEmailCust;
-use App\Models\M_MasterEvent;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -114,7 +113,6 @@ class MasterUserController extends Controller
             ->where('tbl_send_email_cust.id_event', $request->division)
             ->first();
         $masterUser  = M_MasterUser::select('*')->where('id', $id)->first();
-
         $bodyContent = $emailEvent['content'];
         $bodyContent = str_replace(
             ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],

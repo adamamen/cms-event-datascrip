@@ -46,6 +46,32 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </div>
+                                    <h4>{{ $totalWhatsapp }}</h4>
+                                    <a href="{{ route('whatsapp_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total WhatsApp Event</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-hero">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <h4>{{ $totalEmail }}</h4>
+                                    <a href="{{ route('email_event.index', ['page' => $value['title_url']]) }}">
+                                        <div class="card-description" style="color:white">Total E-mail Event</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 @else
                     <div class="col-md-6">

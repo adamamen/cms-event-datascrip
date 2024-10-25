@@ -9,6 +9,7 @@ use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
 use App\Models\M_SendEmailCust;
 use App\Models\M_MetodeBayar;
+use App\Models\M_MasterUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -456,41 +457,58 @@ class VisitorEventController extends Controller
                         $email           = $visitor->email;
                         $domain          = explode("@", $email)[1];
                         $ipAddress       = gethostbyname($domain);
-                        $whatsappEvent   = '';
+
+                        $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+                            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                            ->where('tbl_send_email_cust.type', 'Event_Admin')
+                            ->where('tbl_send_email_cust.id_event', $visitor->event_id)
+                            ->first();
+                        $bodyContent = $emailEvent['content'];
+                        $bodyContent = str_replace(
+                            [
+                                '#NamaUser',
+                                '#NamaEvent',
+                                '#LinkBarcode',
+                                '#StartEvent',
+                                '#EndEvent',
+                                '#StartRegistrasi',
+                                '#EndRegistrasi',
+                                '#AlamatEvent',
+                            ],
+                            [
+                                ucwords($nama),
+                                ucwords($judul),
+                                '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
+                                $tanggalMulai,
+                                $tanggalAkhir,
+                                $mulaiRegistrasi,
+                                $akhirRegistrasi,
+                                $event->location
+                            ],
+                            $bodyContent
+                        );
 
                         if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
                             $body = '<html>
                                         <head>
-                                        <style type="text/css">
-                                            body, td {
-                                                font-family: "Aptos", sans-serif;
-                                                font-size: 16px;
-                                            }
-                                            table#info {
-                                                border: 1px solid #555;
-                                                border-collapse: collapse;
-                                            }
-                                            table#info th,
-                                            table#info td {
-                                                padding: 3px;
-                                                border: 1px solid #555;
-                                            }
-                                        </style>
+                                            <style type="text/css">
+                                                body, td {
+                                                    font-family: "Aptos", sans-serif;
+                                                    font-size: 16px;
+                                                }
+                                                table#info {
+                                                    border: 1px solid #555;
+                                                    border-collapse: collapse;
+                                                }
+                                                table#info th,
+                                                table#info td {
+                                                    padding: 3px;
+                                                    border: 1px solid #555;
+                                                }
+                                            </style>
                                         </head>
-                                        <body>Bapak/Ibu, <br />
-                                        <strong>' . $nama . '</strong><br />
-                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
-                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
-                                        
-                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
-                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
-                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
-    
-                                        <strong>Syarat & Ketentuan</strong><br />
-                                        - QR Code hanya bisa digunakan 1x pada event. <br />
-                                        - QR Code Tidak boleh diperjual-belikan. <br />
-                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
+                                        <body>
+                                        ' . $bodyContent . '
                                         </body>
                                     </html>';
 
@@ -558,7 +576,6 @@ class VisitorEventController extends Controller
         if (!empty($ids)) {
             $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
             $masterEvent = DB::table('tbl_master_event')->select("*")->get();
-            $emailEvent  = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->get();
 
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
@@ -573,40 +590,57 @@ class VisitorEventController extends Controller
                         $email           = $visitor->email;
                         $domain          = explode("@", $email)[1];
                         $ipAddress       = gethostbyname($domain);
+                        $emailEvent      = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+                            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                            ->where('tbl_send_email_cust.type', 'Event_Admin')
+                            ->where('tbl_send_email_cust.id_event', $visitor->event_id)
+                            ->first();
+                        $bodyContent = $emailEvent['content'];
+                        $bodyContent = str_replace(
+                            [
+                                '#NamaUser',
+                                '#NamaEvent',
+                                '#LinkBarcode',
+                                '#StartEvent',
+                                '#EndEvent',
+                                '#StartRegistrasi',
+                                '#EndRegistrasi',
+                                '#AlamatEvent',
+                            ],
+                            [
+                                ucwords($nama),
+                                ucwords($judul),
+                                '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
+                                $tanggalMulai,
+                                $tanggalAkhir,
+                                $mulaiRegistrasi,
+                                $akhirRegistrasi,
+                                $event->location
+                            ],
+                            $bodyContent
+                        );
 
                         if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
                             $body = '<html>
                                         <head>
-                                        <style type="text/css">
-                                            body, td {
-                                                font-family: "Aptos", sans-serif;
-                                                font-size: 16px;
-                                            }
-                                            table#info {
-                                                border: 1px solid #555;
-                                                border-collapse: collapse;
-                                            }
-                                            table#info th,
-                                            table#info td {
-                                                padding: 3px;
-                                                border: 1px solid #555;
-                                            }
-                                        </style>
+                                            <style type="text/css">
+                                                body, td {
+                                                    font-family: "Aptos", sans-serif;
+                                                    font-size: 16px;
+                                                }
+                                                table#info {
+                                                    border: 1px solid #555;
+                                                    border-collapse: collapse;
+                                                }
+                                                table#info th,
+                                                table#info td {
+                                                    padding: 3px;
+                                                    border: 1px solid #555;
+                                                }
+                                            </style>
                                         </head>
-                                        <body>Bapak/Ibu, <br />
-                                        <strong>' . $nama . '</strong><br />
-                                        Terima kasih sudah melakukan Registrasi pada acara ' . $judul . ' <br /><br />
-                                        Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik <a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a> untuk melihat QR Code.<br /><br />
-                                        
-                                        <strong>Tanggal Acara</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $tanggalMulai . ' s/d ' . $tanggalAkhir . ' <br />
-                                        <strong>Mulai Registrasi</strong>&nbsp; &nbsp; &nbsp; : ' . $mulaiRegistrasi . ' <br />
-                                        <strong>Selesai Registrasi</strong> &nbsp;: ' . $akhirRegistrasi . ' <br />
-                                        <strong>Tempat</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : ' . $event->location . ' <br /><br />
-    
-                                        <strong>Syarat & Ketentuan</strong><br />
-                                        - QR Code hanya bisa digunakan 1x pada event. <br />
-                                        - QR Code Tidak boleh diperjual-belikan. <br />
-                                        - Segala tindak kecurangan bukan tanggung jawab penyelenggara event. <br />
+                                        <body>
+                                        ' . $bodyContent . '
                                         </body>
                                     </html>';
 

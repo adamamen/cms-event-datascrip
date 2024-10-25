@@ -460,11 +460,6 @@
                         success: function(response) {
                             var alerts = response.message
 
-                            // if (alerts == "failed") {
-                            // swal('Gagal',
-                            // 'No Tiket sudah pernah digunakan, silahkan coba lagi...',
-                            // 'warning');
-                            // } else
                             if (alerts == "success") {
                                 swal('Success', 'Data has been successfully deleted...',
                                     'success').then(

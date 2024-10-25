@@ -33,6 +33,7 @@ class EmailEventController extends Controller
             $data = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title')
                 ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
                 ->where('tbl_send_email_cust.type', 'Event_Admin')
+                ->where('tbl_send_email_cust.id_event', $masterEvent[0]['id_event'])
                 ->get();
         }
 
@@ -53,13 +54,20 @@ class EmailEventController extends Controller
         $type_menu   = 'email_event';
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
+
         if ($page == "cms") {
-            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
+            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->get();
+            $status = 0;
         } else {
-            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+            $status = 1;
         }
 
         return view('email_event.add', [
+            'status'      => $status,
+            'id'          => $userId,
             'type_menu'   => $type_menu,
             'titleUrl'    => $titleUrl,
             'page'        => $page,
@@ -99,6 +107,8 @@ class EmailEventController extends Controller
         $data        = M_SendEmailCust::select('*')->where('id', $id)->first();
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
         if ($page == "cms") {
             $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
         } else {
@@ -106,6 +116,7 @@ class EmailEventController extends Controller
         }
 
         return view('email_event.edit', [
+            'id'          => $userId,
             'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
             'titleUrl'    => $titleUrl,

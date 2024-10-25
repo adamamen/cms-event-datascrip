@@ -41,8 +41,11 @@ class WhatsappEventController extends Controller
         $type_menu   = 'whatsapp_event';
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
 
         return view('whatsapp_event.add', [
+            'id'          => $userId,
             'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
             'titleUrl'    => $titleUrl,
@@ -81,13 +84,16 @@ class WhatsappEventController extends Controller
         $data        = M_SendWaCust::select('*')->where('id', $id)->first();
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
+        $user        = userAdmin();
+        $userId      = $user[0]['id'];
 
         return view('whatsapp_event.edit', [
-            'type_menu'  => $type_menu,
-            'listDivisi' => !empty($listDivisi) ? $listDivisi : '',
-            'titleUrl'   => $titleUrl,
-            'page'       => $page,
-            'data'       => $data,
+            'id'          => $userId,
+            'type_menu'   => $type_menu,
+            'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
+            'titleUrl'    => $titleUrl,
+            'page'        => $page,
+            'data'        => $data,
             'masterEvent' => $masterEvent,
         ]);
     }

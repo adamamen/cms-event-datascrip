@@ -14,10 +14,12 @@ class LoginController extends Controller
 {
     public function index()
     {
-        $checkId = M_User::select('*')->where('id', Auth::user()->id)->first();
+        if (Auth::check()) {
+            $user = Auth::user();
 
-        if ($checkId->event_id == 0) {
-            if (Auth::check()) {
+            $checkId = M_User::select('*')->where('id', $user->id)->first();
+
+            if ($checkId && $checkId->event_id == 0) {
                 return redirect()->route('dashboard', ['page' => 'cms']);
             }
         }

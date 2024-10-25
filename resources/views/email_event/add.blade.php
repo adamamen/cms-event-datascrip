@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
     <style>
         /* #content p {
-                    font-weight: normal !important;
-                } */
+                                                                                                                                                                                                                    font-weight: normal !important;
+                                                                                                                                                                                                                } */
     </style>
 @endpush
 
@@ -128,15 +128,39 @@
     <script>
         $(document).ready(function() {
             var params = "<?php echo $titleUrl; ?>";
-            var template = `
-                Dear <strong>#NamaUser</strong>, <br><br>
+            var status = "<?php echo $status; ?>";
+            var isUpdating = false;
 
-                Anda telah diundang pada acara event <strong>#NamaEvent</strong>. <br><br>
+            if (status == 0) {
+                var template = `
+                    Dear <strong>#NamaUser</strong>, <br><br>
 
-                Mohon registrasikan diri Anda pada link berikut: <strong>#LinkRegistrasi</strong> <br><br>
+                    Anda telah diundang pada acara event <strong>#NamaEvent</strong>. <br><br>
 
-                Thanks & Regards,<br>
-                Admin Event.`;
+                    Mohon registrasikan diri Anda pada link berikut: <strong>#LinkRegistrasi</strong> <br><br>
+
+                    Thanks & Regards,<br>
+                    Admin Event.`;
+            } else {
+                var template = `
+                    Bapak/Ibu,<br>
+                    <strong>#NamaUser</strong><br><br>
+
+                    ini tes<br><br>
+
+                    Terima kasih sudah melakukan Registrasi pada acara <strong>#NamaEvent</strong>. <br>
+                    Silahkan gunakan QR Code terlampir untuk diperlihatkan pada saat registrasi. Klik #LinkBarcode untuk melihat QR Code. <br><br>
+
+                    <strong>Tanggal Acara</strong>       : #StartEvent s/d #EndEvent <br>
+                    <strong>Mulai Registrasi</strong>    : #StartRegistrasi <br>
+                    <strong>Selesai Registrasi</strong>  : #EndRegistrasi <br>
+                    <strong>Tempat</strong>              : #AlamatEvent <br><br>
+
+                    Syarat & Ketentuan <br>
+                    - QR Code hanya bisa digunakan 1x pada event. <br>
+                    - QR Code Tidak boleh diperjual-belikan. <br>
+                    - Segala tindak kecurangan bukan tanggung jawab penyelenggara event.`;
+            }
 
             $('#content').summernote({
                 height: 300,
@@ -147,17 +171,46 @@
                 ],
                 callbacks: {
                     onChange: function(contents, $editable) {
+                        if (isUpdating)
+                            return;
                         var content = $editable.html();
+                        var missingPlaceholders = [];
+
+                        if (status == 0) {
+                            if (!content.includes('#NamaUser')) missingPlaceholders.push('#NamaUser');
+                            if (!content.includes('#NamaEvent')) missingPlaceholders.push('#NamaEvent');
+                            if (!content.includes('#LinkRegistrasi')) missingPlaceholders.push(
+                                '#LinkRegistrasi');
+                        } else {
+                            if (!content.includes('#NamaUser')) missingPlaceholders.push('#NamaUser');
+                            if (!content.includes('#NamaEvent')) missingPlaceholders.push('#NamaEvent');
+                            if (!content.includes('#LinkBarcode')) missingPlaceholders.push(
+                                '#LinkBarcode');
+                            if (!content.includes('#StartEvent')) missingPlaceholders.push(
+                                '#StartEvent');
+                            if (!content.includes('#EndEvent')) missingPlaceholders.push('#EndEvent');
+                            if (!content.includes('#StartRegistrasi')) missingPlaceholders.push(
+                                '#StartRegistrasi');
+                            if (!content.includes('#EndRegistrasi')) missingPlaceholders.push(
+                                '#EndRegistrasi');
+                            if (!content.includes('#AlamatEvent')) missingPlaceholders.push(
+                                '#AlamatEvent');
+                        }
+
+                        if (missingPlaceholders.length > 0) {
+                            swal({
+                                icon: 'warning',
+                                title: 'Placeholder Removed!',
+                                text: 'The following placeholders were removed: ' +
+                                    missingPlaceholders.join(', '),
+                                confirmButtonText: 'OK'
+                            });
+                        }
 
                         $editable.find('p').css('font-weight', 'normal');
-                        if (!content.includes('#NamaUser') || !content.includes('#NamaEvent') || !
-                            content.includes('#LinkRegistrasi')) {
-                            $('#content').summernote('code', template);
-                        }
                     }
                 }
             });
-
             $('#content').summernote('code', template);
 
             $("#btn_progress").hide();
