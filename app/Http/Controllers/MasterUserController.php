@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Illuminate\Support\Facades\Crypt;
 
 class MasterUserController extends Controller
 {
@@ -105,6 +106,81 @@ class MasterUserController extends Controller
         return response()->json(['success' => false, 'message' => 'No IDs selected']);
     }
 
+    //     public function sendEmailId(Request $request, $id)
+    //     {
+    //         $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+    //             ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+    //             ->where('tbl_send_email_cust.type', 'CMS_Admin')
+    //             ->where('tbl_send_email_cust.id_event', $request->division)
+    //             ->first();
+    //         $masterUser  = M_MasterUser::select('*')->where('id', $id)->first();
+    //         $bodyContent = $emailEvent['content'];
+    //         $bodyContent = str_replace(
+    //             ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
+    //             [
+    //                 ucwords($masterUser['name']),
+    //                 ucwords($emailEvent['title']),
+    //                 url('/register-visitor/' .  $emailEvent['title_url'])
+    //             ],
+    //             $bodyContent
+    //         );
+    // 
+    //         $body = '<html>
+    //                 <head>
+    //                     <style type="text/css">
+    //                         body, td {
+    //                             font-family: "Aptos", sans-serif;
+    //                             font-size: 16px;
+    //                         }
+    //                         table#info {
+    //                             border: 1px solid #555;
+    //                             border-collapse: collapse;
+    //                         }
+    //                         table#info th,
+    //                         table#info td {
+    //                             padding: 3px;
+    //                             border: 1px solid #555;
+    //                         }
+    //                     </style>
+    //                 </head>
+    //                 <body>
+    //                     ' . $bodyContent . '
+    //                 </body>
+    //             </html>';
+    // 
+    //         $mail = new PHPMailer(true);
+    // 
+    //         try {
+    //             $mail->SMTPOptions = array(
+    //                 'ssl' => array(
+    //                     'verify_peer'       => false,
+    //                     'verify_peer_name'  => false,
+    //                     'allow_self_signed' => true
+    //                 )
+    //             );
+    // 
+    //             $mail->isSMTP();
+    //             $mail->Host       = env('MAIL_HOST');
+    //             $mail->SMTPAuth   = true;
+    //             $mail->Username   = env('MAIL_USERNAME');
+    //             $mail->Password   = env('MAIL_PASSWORD');
+    //             $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+    //             $mail->Port       = env('MAIL_PORT');
+    // 
+    //             $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+    //             $mail->addAddress($masterUser->email, ucwords($masterUser->name));
+    // 
+    //             $mail->isHTML(true);
+    //             $mail->Subject = 'Menu Master User Testing Email';
+    //             $mail->Body    = $body;
+    //             $mail->send();
+    // 
+    //             return response()->json(['emails_sent' => 1, 'message' => 'success']);
+    //         } catch (Exception $e) {
+    //             return response()->json(['emails_sent' => 0, 'message' => 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo], 500);
+    //         }
+    //     }
+
     public function sendEmailId(Request $request, $id)
     {
         $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
@@ -112,40 +188,44 @@ class MasterUserController extends Controller
             ->where('tbl_send_email_cust.type', 'CMS_Admin')
             ->where('tbl_send_email_cust.id_event', $request->division)
             ->first();
-        $masterUser  = M_MasterUser::select('*')->where('id', $id)->first();
-        $bodyContent = $emailEvent['content'];
+
+        $masterUser      = M_MasterUser::select('*')->where('id', $id)->first();
+        $bodyContent     = $emailEvent['content'];
+        $encryptId       = Crypt::encryptString($id);
+        $registrationUrl = url('/register-visitor/' . $emailEvent['title_url'] . '/' . $encryptId);
+
         $bodyContent = str_replace(
             ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
             [
                 ucwords($masterUser['name']),
                 ucwords($emailEvent['title']),
-                url('/register-visitor/' .  $emailEvent['title_url'])
+                $registrationUrl
             ],
             $bodyContent
         );
 
         $body = '<html>
-                <head>
-                    <style type="text/css">
-                        body, td {
-                            font-family: "Aptos", sans-serif;
-                            font-size: 16px;
-                        }
-                        table#info {
-                            border: 1px solid #555;
-                            border-collapse: collapse;
-                        }
-                        table#info th,
-                        table#info td {
-                            padding: 3px;
-                            border: 1px solid #555;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ' . $bodyContent . '
-                </body>
-            </html>';
+            <head>
+                <style type="text/css">
+                    body, td {
+                        font-family: "Aptos", sans-serif;
+                        font-size: 16px;
+                    }
+                    table#info {
+                        border: 1px solid #555;
+                        border-collapse: collapse;
+                    }
+                    table#info th,
+                    table#info td {
+                        padding: 3px;
+                        border: 1px solid #555;
+                    }
+                </style>
+            </head>
+            <body>
+                ' . $bodyContent . '
+            </body>
+        </html>';
 
         $mail = new PHPMailer(true);
 

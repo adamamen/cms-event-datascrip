@@ -9,7 +9,7 @@ use App\Models\M_MasterEvent;
 use App\Models\M_VisitorEvent;
 use App\Models\M_SendEmailCust;
 use App\Models\M_MetodeBayar;
-use App\Models\M_MasterUser;
+use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -130,6 +130,7 @@ class VisitorEventController extends Controller
             'scan_date'         => NULL,
             'flag_qr'           => '0',
             'flag_email'        => '0',
+            'id_cust'           => Crypt::decryptString($request->id_cust),
         ]);
 
         return response()->json(['message' => 'success']);
@@ -205,12 +206,21 @@ class VisitorEventController extends Controller
         }
     }
 
-    public function index_register($page)
+    public function index_register($page, $id)
     {
         $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
         $data                      = masterEvent_4($page);
+        $type_menu                 = 'register_visitor';
         if (strtotime(!empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? $tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi : '') > strtotime(date('Y-m-d H:i:s'))) {
             $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
+        }
+
+        if ($id) {
+            try {
+                $id = Crypt::decryptString($id);
+            } catch (\Exception $e) {
+                return view('error.error-404');
+            }
         }
 
         if (!empty($masterEvent)) {
@@ -218,7 +228,8 @@ class VisitorEventController extends Controller
                 return view('visitor_event.register', [
                     'masterEvent' => $masterEvent,
                     'data'        => $data,
-                    'page'        => $page
+                    'page'        => $page,
+                    'type_menu'   => $type_menu
                 ]);
             } else {
                 return view('error.error-404');

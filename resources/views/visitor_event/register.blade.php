@@ -164,7 +164,8 @@
                 var name_of_agency = $('#name_of_agency').val();
 
                 var pathArray = window.location.pathname.split('/');
-                var page = pathArray[pathArray.length - 1];
+                var page = pathArray[pathArray.length - 2];
+                var id_cust = pathArray[pathArray.length - 1];
 
                 var formData = new FormData();
                 formData.append("name", name);
@@ -174,6 +175,7 @@
                 formData.append("phone_number", phone_number);
                 formData.append("invitation_type", invitation_type);
                 formData.append("name_of_agency", name_of_agency);
+                formData.append("id_cust", id_cust);
 
                 if (name == "") {
                     var names = "Name";

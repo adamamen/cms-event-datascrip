@@ -29,12 +29,12 @@
                         @endif
                     @else
                         <div class="sidebar-brand">
-                            <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <a href="#">
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="54">
                             </a>
                         </div>
                         <div class="sidebar-brand sidebar-brand-sm">
-                            <a href="{{ route('dashboard', ['page' => $value['title_url']]) }}">
+                            <a href="#">
                                 <img src="{{ asset('images/' . $value['logo']) }}" height="15">
                             </a>
                         </div>
@@ -51,7 +51,7 @@
                         @endif
                     @endif
 
-                    @if (!empty(Auth::user()->id))
+                    @if (!empty(Auth::user()->id) && $type_menu != 'register_visitor')
                         <li class="menu-header">Event</li>
                         <li class="{{ $type_menu == 'visitor_event' ? 'active' : '' }}">
                             <a class="nav-link"
