@@ -34,10 +34,24 @@ class VisitorEventController extends Controller
         $titleUrl      = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $title         = str_replace('-', ' ', $titleUrl);
         $output        = ucwords($title);
-        $dataArrival   = M_VisitorEvent::select('*')
-            ->where('event_id', $userIdSession)
-            ->whereNotNull('scan_date')
-            ->get();
+
+        if ($page == 'cms') {
+            $totalApproval = M_VisitorEvent::select('*')
+                ->where('flag_approval', '=', '1')
+                ->get();
+            $dataArrival = M_VisitorEvent::select('*')
+                ->whereNotNull('scan_date')
+                ->get();
+        } else {
+            $totalApproval = M_VisitorEvent::select('*')
+                ->where('event_id', $data[0]['event_id'])
+                ->where('flag_approval', '=', '1')
+                ->get();
+            $dataArrival = M_VisitorEvent::select('*')
+                ->where('event_id', $data[0]['event_id'])
+                ->whereNotNull('scan_date')
+                ->get();
+        }
 
         if ($userIdSession != 0 && $page == "cms") {
             return view('error.error-403');
@@ -45,15 +59,16 @@ class VisitorEventController extends Controller
 
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.index', [
-                'id'           => $userId,
-                'masterEvent'  => $masterEvent,
-                'data'         => $data,
-                'type_menu'    => $type_menu,
-                'titleUrl'     => $titleUrl,
-                'pages'        => $page,
-                'output'       => $output,
-                'dataArrival'  => count($dataArrival),
-                'jenis_events' => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
+                'id'            => $userId,
+                'masterEvent'   => $masterEvent,
+                'data'          => $data,
+                'type_menu'     => $type_menu,
+                'titleUrl'      => $titleUrl,
+                'pages'         => $page,
+                'output'        => $output,
+                'dataArrival'   => count($dataArrival),
+                'totalApproval' => count($totalApproval),
+                'jenis_events'  => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
             $this->generate_pdf($page, $userId);
@@ -131,6 +146,10 @@ class VisitorEventController extends Controller
             'flag_qr'           => '0',
             'flag_email'        => '0',
             'id_cust'           => Crypt::decryptString($request->id_cust),
+            'flag_approval'     => '0',                      // flag 1 approval, flag 0 blm di approval
+            'approve_by'        => NULL,
+            'approve_date'      => NULL,
+            'source_visitor'    => 'Register'
         ]);
 
         return response()->json(['message' => 'success']);
@@ -258,7 +277,7 @@ class VisitorEventController extends Controller
         $pages = ucwords(str_replace('-', ' ', $page));
 
         if (!empty($query)) {
-            $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No', 'Date Arrival', 'Email Status'];
+            $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No', 'Date Arrival', 'Email Status', 'Source Visitor', 'Status Approval', 'Approve By', 'Approve Date'];
         }
 
         $filename = 'Data Visitor Event - ' . ucfirst($pages) . '.xlsx';
@@ -329,6 +348,10 @@ class VisitorEventController extends Controller
                     'updated_by'        => Auth::user()->username,
                     'flag_qr'           => '0',
                     'flag_email'        => '0',
+                    'flag_approval'     => '1',                      // flag 1 approval, flag 0 blm di approval
+                    'approve_by'        => Auth::user()->username,
+                    'approve_date'      => Carbon::now(),
+                    'source_visitor'    => 'Upload'
                 ]);
 
                 $countImported++;
@@ -398,6 +421,24 @@ class VisitorEventController extends Controller
         return response()->json(['success' => false, 'message' => 'No IDs selected']);
     }
 
+    public function approvalMultipleVisitors(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            DB::table('tbl_visitor_event')
+                ->whereIn('id', $ids)
+                ->update([
+                    'flag_approval' => '1',
+                    'approve_by'    => Auth::user()->username,
+                    'approve_date'  => Carbon::now(),
+                ]);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No IDs selected']);
+    }
+
     public function index_landing_page($page)
     {
         $title = "landing-page-qr";
@@ -459,50 +500,51 @@ class VisitorEventController extends Controller
 
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
-                    if ($event->id_event == $visitor->event_id) {
-                        $judul           = ucwords($event->title);
-                        $nama            = $visitor->full_name;
-                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
-                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
-                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
-                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
-                        $encryptedId     = encrypt($visitor->id);
-                        $email           = $visitor->email;
-                        $domain          = explode("@", $email)[1];
-                        $ipAddress       = gethostbyname($domain);
+                    if ($visitor->flag_approval == '1') {
+                        if ($event->id_event == $visitor->event_id) {
+                            $judul           = ucwords($event->title);
+                            $nama            = $visitor->full_name;
+                            $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
+                            $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
+                            $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
+                            $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
+                            $encryptedId     = encrypt($visitor->id);
+                            $email           = $visitor->email;
+                            $domain          = explode("@", $email)[1];
+                            $ipAddress       = gethostbyname($domain);
 
-                        $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
-                            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
-                            ->where('tbl_send_email_cust.type', 'Event_Admin')
-                            ->where('tbl_send_email_cust.id_event', $visitor->event_id)
-                            ->first();
-                        $bodyContent = $emailEvent['content'];
-                        $bodyContent = str_replace(
-                            [
-                                '#NamaUser',
-                                '#NamaEvent',
-                                '#LinkBarcode',
-                                '#StartEvent',
-                                '#EndEvent',
-                                '#StartRegistrasi',
-                                '#EndRegistrasi',
-                                '#AlamatEvent',
-                            ],
-                            [
-                                ucwords($nama),
-                                ucwords($judul),
-                                '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
-                                $tanggalMulai,
-                                $tanggalAkhir,
-                                $mulaiRegistrasi,
-                                $akhirRegistrasi,
-                                $event->location
-                            ],
-                            $bodyContent
-                        );
+                            $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+                                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                                ->where('tbl_send_email_cust.type', 'Event_Admin')
+                                ->where('tbl_send_email_cust.id_event', $visitor->event_id)
+                                ->first();
+                            $bodyContent = $emailEvent['content'];
+                            $bodyContent = str_replace(
+                                [
+                                    '#NamaUser',
+                                    '#NamaEvent',
+                                    '#LinkBarcode',
+                                    '#StartEvent',
+                                    '#EndEvent',
+                                    '#StartRegistrasi',
+                                    '#EndRegistrasi',
+                                    '#AlamatEvent',
+                                ],
+                                [
+                                    ucwords($nama),
+                                    ucwords($judul),
+                                    '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
+                                    $tanggalMulai,
+                                    $tanggalAkhir,
+                                    $mulaiRegistrasi,
+                                    $akhirRegistrasi,
+                                    $event->location
+                                ],
+                                $bodyContent
+                            );
 
-                        if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
-                            $body = '<html>
+                            if (filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+                                $body = '<html>
                                         <head>
                                             <style type="text/css">
                                                 body, td {
@@ -525,48 +567,51 @@ class VisitorEventController extends Controller
                                         </body>
                                     </html>';
 
-                            $mail = new PHPMailer(true);
-                            try {
-                                $mail->SMTPOptions = array(
-                                    'ssl' => array(
-                                        'verify_peer'       => false,
-                                        'verify_peer_name'  => false,
-                                        'allow_self_signed' => true
-                                    )
-                                );
+                                $mail = new PHPMailer(true);
+                                try {
+                                    $mail->SMTPOptions = array(
+                                        'ssl' => array(
+                                            'verify_peer'       => false,
+                                            'verify_peer_name'  => false,
+                                            'allow_self_signed' => true
+                                        )
+                                    );
 
-                                $mail->isSMTP();
-                                $mail->Host       = env('MAIL_HOST');
-                                $mail->SMTPAuth   = true;
-                                $mail->Username   = env('MAIL_USERNAME');
-                                $mail->Password   = env('MAIL_PASSWORD');
-                                $mail->SMTPSecure = env('MAIL_ENCRYPTION');
-                                $mail->Port       = env('MAIL_PORT');
+                                    $mail->isSMTP();
+                                    $mail->Host       = env('MAIL_HOST');
+                                    $mail->SMTPAuth   = true;
+                                    $mail->Username   = env('MAIL_USERNAME');
+                                    $mail->Password   = env('MAIL_PASSWORD');
+                                    $mail->SMTPSecure = env('MAIL_ENCRYPTION');
+                                    $mail->Port       = env('MAIL_PORT');
 
-                                $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                                $mail->addAddress($email, $nama);
+                                    $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
+                                    $mail->addAddress($email, $nama);
 
-                                $mail->isHTML(true);
-                                $mail->Subject = 'Event ' . $judul;
-                                $mail->Body = $body;
+                                    $mail->isHTML(true);
+                                    $mail->Subject = 'Event ' . $judul;
+                                    $mail->Body = $body;
 
-                                // $mail->SMTPDebug = 2;
+                                    // $mail->SMTPDebug = 2;
 
-                                if ($mail->send()) {
-                                    $visitor->flag_email = 1;
-                                    $emailsSent++;
-                                } else {
+                                    if ($mail->send()) {
+                                        $visitor->flag_email = 1;
+                                        $emailsSent++;
+                                    } else {
+                                        $visitor->flag_email = 0;
+                                    }
+                                } catch (Exception $e) {
                                     $visitor->flag_email = 0;
                                 }
-                            } catch (Exception $e) {
-                                $visitor->flag_email = 0;
-                            }
 
-                            $visitor->save();
-                        } else {
-                            $visitor->flag_email = 0;
-                            $visitor->save();
+                                $visitor->save();
+                            } else {
+                                $visitor->flag_email = 0;
+                                $visitor->save();
+                            }
                         }
+                    } else {
+                        return response()->json(['message' => 'not_approved']);
                     }
                 }
             }
@@ -578,6 +623,39 @@ class VisitorEventController extends Controller
         }
 
         return response()->json(['message' => 'No visitors selected'], 400);
+    }
+
+    public function checkApproval(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        $unapprovedCount = M_VisitorEvent::whereIn('id', $ids)
+            ->where(function ($query) {
+                $query->where('flag_approval', '=', NULL)
+                    ->orWhere('flag_approval', '=', 0);
+            })
+            ->count();
+
+        if ($unapprovedCount > 0) {
+            return response()->json(['status' => 'not_approved']);
+        }
+
+        return response()->json(['status' => 'approved']);
+    }
+
+    public function checkApprovalId($id)
+    {
+        $visitor = M_VisitorEvent::find($id);
+
+        if (!$visitor) {
+            return response()->json(['message' => 'Visitor not found'], 404);
+        }
+
+        if ($visitor->flag_approval != '1') {
+            return response()->json(['message' => 'not_approved'], 200);
+        }
+
+        return response()->json(['message' => 'approved'], 200);
     }
 
     public function sendEmail(Request $request)
@@ -729,6 +807,26 @@ class VisitorEventController extends Controller
             $visitor->save();
 
             return response()->json(['success' => true, 'message' => 'Arrival details saved successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function approval(Request $request)
+    {
+        try {
+            DB::table('tbl_visitor_event')
+                ->where('id', $request->approvalId)
+                ->update([
+                    'flag_approval' => '1',
+                    'approve_by'    => Auth::user()->username,
+                    'approve_date'  => Carbon::now(),
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => '<strong>' . $request->userName  . '</strong> has been approved'
+            ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }

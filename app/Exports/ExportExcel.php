@@ -96,6 +96,10 @@ class ExportExcel implements FromCollection, WithHeadings
                                 'barcode_no'        => $visitor->barcode_no,
                                 'scan_date'         => $visitor->scan_date,
                                 'email_status'      => $visitor->flag_email == 0 ? 'Not Delivered' : 'Delivered',
+                                'source_visitor'    => $visitor->source_visitor,
+                                'status_approval'   => $visitor->flag_approval == 1 ? 'Approve' : 'Waiting',
+                                'approve_by'        => $visitor->approve_by,
+                                'approve_date'      => $visitor->approve_date,
 
                                 // $merge[] = [
                                 //     'RowNumber'  => $sequenceNumber++,

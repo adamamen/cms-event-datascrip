@@ -21,9 +21,18 @@ class WhatsappEventController extends Controller
         $title       = str_replace('-', ' ', $titleUrl);
         $output      = ucwords($title);
         if ($page == "cms") {
-            $data = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->get();
+            // $data = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->get();
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->get();
         } else {
-            $data = M_SendWaCust::select('*')->where('type', 'Event_Admin')->get();
+            // $data = M_SendWaCust::select('*')->where('type', 'Event_Admin')->get();
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'Event_Admin')
+                ->where('tbl_send_wa_cust.id_event', $masterEvent[0]['id_event'])
+                ->get();
         }
 
         return view('whatsapp_event.index', [
@@ -68,9 +77,9 @@ class WhatsappEventController extends Controller
     function add(Request $request)
     {
         if ($request->page == "cms") {
-            $count = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->count();
+            $count = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->where('id_event', $request->event)->count();
         } else {
-            $count = M_SendWaCust::select('*')->where('type', 'Event_Admin')->count();
+            $count = M_SendWaCust::select('*')->where('type', 'Event_Admin')->where('id_event', $request->event)->count();
         }
 
         if ($count > 0) {

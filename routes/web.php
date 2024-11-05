@@ -78,9 +78,14 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/visitor-event/import-excel/{page?}', [VisitorEventController::class, 'import_excel'])->name('import.excel');
     Route::get('/visitor-event/template-excel/{page?}', [VisitorEventController::class, 'template_excel'])->name('template.excel');
     Route::post('/delete-multiple-visitors', [VisitorEventController::class, 'deleteMultipleVisitors'])->name('delete-multiple-visitors');
+    Route::post('/approval-multiple-visitors', [VisitorEventController::class, 'approvalMultipleVisitors'])->name('approval-multiple-visitors');
     Route::post('/visitor-event/send-email', [VisitorEventController::class, 'sendEmail'])->name('send.email');
     Route::get('/visitor-event/send-email/{id}', [VisitorEventController::class, 'sendEmailId'])->name('send.email.id');
+    Route::post('/visitor-event/approval-visitor', [VisitorEventController::class, 'approval'])->name('approval.visitor');
     Route::post('/visitor-event/arrival', [VisitorEventController::class, 'storeArrival'])->name('visitor.arrival');
+    Route::post('/visitor-event/check-approval', [VisitorEventController::class, 'checkApproval'])->name('check.approval');
+    Route::get('/visitor-event/check-approval/{id}', [VisitorEventController::class, 'checkApprovalId'])->name('check.approval.id');
+
 
     // Master User
     Route::get('/master-user/{page?}', [MasterUserController::class, 'index'])->name('master_user.index');

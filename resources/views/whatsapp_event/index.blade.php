@@ -44,6 +44,7 @@
                                             <th>No</th>
                                             <th>Content</th>
                                             <th>Type</th>
+                                            <th>Event Name</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -53,6 +54,7 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $value['content'] }}</td>
                                                 <td>{{ $value['type'] == 'CMS_Admin' ? 'Registrasi' : 'Undangan' }}</td>
+                                                <td>{{ ucwords($value['title']) }}</td>
                                                 <td>
                                                     @if ($page == 'cms')
                                                         <form method="POST"

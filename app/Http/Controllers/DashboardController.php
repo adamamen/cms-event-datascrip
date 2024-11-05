@@ -26,10 +26,15 @@ class DashboardController extends Controller
         $user               = userAdmin();
         $totalAdmin         = count(adminEvent($page));
         $userId             = $user[0]['id'];
-        $totalWhatsapp      = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->count();
-        $totalEmail         = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->count();
         $totalReportVisitor = '0';
         $totalMasterUser    = M_MasterUser::select('*')->count();
+        if ($page == 'cms') {
+            $totalWhatsapp = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->count();
+            $totalEmail    = M_SendEmailCust::select('*')->where('type', 'CMS_Admin')->count();
+        } else {
+            $totalWhatsapp = M_SendWaCust::select('*')->where('type', 'Event_Admin')->where('id_event', '=', $divisiEvent[0]->id_event)->count();
+            $totalEmail    = M_SendEmailCust::select('*')->where('type', 'Event_Admin')->where('id_event', '=', $divisiEvent[0]->id_event)->count();
+        }
 
         if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('dashboard.index', [

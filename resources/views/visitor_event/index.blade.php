@@ -104,15 +104,18 @@
                                         Excel</a>
                                 @endif
                             @endif
-
                             &emsp;
-                            <a href="#" class="btn btn-success"><i class="fa-solid fa-users"></i>&nbsp;</i>&emsp;
-                                Total Visitor = <b>{{ count($data) }}</b></a>
-                            <div class="article-cta"></div>
+                            <a href="#" class="btn btn-success"><i class="fa-solid fa-users"></i>&emsp; Total Visitor
+                                = <b>{{ count($data) }}</b>
+                            </a>
                             &emsp;
                             <a href="#" class="btn btn-info"><i class="fa-solid fa-user-check"></i>&emsp; Total
-                                Arrival Visitor = {{ $dataArrival }}</a>
-                            <div class="article-cta"></div>
+                                Arrival Visitor = <b>{{ $dataArrival }}</b>
+                            </a>
+                            &emsp;
+                            <a href="#" class="btn btn-light"><i class="fa-solid fa-check"></i>&emsp; Total Approval =
+                                <b>{{ $totalApproval }}</b>
+                            </a>
                             &emsp;
                             @if ($pages == 'cms')
                                 <a href="{{ route('landing.page', ['page' => 'cms']) }}" class="btn btn-warning"
@@ -137,6 +140,9 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="#" id="delete-checkbox-btn">
                                     <i class="fas fa-trash"></i>&emsp; Delete Selected
+                                </a>
+                                <a class="dropdown-item" href="#" id="approval-checkbox-btn">
+                                    <i class="fas fa-check"></i>&emsp; Approval Selected
                                 </a>
                                 {{-- <a class="dropdown-item" href="#" id="send-whatsapp-btn">
                                     <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp Selected
@@ -166,6 +172,10 @@
                                         <th>Barcode No</th>
                                         <th>Date Arrival</th>
                                         <th>E-mail Status</th>
+                                        <th>Source Visitor</th>
+                                        <th>Status Approval</th>
+                                        <th>Approve By</th>
+                                        <th>Approve Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -194,6 +204,18 @@
                                                     <span class="badge badge-danger">Not Delivered</span>
                                                 </td>
                                             @endif
+                                            <td>{{ $value['source_visitor'] }}</td>
+                                            @if ($value['flag_approval'] == '1')
+                                                <td>
+                                                    <span class="badge badge-success">Approve</span>
+                                                </td>
+                                            @else
+                                                <td>
+                                                    <span class="badge badge-warning">Waiting</span>
+                                                </td>
+                                            @endif
+                                            <td>{{ $value['approve_by'] }}</td>
+                                            <td>{{ $value['approve_date'] }}</td>
                                             <td>
                                                 @if ($pages == 'cms')
                                                     <form method="POST"
@@ -235,10 +257,18 @@
                                                                 data-id="{{ $value['id'] }}"
                                                                 data-name="{{ $value['full_name'] }}"
                                                                 title="Arrival">
-                                                                <i class="fas fa-plane-arrival"></i>&emsp; Arrival
+                                                                <i class="fas fa-plane-arrival"></i>&emsp;Arrival
                                                             </a>
                                                         @endif
 
+                                                        @if ($value['flag_approval'] == 0 || $value['flag_approval'] == null)
+                                                            <a href="#" class="dropdown-item approval-btn"
+                                                                data-id="{{ $value['id'] }}"
+                                                                data-name="{{ $value['full_name'] }}"
+                                                                title="Approval">
+                                                                <i class="fas fa-solid fa-check"></i>&emsp; Approval
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 </div>
                                                 </form>
@@ -303,67 +333,91 @@
     $(document).ready(function() {
         $('.send-email-btn-id').on('click', function() {
             const id = $(this).data('id');
-            const url = "{{ route('send.email.id', ['id' => '__ID__']) }}".replace('__ID__',
+            const checkApprovalUrl = "{{ route('check.approval.id', ['id' => '__ID__']) }}".replace(
+                '__ID__', id);
+            const sendEmailUrl = "{{ route('send.email.id', ['id' => '__ID__']) }}".replace('__ID__',
                 id);
 
-            swal({
-                title: "Are you sure you want to send the email?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then((willSend) => {
-                if (willSend) {
-                    swal({
-                        title: "Sending email, please wait...",
-                        text: "The process is ongoing.",
-                        icon: "info",
-                        buttons: false,
-                        closeOnClickOutside: false,
-                    });
-
-                    fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
+            fetch(checkApprovalUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'not_approved') {
+                        swal({
+                            title: "Cannot send email because it has not been approved yet.",
+                            icon: "error",
+                            dangerMode: true,
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            const emailsSent = data.emails_sent ||
-                                0;
-
-                            if (emailsSent > 0) {
-                                var content = document.createElement('div');
-                                content.innerHTML =
-                                    "Email has been successfully sent";
-
+                    } else {
+                        swal({
+                            title: "Are you sure you want to send the email?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        }).then((willSend) => {
+                            if (willSend) {
                                 swal({
-                                    title: "Success!",
-                                    content: content,
-                                    icon: "success",
-                                }).then(() => {
-                                    window.location.reload();
+                                    title: "Sending email, please wait...",
+                                    text: "The process is ongoing.",
+                                    icon: "info",
+                                    buttons: false,
+                                    closeOnClickOutside: false,
                                 });
-                            } else {
-                                swal("Failed!", "Emails failed to send.", "error").then(
-                                    () => {
-                                        window.location.reload();
+
+                                fetch(sendEmailUrl, {
+                                        method: 'GET',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const emailsSent = data.emails_sent || 0;
+
+                                        if (emailsSent > 0) {
+                                            var content = document.createElement('div');
+                                            content.innerHTML =
+                                                "Email has been successfully sent";
+
+                                            swal({
+                                                title: "Success!",
+                                                content: content,
+                                                icon: "success",
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            swal("Failed!", "Emails failed to send.",
+                                                "error").then(
+                                                () => {
+                                                    window.location.reload();
+                                                });
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        swal("Failed!",
+                                            "An error occurred while sending the email.",
+                                            "error").then(
+                                            () => {
+                                                window.location.reload();
+                                            });
                                     });
                             }
-                        })
-                        .catch((error) => {
-                            swal("Failed!", "An error occurred while sending the email.",
-                                "error").then(
-                                () => {
-                                    window.location.reload();
-                                });
                         });
-                }
-            });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error checking approval:', error);
+                    swal("Failed!", "An error occurred while checking approval status.", "error");
+                });
         });
     });
 
-    // Upload Excel 
+    // Upload Excel
     $(document).ready(function() {
         $('#uploadForm').on('submit', function(e) {
             e.preventDefault();
@@ -428,7 +482,7 @@
         });
     });
 
-    // Delete satuan 
+    // Delete satuan
     $(document).on('click', '#delete-btn', function() {
         var recordId = $(this).data('id');
         var params = "<?php echo $titleUrl; ?>";
@@ -490,13 +544,13 @@
         $(this).next('.custom-file-label').html(fileName);
     })
 
-    // Reset upload excel 
+    // Reset upload excel
     document.getElementById('reset-btn').addEventListener('click', function() {
         document.getElementById('uploadForm').reset();
         document.querySelector('.custom-file-label').textContent = 'Choose File';
     });
 
-    // Arrival 
+    // Arrival
     $(document).ready(function() {
         $('.arrival-btn').click(function(e) {
             e.preventDefault();
@@ -544,7 +598,68 @@
                             }
                         },
                         error: function(xhr, status, error) {
-                            swal("Failed", "Terjadi kesalahan, coba lagi.",
+                            swal("Failed", "An error occurred, please try again.",
+                                "error");
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    // Approval
+    $(document).ready(function() {
+        $('.approval-btn').click(function(e) {
+            e.preventDefault();
+
+            const approvalId = $(this).data('id');
+            const userName = $(this).data('name');
+
+            var content = document.createElement('div');
+            content.innerHTML =
+                `Are you sure want to approve <strong>${userName}</strong>?`;
+            swal({
+                title: "Confirmation",
+                content: content,
+                icon: "warning",
+                buttons: {
+                    cancel: "No",
+                    confirm: {
+                        text: "Yes",
+                        value: true,
+                    }
+                },
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '{{ route('approval.visitor') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            approvalId: approvalId,
+                            userName: userName
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                var content = document.createElement('div');
+                                content.innerHTML = response
+                                    .message;
+
+                                swal({
+                                    title: "Success",
+                                    content: content,
+                                    icon: "success"
+                                }).then(() => {
+                                    $(`.approval-btn[data-id="${approvalId}"]`)
+                                        .hide();
+                                    window.location.reload();
+                                });
+                            } else {
+                                swal("Failed", response.message, "error");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Failed", "An error occurred, please try again.",
                                 "error");
                         }
                     });
@@ -593,8 +708,8 @@
             updateSendEmailButton();
         });
 
-
-        $('.checkbox-item').on('change', function() {
+        // Delegated event listener untuk checkbox-item
+        $(document).on('change', '.checkbox-item', function() {
             const id = $(this).val();
 
             if (this.checked) {
@@ -605,10 +720,49 @@
                 selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !== id);
             }
 
-            $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
-                .length);
+            // Update select-all checkbox
+            const totalCheckboxes = $('.checkbox-item').length;
+            const totalChecked = $('.checkbox-item:checked').length;
+            $('#select-all').prop('checked', totalChecked === totalCheckboxes);
             updateSendEmailButton();
         });
+        //         $('#select-all').on('click', function() {
+        //             const isChecked = this.checked;
+        // 
+        //             dt.rows({
+        //                 'search': 'applied'
+        //             }).nodes().each(function(row) {
+        //                 $(row).find('.checkbox-item').prop('checked', isChecked);
+        //                 const id = $(row).find('.checkbox-item').val();
+        //                 if (isChecked) {
+        //                     if (!selectedCheckboxes.includes(id)) {
+        //                         selectedCheckboxes.push(id);
+        //                     }
+        //                 } else {
+        //                     selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !==
+        //                         id);
+        //                 }
+        //             });
+        // 
+        //             updateSendEmailButton();
+        //         });
+        // 
+        // 
+        //         $('.checkbox-item').on('change', function() {
+        //             const id = $(this).val();
+        // 
+        //             if (this.checked) {
+        //                 if (!selectedCheckboxes.includes(id)) {
+        //                     selectedCheckboxes.push(id);
+        //                 }
+        //             } else {
+        //                 selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !== id);
+        //             }
+        // 
+        //             $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
+        //                 .length);
+        //             updateSendEmailButton();
+        //         });
 
         function updateSelectAllCheckbox() {
             const totalCheckboxes = $('.checkbox-item').length;
@@ -631,65 +785,86 @@
                 return;
             }
 
-            swal({
-                    title: "Are you sure you want to send the email?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
+            fetch("{{ route('check.approval') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        ids: selectedCheckboxes
+                    })
                 })
-                .then((willSend) => {
-                    if (willSend) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'not_approved') {
+                        swal("Cannot send email", "One or more items are not approved.", "error");
+                    } else {
                         swal({
-                            title: "Sending email, please wait...",
-                            text: "The process is ongoing.",
-                            icon: "info",
-                            buttons: false,
-                            closeOnClickOutside: false,
-                        });
+                            title: "Are you sure you want to send the email?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        }).then((willSend) => {
+                            if (willSend) {
+                                swal({
+                                    title: "Sending email, please wait...",
+                                    text: "The process is ongoing.",
+                                    icon: "info",
+                                    buttons: false,
+                                    closeOnClickOutside: false,
+                                });
 
-                        fetch("{{ route('send.email') }}", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({
-                                    ids: selectedCheckboxes
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                const emailsSent = data.emails_sent;
-                                const totalSelected = data.total_selected;
+                                fetch("{{ route('send.email') }}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({
+                                            ids: selectedCheckboxes
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const emailsSent = data.emails_sent;
+                                        const totalSelected = data.total_selected;
 
-                                if (emailsSent > 0) {
-                                    var content = document.createElement('div');
-                                    content.innerHTML =
-                                        "Email has been successfully sent to <b>" + emailsSent +
-                                        " out of " + totalSelected + " people.</b>";
+                                        if (emailsSent > 0) {
+                                            var content = document.createElement('div');
+                                            content.innerHTML =
+                                                "Email has been successfully sent to <b>" +
+                                                emailsSent + " out of " +
+                                                totalSelected + " people.</b>";
 
-                                    swal({
-                                        title: "Success!",
-                                        content: content,
-                                        icon: "success",
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
-                                } else {
-                                    swal("Failed!", "Emails failed to send.", "error").then(
-                                        () => {
+                                            swal({
+                                                title: "Success!",
+                                                content: content,
+                                                icon: "success",
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            swal("Failed!", "Emails failed to send.",
+                                                "error").then(() => {
+                                                window.location.reload();
+                                            });
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        swal("Failed!",
+                                            "An error occurred while sending the email.",
+                                            "error").then(() => {
                                             window.location.reload();
                                         });
-                                }
-                            })
-                            .catch((error) => {
-                                swal("Failed!", "An error occurred while sending the email.",
-                                    "error").then(
-                                    () => {
-                                        window.location.reload();
                                     });
-                            });
+                            }
+                        });
                     }
+                })
+                .catch(error => {
+                    console.error('Error checking approvals:', error);
+                    swal("Failed!", "An error occurred while checking approvals.", "error");
                 });
         });
 
@@ -742,6 +917,64 @@
                                 setTimeout(function() {
                                     location.reload();
                                 }, 1500);
+                            } else {
+                                swal('Failed!',
+                                    'An error occurred while deleting the item.',
+                                    'error');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        // Approval Selected 
+        $('#approval-checkbox-btn').on('click', function(e) {
+            e.preventDefault();
+
+            if (selectedCheckboxes.length === 0) {
+                swal('No data selected.', 'Please select at least one item to approve.', 'warning');
+                return;
+            }
+
+            swal({
+                title: 'Are you sure?',
+                text: "Are you sure you want to approve this data?",
+                icon: "warning",
+                buttons: [
+                    'No',
+                    'Yes'
+                ],
+                dangerMode: true,
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    swal({
+                        title: "Process Approve...",
+                        text: "The process is ongoing.",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
+                    $.ajax({
+                        url: "{{ route('approval-multiple-visitors') }}",
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            ids: selectedCheckboxes
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                selectedCheckboxes.forEach(id => {
+                                    $('input[value="' + id + '"]').closest(
+                                        'tr').remove();
+                                });
+
+                                swal("Success!",
+                                    "The selected data has been approve.",
+                                    "success").then(() => {
+                                    window.location.reload();
+                                });
                             } else {
                                 swal('Failed!',
                                     'An error occurred while deleting the item.',
