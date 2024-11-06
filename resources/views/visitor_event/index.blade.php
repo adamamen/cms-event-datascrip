@@ -256,6 +256,7 @@
                                                             <a href="#" class="dropdown-item arrival-btn"
                                                                 data-id="{{ $value['id'] }}"
                                                                 data-name="{{ $value['full_name'] }}"
+                                                                data-flag-approval="{{ $value['flag_approval'] }}"
                                                                 title="Arrival">
                                                                 <i class="fas fa-plane-arrival"></i>&emsp;Arrival
                                                             </a>
@@ -557,6 +558,7 @@
 
             const visitorId = $(this).data('id');
             const userName = $(this).data('name');
+            const flagApproval = $(this).data('flag-approval');
 
             var content = document.createElement('div');
             content.innerHTML =
@@ -582,7 +584,9 @@
                         data: {
                             _token: '{{ csrf_token() }}',
                             visitorId: visitorId,
-                            dateArrival: arrivalDate
+                            dateArrival: arrivalDate,
+                            userName: userName,
+                            flagApproval: flagApproval,
                         },
                         success: function(response) {
                             if (response.success) {
@@ -594,7 +598,19 @@
                                             .reload();
                                     });
                             } else {
-                                swal("Failed", response.message, "error");
+                                var content = document.createElement('div');
+                                content.innerHTML = response
+                                    .message;
+
+                                swal({
+                                    title: "Failed",
+                                    content: content,
+                                    icon: "error"
+                                }).then(() => {
+                                    $(`.arrival-btn[data-id="${visitorId}"]`)
+                                        .hide();
+                                    window.location.reload();
+                                });
                             }
                         },
                         error: function(xhr, status, error) {
@@ -637,7 +653,7 @@
                         data: {
                             _token: '{{ csrf_token() }}',
                             approvalId: approvalId,
-                            userName: userName
+                            userName: userName,
                         },
                         success: function(response) {
                             if (response.success) {

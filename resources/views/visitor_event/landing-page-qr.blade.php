@@ -125,154 +125,6 @@
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
     <script>
-        //         $(document).ready(function() {
-        //             function verifyQRCode(qrCode) {
-        //                 $.ajax({
-        //                     url: "{{ route('verify.qr') }}",
-        //                     type: "POST",
-        //                     dataType: 'json',
-        //                     data: {
-        //                         _token: "{{ csrf_token() }}",
-        //                         qr_code: qrCode
-        //                     },
-        //                     success: function(response) {
-        //                         if (response.status === 'success') {
-        //                             var name = response.visitorName;
-        //                             var content = document.createElement('div');
-        //                             content.innerHTML = 'QR Code is valid! <br> Welcome <strong>' + name +
-        //                                 '</strong>';
-        //                             swal({
-        //                                 title: 'Sukses',
-        //                                 content: content,
-        //                                 icon: "success",
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         } else if (response.status === 'error_arrival') {
-        //                             var name = response.message;
-        //                             var content = document.createElement('div');
-        //                             content.innerHTML =
-        //                                 'QR Code sudah pernah digunakan. Silahkan coba lagi. <br> <strong>' +
-        //                                 name + '</strong>';
-        //                             swal({
-        //                                 title: 'Error',
-        //                                 content: content,
-        //                                 icon: "error",
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         } else {
-        //                             swal({
-        //                                 title: 'Error',
-        //                                 content: content,
-        //                                 icon: "error",
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         }
-        //                     },
-        //                     error: function(response) {
-        //                         var message = response.responseJSON.message ||
-        //                             "Invalid QR Code. Please try again.";
-        //                         swal({
-        //                             title: "Error",
-        //                             text: message,
-        //                             icon: "error",
-        //                         });
-        // 
-        //                         $('#qr_code').val('');
-        //                     }
-        //                 });
-        //             }
-        // 
-        //             $('#qr_code').on('input', function() {
-        //                 var qrCode = $(this).val();
-        // 
-        //                 if (qrCode.length === 10) {
-        //                     verifyQRCode(qrCode);
-        //                 }
-        //             });
-        //         });
-
-        //         $(document).ready(function() {
-        //             $('#qr_code').focus();
-        // 
-        //             function verifyQRCode(qrCode) {
-        //                 $.ajax({
-        //                     url: "{{ route('verify.qr') }}",
-        //                     type: "POST",
-        //                     dataType: 'json',
-        //                     data: {
-        //                         _token: "{{ csrf_token() }}",
-        //                         qr_code: qrCode
-        //                     },
-        //                     success: function(response) {
-        //                         if (response.status === 'success') {
-        //                             var name = response.visitorName;
-        //                             var content = document.createElement('div');
-        //                             content.innerHTML = 'QR Code is valid! <br> Welcome <strong>' + name +
-        //                                 '</strong>';
-        //                             swal({
-        //                                 title: 'Sukses',
-        //                                 content: content,
-        //                                 icon: "success",
-        //                             }).then(() => {
-        //                                 $('#qr_code').focus();
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         } else if (response.status === 'error_arrival') {
-        //                             var name = response.message;
-        //                             var content = document.createElement('div');
-        //                             content.innerHTML =
-        //                                 'QR Code sudah pernah digunakan. Silahkan coba lagi. <br> <strong>' +
-        //                                 name + '</strong>';
-        //                             swal({
-        //                                 title: 'Error',
-        //                                 content: content,
-        //                                 icon: "error",
-        //                             }).then(() => {
-        //                                 $('#qr_code').focus();
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         } else {
-        //                             swal({
-        //                                 title: 'Error',
-        //                                 content: content,
-        //                                 icon: "error",
-        //                             }).then(() => {
-        //                                 $('#qr_code').focus();
-        //                             });
-        // 
-        //                             $('#qr_code').val('');
-        //                         }
-        //                     },
-        //                     error: function(response) {
-        //                         var message = response.responseJSON.message ||
-        //                             "Invalid QR Code. Please try again.";
-        //                         swal({
-        //                             title: "Error",
-        //                             text: message,
-        //                             icon: "error",
-        //                         }).then(() => {
-        //                             $('#qr_code').focus();
-        //                         });
-        // 
-        //                         $('#qr_code').val('');
-        //                     }
-        //                 });
-        //             }
-        // 
-        //             $('#qr_code').on('input', function() {
-        //                 var qrCode = $(this).val();
-        // 
-        //                 if (qrCode.length === 10) {
-        //                     verifyQRCode(qrCode);
-        //                 }
-        //             });
-        //         });
-
         $(document).ready(function() {
             function keepFocusOnQRCode() {
                 $('#qr_code').focus();
@@ -337,6 +189,18 @@
                             });
 
                             $('#qr_code').val('');
+                        } else if (response.status === 'flag_approval') {
+                            var content = document.createElement('div');
+                            content.innerHTML = response
+                                .message;
+
+                            swal({
+                                title: "Failed",
+                                content: content,
+                                icon: "error"
+                            }).then(() => {
+                                window.location.reload();
+                            });
                         } else {
                             swal({
                                 title: 'Error',

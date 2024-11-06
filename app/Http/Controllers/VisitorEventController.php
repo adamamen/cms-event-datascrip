@@ -462,30 +462,37 @@ class VisitorEventController extends Controller
 
         $visitor = M_VisitorEvent::where('barcode_no', $request->qr_code)->first();
 
-        if ($visitor) {
-            $tanggalDatang = tgl_indo(date('Y-m-d', strtotime($visitor->scan_date)));
-            $waktuDatang   = date('H:i:s', strtotime($visitor->scan_date));
+        if ($visitor->flag_approval == 0) {
+            return response()->json([
+                'status' => 'flag_approval',
+                'message' => '<strong>' . $visitor->full_name  . '</strong> has not yet approved. Please complete the approval first.'
+            ]);
+        } else {
+            if ($visitor) {
+                $tanggalDatang = tgl_indo(date('Y-m-d', strtotime($visitor->scan_date)));
+                $waktuDatang   = date('H:i:s', strtotime($visitor->scan_date));
 
-            if ($visitor->flag_qr == '0') {
-                $visitor->flag_qr   = true;
-                $visitor->scan_date = Carbon::now();
-                $visitor->save();
+                if ($visitor->flag_qr == '0') {
+                    $visitor->flag_qr   = true;
+                    $visitor->scan_date = Carbon::now();
+                    $visitor->save();
 
-                return response()->json([
-                    'status'         => 'success',
-                    'visitorName'    => $visitor->full_name,
-                ]);
+                    return response()->json([
+                        'status'         => 'success',
+                        'visitorName'    => $visitor->full_name,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status'  => 'error_arrival',
+                        'message' => 'Time Arrival = ' . $tanggalDatang . " " . $waktuDatang,
+                    ]);
+                }
             } else {
                 return response()->json([
-                    'status'  => 'error_arrival',
-                    'message' => 'Time Arrival = ' . $tanggalDatang . " " . $waktuDatang,
-                ]);
+                    'status'  => 'error',
+                    'message' => 'QR Code not found, please try again.'
+                ], 404);
             }
-        } else {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'QR Code not found, please try again.'
-            ], 404);
         }
     }
 
@@ -793,22 +800,29 @@ class VisitorEventController extends Controller
 
     public function storeArrival(Request $request)
     {
-        $request->validate([
-            'visitorId'   => 'required|exists:tbl_visitor_event,id',
-            'dateArrival' => 'required|date',
-        ]);
+        if ($request->flagApproval == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => '<strong>' . $request->userName  . '</strong> has not yet approved. Please complete the approval first.'
+            ]);
+        } else {
+            $request->validate([
+                'visitorId'   => 'required|exists:tbl_visitor_event,id',
+                'dateArrival' => 'required|date',
+            ]);
 
-        try {
-            $visitor = M_VisitorEvent::findOrFail($request->visitorId);
+            try {
+                $visitor = M_VisitorEvent::findOrFail($request->visitorId);
 
-            $visitor->scan_date = Carbon::now();
-            $visitor->flag_qr   = 1;
+                $visitor->scan_date = Carbon::now();
+                $visitor->flag_qr   = 1;
 
-            $visitor->save();
+                $visitor->save();
 
-            return response()->json(['success' => true, 'message' => 'Arrival details saved successfully!']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+                return response()->json(['success' => true, 'message' => 'Arrival details saved successfully!']);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            }
         }
     }
 
@@ -828,7 +842,10 @@ class VisitorEventController extends Controller
                 'message' => '<strong>' . $request->userName  . '</strong> has been approved'
             ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }
