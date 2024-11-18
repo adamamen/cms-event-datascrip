@@ -73,7 +73,7 @@ if (!function_exists('visitorEvent')) {
     function visitorEvent()
     {
         $q = DB::table('tbl_visitor_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at', 'jenis_event', 'no_invoice', 'status_pembayaran', 'metode_bayar', 'sn_product', 'gender', 'account_instagram', 'type_invitation', 'invitation_name', 'barcode_no', 'scan_date', 'flag_email', 'source_visitor', 'flag_approval', 'approve_by', 'approve_date')
+            ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'event_id', 'registration_date', 'full_name', 'address', 'email', 'mobile', 'created_at', 'ticket_no', 'created_by', 'updated_by', 'updated_at', 'jenis_event', 'no_invoice', 'status_pembayaran', 'metode_bayar', 'sn_product', 'gender', 'account_instagram', 'type_invitation', 'invitation_name', 'barcode_no', 'scan_date', 'flag_email', 'source_visitor', 'flag_approval', 'approve_by', 'approve_date', 'flag_whatsapp')
             ->get();
         return $q;
     }
@@ -234,8 +234,6 @@ if (!function_exists('adminEvent')) {
                 $queryMasterEvent = masterEvent_2($page);
             }
 
-            // dd();
-
             if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
                 foreach ($queryVisitorEvent as $visitor) {
                     foreach ($queryMasterEvent as $event) {
@@ -274,6 +272,7 @@ if (!function_exists('adminEvent')) {
                                 'flag_approval'     => $visitor->flag_approval,
                                 'approve_by'        => $visitor->approve_by,
                                 'approve_date'      => $visitor->approve_date,
+                                'flag_whatsapp'     => $visitor->flag_whatsapp,
                             ];
                         }
                     }

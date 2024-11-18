@@ -80,12 +80,13 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::post('/delete-multiple-visitors', [VisitorEventController::class, 'deleteMultipleVisitors'])->name('delete-multiple-visitors');
     Route::post('/approval-multiple-visitors', [VisitorEventController::class, 'approvalMultipleVisitors'])->name('approval-multiple-visitors');
     Route::post('/visitor-event/send-email', [VisitorEventController::class, 'sendEmail'])->name('send.email');
+    Route::post('/visitor-event/send-whatsapp', [VisitorEventController::class, 'sendWhatsapp'])->name('send.whatsapp');
     Route::get('/visitor-event/send-email/{id}', [VisitorEventController::class, 'sendEmailId'])->name('send.email.id');
+    Route::get('/visitor-event/send-whatsapp/{id}', [VisitorEventController::class, 'sendWhatsappId'])->name('send.whatsapp.id');
     Route::post('/visitor-event/approval-visitor', [VisitorEventController::class, 'approval'])->name('approval.visitor');
     Route::post('/visitor-event/arrival', [VisitorEventController::class, 'storeArrival'])->name('visitor.arrival');
     Route::post('/visitor-event/check-approval', [VisitorEventController::class, 'checkApproval'])->name('check.approval');
     Route::get('/visitor-event/check-approval/{id}', [VisitorEventController::class, 'checkApprovalId'])->name('check.approval.id');
-
 
     // Master User
     Route::get('/master-user/{page?}', [MasterUserController::class, 'index'])->name('master_user.index');
@@ -96,10 +97,10 @@ Route::group(['middleware' => ['auth', 'preventBackHistory']], function () {
     Route::delete('/master-user/delete-visitor/{id}', [MasterUserController::class, 'delete'])->name('delete-master-user');
     Route::post('/master-user/delete-multiple-master-user', [MasterUserController::class, 'deleteMultipleVisitors'])->name('delete-multiple-master-user');
     Route::post('/master-user/send-email', [MasterUserController::class, 'sendEmail'])->name('send.email.master.user');
-    // Route::get('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
     Route::post('/master-user/send-email/{id}', [MasterUserController::class, 'sendEmailId'])->name('send.email.id.master.user');
     Route::post('/master-user/send-whatsapp', [MasterUserController::class, 'sendWhatsapp'])->name('send.whatsapp.master.user');
     Route::post('/master-user/send-whatsapp/{id}', [MasterUserController::class, 'sendWhatsappId'])->name('send.whatsapp.id.master.user');
+    Route::post('/master-user/list-event/{id}', [MasterUserController::class, 'listEvent'])->name('list_event');
 
     // Whatsapp Event
     Route::get('/whatsapp-event/{page?}', [WhatsappEventController::class, 'index'])->name('whatsapp_event.index');

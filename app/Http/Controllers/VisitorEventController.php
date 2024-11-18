@@ -102,15 +102,6 @@ class VisitorEventController extends Controller
         ]);
     }
 
-
-    function initials($str)
-    {
-        $ret = '';
-        foreach (explode('-', $str) as $word)
-            $ret .= strtoupper($word[0]);
-        return $ret;
-    }
-
     public function add(Request $request, $page)
     {
         $getIdEvent = M_MasterEvent::select('*')->where('title_url', trim($page))->first();
@@ -509,17 +500,7 @@ class VisitorEventController extends Controller
                 foreach ($masterEvent as $event) {
                     if ($visitor->flag_approval == '1') {
                         if ($event->id_event == $visitor->event_id) {
-                            $judul           = ucwords($event->title);
-                            $nama            = $visitor->full_name;
-                            $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
-                            $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
-                            $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
-                            $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
-                            $encryptedId     = encrypt($visitor->id);
-                            $email           = $visitor->email;
-                            $domain          = explode("@", $email)[1];
-                            $ipAddress       = gethostbyname($domain);
-
+                            $ipAddress  = gethostbyname(explode("@", $visitor->email)[1]);
                             $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
                                 ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
                                 ->where('tbl_send_email_cust.type', 'Event_Admin')
@@ -538,13 +519,13 @@ class VisitorEventController extends Controller
                                     '#AlamatEvent',
                                 ],
                                 [
-                                    ucwords($nama),
-                                    ucwords($judul),
-                                    '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
-                                    $tanggalMulai,
-                                    $tanggalAkhir,
-                                    $mulaiRegistrasi,
-                                    $akhirRegistrasi,
+                                    ucwords($visitor->full_name),
+                                    ucwords($event->title),
+                                    '<a href="' . route('visitor.event.qrcode', ['id' => encrypt($visitor->id)]) . '">di sini</a>',
+                                    tgl_indo(date('Y-m-d', strtotime($event->start_event))),
+                                    tgl_indo(date('Y-m-d', strtotime($event->end_event))),
+                                    date('H:i', strtotime($event->start_registrasi)),
+                                    date('H:i', strtotime($event->end_registrasi)),
                                     $event->location
                                 ],
                                 $bodyContent
@@ -593,10 +574,10 @@ class VisitorEventController extends Controller
                                     $mail->Port       = env('MAIL_PORT');
 
                                     $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                                    $mail->addAddress($email, $nama);
+                                    $mail->addAddress($visitor->email, ucwords($visitor->full_name));
 
                                     $mail->isHTML(true);
-                                    $mail->Subject = 'Event ' . $judul;
+                                    $mail->Subject = 'Event ' . ucwords($event->title);
                                     $mail->Body = $body;
 
                                     // $mail->SMTPDebug = 2;
@@ -626,6 +607,82 @@ class VisitorEventController extends Controller
             return response()->json([
                 'message'        => 'Emails processed!',
                 'emails_sent'    => $emailsSent
+            ], 200);
+        }
+
+        return response()->json(['message' => 'No visitors selected'], 400);
+    }
+
+    public function sendWhatsappId($id)
+    {
+        $ids          = explode(',', $id);
+        $whatsappSent = 0;
+
+        if (!empty($ids)) {
+            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
+            $masterEvent = DB::table('tbl_master_event')->select("*")->get();
+
+            foreach ($visitors as $visitor) {
+                foreach ($masterEvent as $event) {
+                    if ($visitor->flag_approval == '1' && $event->id_event == $visitor->event_id) {
+                        if (substr($visitor->mobile, 0, 1) === '0') {
+                            $phoneNo = '+62' . substr($visitor->mobile, 1);
+                        } elseif (substr($visitor->mobile, 0, 2) === '62') {
+                            $phoneNo = '+' . $visitor->mobile;
+                        } elseif (substr($visitor->mobile, 0, 1) !== '+') {
+                            $phoneNo = '+62' . $visitor->mobile;
+                        }
+
+                        $dataContent = [
+                            "data" => [
+                                [
+                                    "phone_no"        => $phoneNo,
+                                    "customer_name"   => ucwords($visitor->full_name),
+                                    "NamaEvent"       => ucwords($event->title),
+                                    "Link"            => route('visitor.event.qrcode', ['id' => encrypt($visitor->id)]),
+                                    "StartEvent"      => tgl_indo(date('Y-m-d', strtotime($event->start_event))),
+                                    "EndEvent"        => tgl_indo(date('Y-m-d', strtotime($event->end_event))),
+                                    "StartRegistrasi" => date('H:i', strtotime($event->start_registrasi)),
+                                    "EndRegistrasi"   => date('H:i', strtotime($event->end_registrasi)),
+                                    "AlamatEvent"     => $event->location,
+                                ]
+                            ]
+                        ];
+
+                        $curl = curl_init();
+                        curl_setopt_array($curl, [
+                            CURLOPT_URL            => 'https://prod-28.southeastasia.logic.azure.com:443/workflows/2b5e1f3507f041e9a49683569b5e14d1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=dlJW7OOlZ3WBK5u1ZsVX9Vf2GI1edGcWVRnfL10kJ28',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING       => '',
+                            CURLOPT_MAXREDIRS      => 10,
+                            CURLOPT_TIMEOUT        => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST  => 'POST',
+                            CURLOPT_POSTFIELDS     => json_encode($dataContent),
+                            CURLOPT_HTTPHEADER     => [
+                                'Content-Type: application/json'
+                            ],
+                        ]);
+
+                        $response = curl_exec($curl);
+                        curl_close($curl);
+
+                        if (json_decode($response)->status == true) {
+                            $visitor->flag_whatsapp = 1;
+                            $whatsappSent++;
+                        } else {
+                            $visitor->flag_whatsapp = 0;
+                            $whatsappSent++;
+                        }
+                        $visitor->save();
+                    }
+                }
+            }
+
+            return response()->json([
+                'message'       => 'WhatsApp processed!',
+                'whatsapp_sent' => $whatsappSent
             ], 200);
         }
 
@@ -678,17 +735,8 @@ class VisitorEventController extends Controller
             foreach ($visitors as $visitor) {
                 foreach ($masterEvent as $event) {
                     if ($event->id_event == $visitor->event_id) {
-                        $judul           = ucwords($event->title);
-                        $nama            = $visitor->full_name;
-                        $tanggalMulai    = tgl_indo(date('Y-m-d', strtotime($event->start_event)));
-                        $tanggalAkhir    = tgl_indo(date('Y-m-d', strtotime($event->end_event)));
-                        $mulaiRegistrasi = date('H:i', strtotime($event->start_registrasi));
-                        $akhirRegistrasi = date('H:i', strtotime($event->end_registrasi));
-                        $encryptedId     = encrypt($visitor->id);
-                        $email           = $visitor->email;
-                        $domain          = explode("@", $email)[1];
-                        $ipAddress       = gethostbyname($domain);
-                        $emailEvent      = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
+                        $ipAddress  = gethostbyname(explode("@", $visitor->email)[1]);
+                        $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
                             ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
                             ->where('tbl_send_email_cust.type', 'Event_Admin')
                             ->where('tbl_send_email_cust.id_event', $visitor->event_id)
@@ -706,13 +754,13 @@ class VisitorEventController extends Controller
                                 '#AlamatEvent',
                             ],
                             [
-                                ucwords($nama),
-                                ucwords($judul),
-                                '<a href="' . route('visitor.event.qrcode', ['id' => $encryptedId]) . '">di sini</a>',
-                                $tanggalMulai,
-                                $tanggalAkhir,
-                                $mulaiRegistrasi,
-                                $akhirRegistrasi,
+                                ucwords($visitor->full_name),
+                                ucwords($event->title),
+                                '<a href="' . route('visitor.event.qrcode', ['id' => encrypt($visitor->id)]) . '">di sini</a>',
+                                tgl_indo(date('Y-m-d', strtotime($event->start_event))),
+                                tgl_indo(date('Y-m-d', strtotime($event->end_event))),
+                                date('H:i', strtotime($event->start_registrasi)),
+                                date('H:i', strtotime($event->end_registrasi)),
                                 $event->location
                             ],
                             $bodyContent
@@ -761,10 +809,10 @@ class VisitorEventController extends Controller
                                 $mail->Port       = env('MAIL_PORT');
 
                                 $mail->setFrom('no_reply@datascrip.co.id', 'No Reply');
-                                $mail->addAddress($email, $nama);
+                                $mail->addAddress($visitor->email, ucwords($visitor->full_name));
 
                                 $mail->isHTML(true);
-                                $mail->Subject = 'Event ' . $judul;
+                                $mail->Subject = 'Event ' . ucwords($event->title);
                                 $mail->Body = $body;
 
                                 // $mail->SMTPDebug = 2;
@@ -791,6 +839,84 @@ class VisitorEventController extends Controller
             return response()->json([
                 'message'        => 'Emails processed!',
                 'emails_sent'    => $emailsSent,
+                'total_selected' => $totalSelected
+            ], 200);
+        }
+
+        return response()->json(['message' => 'No visitors selected'], 400);
+    }
+
+    public function sendWhatsapp(Request $request)
+    {
+        $ids           = $request->input('ids');
+        $whatsappSent  = 0;
+        $totalSelected = count($ids);
+
+        if (!empty($ids)) {
+            $visitors    = M_VisitorEvent::whereIn('id', $ids)->get();
+            $masterEvent = DB::table('tbl_master_event')->select("*")->get();
+
+            foreach ($visitors as $visitor) {
+                foreach ($masterEvent as $event) {
+                    if ($event->id_event == $visitor->event_id) {
+                        if (substr($visitor->mobile, 0, 1) === '0') {
+                            $phoneNo = '+62' . substr($visitor->mobile, 1);
+                        } elseif (substr($visitor->mobile, 0, 2) === '62') {
+                            $phoneNo = '+' . $visitor->mobile;
+                        } elseif (substr($visitor->mobile, 0, 1) !== '+') {
+                            $phoneNo = '+62' . $visitor->mobile;
+                        }
+
+                        $dataContent = [
+                            "data" => [
+                                [
+                                    "phone_no"        => $phoneNo,
+                                    "customer_name"   => ucwords($visitor->full_name),
+                                    "NamaEvent"       => ucwords($event->title),
+                                    "Link"            => route('visitor.event.qrcode', ['id' => encrypt($visitor->id)]),
+                                    "StartEvent"      => tgl_indo(date('Y-m-d', strtotime($event->start_event))),
+                                    "EndEvent"        => tgl_indo(date('Y-m-d', strtotime($event->end_event))),
+                                    "StartRegistrasi" => date('H:i', strtotime($event->start_registrasi)),
+                                    "EndRegistrasi"   => date('H:i', strtotime($event->end_registrasi)),
+                                    "AlamatEvent"     => $event->location,
+                                ]
+                            ]
+                        ];
+
+                        $curl = curl_init();
+                        curl_setopt_array($curl, [
+                            CURLOPT_URL            => 'https://prod-28.southeastasia.logic.azure.com:443/workflows/2b5e1f3507f041e9a49683569b5e14d1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=dlJW7OOlZ3WBK5u1ZsVX9Vf2GI1edGcWVRnfL10kJ28',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING       => '',
+                            CURLOPT_MAXREDIRS      => 10,
+                            CURLOPT_TIMEOUT        => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST  => 'POST',
+                            CURLOPT_POSTFIELDS     => json_encode($dataContent),
+                            CURLOPT_HTTPHEADER     => [
+                                'Content-Type: application/json'
+                            ],
+                        ]);
+
+                        $response = curl_exec($curl);
+                        curl_close($curl);
+
+                        if (json_decode($response)->status == true) {
+                            $visitor->flag_whatsapp = 1;
+                            $whatsappSent++;
+                        } else {
+                            $visitor->flag_whatsapp = 0;
+                            $whatsappSent++;
+                        }
+                        $visitor->save();
+                    }
+                }
+            }
+
+            return response()->json([
+                'message'        => 'WhatsApp processed!',
+                'whatsapp_sent'  => $whatsappSent,
                 'total_selected' => $totalSelected
             ], 200);
         }

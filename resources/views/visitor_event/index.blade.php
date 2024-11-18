@@ -144,9 +144,9 @@
                                 <a class="dropdown-item" href="#" id="approval-checkbox-btn">
                                     <i class="fas fa-check"></i>&emsp; Approval Selected
                                 </a>
-                                {{-- <a class="dropdown-item" href="#" id="send-whatsapp-btn">
-                                    <i class="fa-brands fa-whatsapp"></i>&emsp; Send Whatsapp Selected
-                                </a> --}}
+                                <a class="dropdown-item" href="#" id="send-whatsapp-btn">
+                                    &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp; Send WhatsApp Selected
+                                </a>
                                 <a class="dropdown-item" href="#" id="send-email-btn">
                                     <i class="fas fa-envelope"></i>&emsp; Send Email Selected
                                 </a>
@@ -172,6 +172,7 @@
                                         <th>Barcode No</th>
                                         <th>Date Arrival</th>
                                         <th>E-mail Status</th>
+                                        <th>WhatsApp Status</th>
                                         <th>Source Visitor</th>
                                         <th>Status Approval</th>
                                         <th>Approve By</th>
@@ -196,6 +197,15 @@
                                             <td>{{ $value['barcode_no'] }}</td>
                                             <td>{{ $value['scan_date'] }}</td>
                                             @if ($value['flag_email'] == '1')
+                                                <td>
+                                                    <span class="badge badge-success">Delivered</span>
+                                                </td>
+                                            @else
+                                                <td>
+                                                    <span class="badge badge-danger">Not Delivered</span>
+                                                </td>
+                                            @endif
+                                            @if ($value['flag_whatsapp'] == '1')
                                                 <td>
                                                     <span class="badge badge-success">Delivered</span>
                                                 </td>
@@ -251,6 +261,11 @@
                                                         <a class="send-email-btn-id dropdown-item"
                                                             data-id="{{ $value['id'] }}" title="Send Email">
                                                             <i class="fas fa-envelope"></i>&emsp; Send Email
+                                                        </a>
+                                                        <a class="send-whatsapp-btn-id dropdown-item"
+                                                            data-id="{{ $value['id'] }}" title="Send WhatsApp">
+                                                            &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp;&nbsp;
+                                                            Send WhatsApp
                                                         </a>
                                                         @if (empty($value['scan_date']))
                                                             <a href="#" class="dropdown-item arrival-btn"
@@ -405,6 +420,95 @@
                                             "error").then(
                                             () => {
                                                 window.location.reload();
+                                            });
+                                    });
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error checking approval:', error);
+                    swal("Failed!", "An error occurred while checking approval status.", "error");
+                });
+        });
+    });
+
+    // WhatsApp Satuan
+    $(document).ready(function() {
+        $('.send-whatsapp-btn-id').on('click', function() {
+            const id = $(this).data('id');
+            const checkApprovalUrl = "{{ route('check.approval.id', ['id' => '__ID__']) }}".replace(
+                '__ID__', id);
+            const sendWhatsappUrl = "{{ route('send.whatsapp.id', ['id' => '__ID__']) }}".replace(
+                '__ID__',
+                id);
+
+            fetch(checkApprovalUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'not_approved') {
+                        swal({
+                            title: "Cannot send whatsapp because it has not been approved yet.",
+                            icon: "error",
+                            dangerMode: true,
+                        })
+                    } else {
+                        swal({
+                            title: "Are you sure you want to send the whatsapp?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        }).then((willSend) => {
+                            if (willSend) {
+                                swal({
+                                    title: "Sending whatsapp, please wait...",
+                                    text: "The process is ongoing.",
+                                    icon: "info",
+                                    buttons: false,
+                                    closeOnClickOutside: false,
+                                });
+
+                                fetch(sendWhatsappUrl, {
+                                        method: 'GET',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const whatsappSent = data.whatsapp_sent || 0;
+
+                                        if (whatsappSent > 0) {
+                                            var content = document.createElement('div');
+                                            content.innerHTML =
+                                                "WhatsApp has been successfully sent";
+
+                                            swal({
+                                                title: "Success!",
+                                                content: content,
+                                                icon: "success",
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            swal("Failed!", "WhatsApp failed to send.",
+                                                "error").then(
+                                                () => {
+                                                    window.location.reload();
+                                                });
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        swal("Failed!",
+                                            "An error occurred while sending the whatsapp.",
+                                            "error").then(
+                                            () => {
+                                                // window.location.reload();
                                             });
                                     });
                             }
@@ -722,6 +826,7 @@
             });
 
             updateSendEmailButton();
+            updateSendWhatsappButton();
         });
 
         // Delegated event listener untuk checkbox-item
@@ -741,44 +846,8 @@
             const totalChecked = $('.checkbox-item:checked').length;
             $('#select-all').prop('checked', totalChecked === totalCheckboxes);
             updateSendEmailButton();
+            updateSendWhatsappButton();
         });
-        //         $('#select-all').on('click', function() {
-        //             const isChecked = this.checked;
-        // 
-        //             dt.rows({
-        //                 'search': 'applied'
-        //             }).nodes().each(function(row) {
-        //                 $(row).find('.checkbox-item').prop('checked', isChecked);
-        //                 const id = $(row).find('.checkbox-item').val();
-        //                 if (isChecked) {
-        //                     if (!selectedCheckboxes.includes(id)) {
-        //                         selectedCheckboxes.push(id);
-        //                     }
-        //                 } else {
-        //                     selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !==
-        //                         id);
-        //                 }
-        //             });
-        // 
-        //             updateSendEmailButton();
-        //         });
-        // 
-        // 
-        //         $('.checkbox-item').on('change', function() {
-        //             const id = $(this).val();
-        // 
-        //             if (this.checked) {
-        //                 if (!selectedCheckboxes.includes(id)) {
-        //                     selectedCheckboxes.push(id);
-        //                 }
-        //             } else {
-        //                 selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !== id);
-        //             }
-        // 
-        //             $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
-        //                 .length);
-        //             updateSendEmailButton();
-        //         });
 
         function updateSelectAllCheckbox() {
             const totalCheckboxes = $('.checkbox-item').length;
@@ -789,6 +858,11 @@
         function updateSendEmailButton() {
             const anyChecked = selectedCheckboxes.length > 0;
             $('#send-email-btn').prop('disabled', !anyChecked);
+        }
+
+        function updateSendWhatsappButton() {
+            const anyChecked = selectedCheckboxes.length > 0;
+            $('#send-whatsapp-btn').prop('disabled', !anyChecked);
         }
 
         // Send Email Selected
@@ -872,6 +946,100 @@
                                             "An error occurred while sending the email.",
                                             "error").then(() => {
                                             window.location.reload();
+                                        });
+                                    });
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking approvals:', error);
+                    swal("Failed!", "An error occurred while checking approvals.", "error");
+                });
+        });
+
+        // Send WhatsApp Selected
+        document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (selectedCheckboxes.length === 0) {
+                swal('No data selected.', 'Please select at least one item to send the whatsapp.',
+                    'warning');
+                return;
+            }
+
+            fetch("{{ route('check.approval') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        ids: selectedCheckboxes
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'not_approved') {
+                        swal("Cannot send whatsapp", "One or more items are not approved.",
+                            "error");
+                    } else {
+                        swal({
+                            title: "Are you sure you want to send the whatsapp?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        }).then((willSend) => {
+                            if (willSend) {
+                                swal({
+                                    title: "Sending whatsapp, please wait...",
+                                    text: "The process is ongoing.",
+                                    icon: "info",
+                                    buttons: false,
+                                    closeOnClickOutside: false,
+                                });
+
+                                fetch("{{ route('send.whatsapp') }}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({
+                                            ids: selectedCheckboxes
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const whatsappSent = data.whatsapp_sent;
+                                        const totalSelected = data.total_selected;
+
+                                        if (whatsappSent > 0) {
+                                            var content = document.createElement('div');
+                                            content.innerHTML =
+                                                "WhatsApp has been successfully sent to <b>" +
+                                                whatsappSent + " out of " +
+                                                totalSelected + " people.</b>";
+
+                                            swal({
+                                                title: "Success!",
+                                                content: content,
+                                                icon: "success",
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            swal("Failed!", "WhatsApp failed to send.",
+                                                "error").then(() => {
+                                                window.location.reload();
+                                            });
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        swal("Failed!",
+                                            "An error occurred while sending the whatsapp.",
+                                            "error").then(() => {
+                                            // window.location.reload();
                                         });
                                     });
                             }

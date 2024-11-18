@@ -101,11 +101,11 @@
                                     <a class="dropdown-item" href="#" id="delete-checkbox-btn">
                                         <i class="fas fa-trash"></i>&emsp; Delete Selected
                                     </a>
-                                    <a class="dropdown-item" href="#" id="send-whatsapp-btn">
+                                    <a class="dropdown-item" href="#" id="send-whatsapp-btn" data-type="1">
                                         <i class="fa-brands fa-whatsapp" style="margin-left: 2%"></i>&emsp; Send Whatsapp
                                         Selected
                                     </a>
-                                    <a class="dropdown-item" href="#" id="send-email-btn">
+                                    <a class="dropdown-item" href="#" id="send-email-btn" data-type="0">
                                         <i class="fas fa-envelope"></i>&emsp; Send Email Selected
                                     </a>
                                 </div>
@@ -172,12 +172,14 @@
                                                                 <i class="fas fa-trash"></i>&emsp; Delete
                                                             </a>
                                                             <a class="send-whatsapp-btn-id dropdown-item"
-                                                                data-id="{{ $value['id'] }}" title="Send Whatsapp">
+                                                                data-id="{{ $value['id'] }}" data-action="1"
+                                                                title="Send WhatsApp">
                                                                 <i class="fa-brands fa-whatsapp"
-                                                                    style="margin-left: 2%;"></i>&emsp; Send Whatsapp
+                                                                    style="margin-left: 2%;"></i>&emsp; Send WhatsApp
                                                             </a>
                                                             <a class="send-email-btn-id dropdown-item"
-                                                                data-id="{{ $value['id'] }}" title="Send Email">
+                                                                data-id="{{ $value['id'] }}" data-action="0"
+                                                                title="Send Email">
                                                                 <i class="fas fa-envelope"></i>&emsp; Send Email
                                                             </a>
                                                         </div>
@@ -199,25 +201,20 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="divisionModalLabel">Select Division</h5>
+                            <h5 class="modal-title" id="divisionModalLabel"></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <label for="divisionSelect">Choose a division:</label>
+                            {{-- <label for="divisionSelect">Choose a division:</label> --}}
                             <select class="form-control select2" name="divisionSelect" id="divisionSelect">
                                 <option selected disabled>-- Please Select --</option>
-                                @foreach ($listEvent as $event)
-                                    <option value="{{ $event->id_event }}">
-                                        {{ ucwords($event->title) }}
-                                    </option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="sendEmailButton">Send Email</button>
+                            <button type="button" class="btn btn-primary" id="sendButton">Send</button>
                         </div>
                     </div>
                 </div>
@@ -326,9 +323,42 @@
             // Email Satuan 
             $('.send-email-btn-id').on('click', function() {
                 const id = $(this).data('id');
+                const url_list = "{{ route('list_event', ['id' => 0]) }}";
+
+                $('#divisionSelect').html('<option selected disabled>Loading...</option>');
                 $('#divisionModal').modal('show');
 
-                $('#sendEmailButton').off('click').on('click', function() {
+                fetch(url_list, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        function ucwords(str) {
+                            return str.replace(/\b\w/g, char => char.toUpperCase());
+                        }
+
+                        $('#divisionModalLabel').empty().append(
+                            '<h5 class="modal-title" id="divisionModalLabel">Select Event Name (Send Email Selected)</h5>'
+                        );
+
+                        $('#divisionSelect').empty().append(
+                            '<option selected disabled>-- Please Select --</option>');
+
+                        data.listEvent.forEach(event => {
+                            $('#divisionSelect').append(
+                                `<option value="${event.id_event}">${ucwords(event.title)}</option>`
+                            );
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        swal("Error!", "Failed to load events.", "error");
+                    });
+
+                $('#sendButton').off('click').on('click', function() {
                     const selectedDivision = $('#divisionSelect').val();
 
                     if (!selectedDivision) {
@@ -364,44 +394,29 @@
                                         division: selectedDivision
                                     }),
                                 })
-                                .then(response => {
-                                    return response.json();
-                                })
+                                .then(response => response.json())
                                 .then(data => {
                                     const emailsSent = data.emails_sent || 0;
-
                                     if (emailsSent > 0) {
-                                        var content = document.createElement('div');
-                                        content.innerHTML =
-                                            "Email has been successfully sent";
-
-                                        swal({
-                                            title: "Success!",
-                                            content: content,
-                                            icon: "success",
-                                        }).then(() => {
+                                        swal("Success!",
+                                            "Email has been successfully sent",
+                                            "success").then(() => {
                                             window.location.reload();
                                         });
                                     } else {
                                         swal("Failed!", "Emails failed to send.",
-                                            "error").then(
-                                            () => {
-                                                window.location.reload();
-                                            }
-                                        );
+                                            "error").then(() => {
+                                            window.location.reload();
+                                        });
                                     }
                                 })
-                                .catch((error) => {
-                                    console.error(
-                                        error
-                                    );
+                                .catch(error => {
+                                    console.error(error);
                                     swal("Failed!",
                                         "An error occurred while sending the email.",
-                                        "error").then(
-                                        () => {
-                                            window.location.reload();
-                                        }
-                                    );
+                                        "error").then(() => {
+                                        // window.location.reload();
+                                    });
                                 });
                         }
                         $('#divisionModal').modal('hide');
@@ -412,65 +427,106 @@
             // Whatsapp Satuan
             $('.send-whatsapp-btn-id').on('click', function() {
                 const id = $(this).data('id');
-                const url = "{{ route('send.whatsapp.id.master.user', ['id' => '__ID__']) }}".replace(
-                    '__ID__', id
-                );
+                const action = $(this).data('action');
+                const url_list = "{{ route('list_event', ['id' => 1]) }}";
 
-                swal({
-                    title: "Are you sure you want to send the whatsapp?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                }).then((willSend) => {
-                    if (willSend) {
-                        swal({
-                            title: "Sending whatsapp, please wait...",
-                            text: "The process is ongoing.",
-                            icon: "info",
-                            buttons: false,
-                            closeOnClickOutside: false,
+                $('#divisionSelect').html('<option selected disabled>Loading...</option>');
+
+                $('#divisionModal').modal('show');
+
+                fetch(url_list, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        function ucwords(str) {
+                            return str.replace(/\b\w/g, char => char.toUpperCase());
+                        }
+
+                        $('#divisionModalLabel').empty().append(
+                            '<h5 class="modal-title" id="divisionModalLabel">Select Event Name (Send WhatsApp Selected)</h5>'
+                        );
+
+                        $('#divisionSelect').empty().append(
+                            '<option selected disabled>-- Please Select --</option>');
+
+                        data.listEvent.forEach(event => {
+                            $('#divisionSelect').append(
+                                `<option value="${event.id_event}">${ucwords(event.title)}</option>`
+                            );
                         });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        swal("Error!", "Failed to load events.", "error");
+                    });
 
-                        fetch(url, {
-                                method: 'GET',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                            .then(response => {
-                                return response.json();
-                            })
-                            .then(data => {
-                                const whatsappSent = data.whatsapp_sent || 0;
+                $('#sendButton').off('click').on('click', function() {
+                    const selectedDivision = $('#divisionSelect').val();
 
-                                if (whatsappSent > 0) {
-                                    var content = document.createElement('div');
-                                    content.innerHTML = "Whatsapp has been successfully sent";
-
-                                    swal({
-                                        title: "Success!",
-                                        content: content,
-                                        icon: "success",
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
-                                } else {
-                                    swal("Failed!", "Whatsapp failed to send.", "error").then(
-                                        () => {
-                                            window.location.reload();
-                                        }
-                                    );
-                                }
-                            })
-                            .catch((error) => {
-                                swal("Failed!", "An error occurred while sending the Whatsapp.",
-                                    "error").then(
-                                    () => {
-                                        window.location.reload();
-                                    }
-                                );
-                            });
+                    if (!selectedDivision) {
+                        swal("Warning!", "Please select a division.", "warning");
+                        return;
                     }
+
+                    const url = "{{ route('send.whatsapp.id.master.user', ['id' => '__ID__']) }}"
+                        .replace('__ID__', id);
+
+                    swal({
+                        title: "Are you sure you want to send the WhatsApp?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willSend) => {
+                        if (willSend) {
+                            swal({
+                                title: "Sending WhatsApp, please wait...",
+                                text: "The process is ongoing.",
+                                icon: "info",
+                                buttons: false,
+                                closeOnClickOutside: false,
+                            });
+
+                            fetch(url, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({
+                                        division: selectedDivision
+                                    }),
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    const whatsappSent = data.whatsapp_sent || 0;
+                                    if (whatsappSent == 1) {
+                                        swal("Success!",
+                                            "WhatsApp has been successfully sent",
+                                            "success").then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        swal("Failed!", "WhatsApp failed to send.",
+                                            "error").then(() => {
+                                            window.location.reload();
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error(error);
+                                    swal("Failed!",
+                                        "An error occurred while sending the WhatsApp.",
+                                        "error").then(() => {
+                                        // window.location.reload();
+                                    });
+                                });
+                        }
+                        $('#divisionModal').modal('hide');
+                    });
                 });
             });
         });
@@ -703,6 +759,7 @@
                 });
 
                 updateSendEmailButton();
+                updateSendWhatsappButton();
             });
 
 
@@ -720,6 +777,7 @@
                 $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
                     .length);
                 updateSendEmailButton();
+                updateSendWhatsappButton();
             });
 
             function updateSelectAllCheckbox() {
@@ -733,8 +791,16 @@
                 $('#send-email-btn').prop('disabled', !anyChecked);
             }
 
+            function updateSendWhatsappButton() {
+                const anyChecked = selectedCheckboxes.length > 0;
+                $('#send-whatsapp-btn').prop('disabled', !anyChecked);
+            }
+
             document.getElementById('send-email-btn').addEventListener('click', function(e) {
                 e.preventDefault();
+
+                $(this).addClass('active');
+                $('#send-whatsapp-btn').removeClass('active');
 
                 if (selectedCheckboxes.length === 0) {
                     swal('No data selected.', 'Please select at least one item to send the email.',
@@ -742,22 +808,112 @@
                     return;
                 }
 
+                const id = $(this).data('id');
+                const type = $(this).data('type');
+                const url_list = "{{ route('list_event', ['id' => 0]) }}";
+                // const url_list = "{{ route('list_event', ['id' => 0]) }}";
+
+                $('#divisionSelect').html('<option selected disabled>Loading...</option>');
                 $('#divisionModal').modal('show');
+
+                fetch(url_list, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        function ucwords(str) {
+                            return str.replace(/\b\w/g, char => char.toUpperCase());
+                        }
+
+                        $('#divisionModalLabel').empty().append(
+                            '<h5 class="modal-title" id="divisionModalLabel">Select Event Name (Send Email Selected)</h5>'
+                        );
+
+                        $('#divisionSelect').empty().append(
+                            '<option selected disabled>-- Please Select --</option>');
+
+                        data.listEvent.forEach(event => {
+                            $('#divisionSelect').append(
+                                `<option value="${event.id_event}">${ucwords(event.title)}</option>`
+                            );
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        swal("Error!", "Failed to load events.", "error");
+                    });
             });
 
-            // Send Email Selected
-            document.getElementById('sendEmailButton').addEventListener('click', function() {
-                const selectedDivision = $('#divisionSelect').val();
+            document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
+                e.preventDefault();
 
-                console.log(selectedDivision)
+                $(this).addClass('active');
+                $('#send-email-btn').removeClass('active');
+
+                if (selectedCheckboxes.length === 0) {
+                    swal('No data selected.', 'Please select at least one item to send the whatsapp.',
+                        'warning');
+                    return;
+                }
+
+                const id = $(this).data('id');
+                const type = $(this).data('type');
+                const url_list = "{{ route('list_event', ['id' => 1]) }}";
+
+                $('#divisionSelect').html('<option selected disabled>Loading...</option>');
+                $('#divisionModal').modal('show');
+
+                fetch(url_list, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        function ucwords(str) {
+                            return str.replace(/\b\w/g, char => char.toUpperCase());
+                        }
+
+                        $('#divisionModalLabel').empty().append(
+                            '<h5 class="modal-title" id="divisionModalLabel">Select Event Name (Send WhatsApp Selected)</h5>'
+                        );
+
+                        $('#divisionSelect').empty().append(
+                            '<option selected disabled>-- Please Select --</option>');
+
+                        data.listEvent.forEach(event => {
+                            $('#divisionSelect').append(
+                                `<option value="${event.id_event}">${ucwords(event.title)}</option>`
+                            );
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        swal("Error!", "Failed to load events.", "error");
+                    });
+            });
+
+            // Send Email dan WhatsApp Selected
+            document.getElementById('sendButton').addEventListener('click', function() {
+                const selectedDivision = $('#divisionSelect').val();
 
                 if (!selectedDivision) {
                     swal("Warning!", "Please select a division.", "warning");
                     return;
                 }
 
+                const type = $('#send-email-btn').hasClass('active') ? 0 : 1;
+
+                const route = type === 0 ?
+                    "{{ route('send.email.master.user') }}" :
+                    "{{ route('send.whatsapp.master.user') }}";
+
                 swal({
-                        title: "Are you sure you want to send the email?",
+                        title: `Are you sure you want to send the ${type === 0 ? 'email' : 'whatsapp'}?`,
                         icon: "warning",
                         buttons: true,
                         dangerMode: true,
@@ -765,14 +921,14 @@
                     .then((willSend) => {
                         if (willSend) {
                             swal({
-                                title: "Sending email, please wait...",
+                                title: `${type === 0 ? 'Sending email' : 'Sending whatsapp'}, please wait...`,
                                 text: "The process is ongoing.",
                                 icon: "info",
                                 buttons: false,
                                 closeOnClickOutside: false,
                             });
 
-                            fetch("{{ route('send.email.master.user') }}", {
+                            fetch(route, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -785,14 +941,13 @@
                                 })
                                 .then(response => response.json())
                                 .then(data => {
-                                    const emailsSent = data.emails_sent;
+                                    const totalSent = data.sent;
                                     const totalSelected = data.total_selected;
 
-                                    if (emailsSent > 0) {
+                                    if (totalSent > 0) {
                                         var content = document.createElement('div');
                                         content.innerHTML =
-                                            "Email has been successfully sent to <b>" + emailsSent +
-                                            " out of " + totalSelected + " people.</b>";
+                                            `${type === 0 ? 'Email' : 'Whatsapp'} has been successfully sent to <b>${totalSent} out of ${totalSelected} people.</b>`;
 
                                         swal({
                                             title: "Success!",
@@ -802,91 +957,19 @@
                                             window.location.reload();
                                         });
                                     } else {
-                                        swal("Failed!", "Emails failed to send.", "error").then(
-                                            () => {
-                                                window.location.reload();
-                                            });
+                                        swal("Failed!",
+                                            `${type === 0 ? 'Emails' : 'Whatsapps'} failed to send.`,
+                                            "error").then(() => {
+                                            window.location.reload();
+                                        });
                                     }
                                 })
                                 .catch((error) => {
-                                    swal("Failed!", "An error occurred while sending the email.",
-                                        "error").then(
-                                        () => {
-                                            window.location.reload();
-                                        });
-                                });
-                        }
-                    });
-            });
-
-            // Send Whatsapp Selected
-            document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-
-                if (selectedCheckboxes.length === 0) {
-                    swal('No data selected.', 'Please select at least one item to send the whatsapp.',
-                        'warning');
-                    return;
-                }
-
-                swal({
-                        title: "Are you sure you want to send the whatsapp?",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true,
-                    })
-                    .then((willSend) => {
-                        if (willSend) {
-                            swal({
-                                title: "Sending whatsapp, please wait...",
-                                text: "The process is ongoing.",
-                                icon: "info",
-                                buttons: false,
-                                closeOnClickOutside: false,
-                            });
-
-                            fetch("{{ route('send.whatsapp.master.user') }}", {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    body: JSON.stringify({
-                                        ids: selectedCheckboxes
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    const whatsappSent = data.whatsapp_sent;
-                                    const totalSelected = data.total_selected;
-
-                                    if (whatsappSent > 0) {
-                                        var content = document.createElement('div');
-                                        content.innerHTML =
-                                            "Whatsapp has been successfully sent to <b>" +
-                                            whatsappSent +
-                                            " out of " + totalSelected + " people.</b>";
-
-                                        swal({
-                                            title: "Success!",
-                                            content: content,
-                                            icon: "success",
-                                        }).then(() => {
-                                            window.location.reload();
-                                        });
-                                    } else {
-                                        swal("Failed!", "Whatsapp failed to send.", "error").then(
-                                            () => {
-                                                window.location.reload();
-                                            });
-                                    }
-                                })
-                                .catch((error) => {
-                                    swal("Failed!", "An error occurred while sending the Whatsapp.",
-                                        "error").then(
-                                        () => {
-                                            window.location.reload();
-                                        });
+                                    swal("Failed!",
+                                        `An error occurred while sending the ${type === 0 ? 'email' : 'whatsapp'}.`,
+                                        "error").then(() => {
+                                        // window.location.reload();
+                                    });
                                 });
                         }
                     });
@@ -930,8 +1013,9 @@
                             success: function(response) {
                                 if (response.success) {
                                     selectedCheckboxes.forEach(id => {
-                                        $('input[value="' + id + '"]').closest(
-                                            'tr').remove();
+                                        $('input[value="' + id + '"]')
+                                            .closest(
+                                                'tr').remove();
                                     });
 
                                     swal('Success',
