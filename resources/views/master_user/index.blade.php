@@ -362,7 +362,7 @@
                     const selectedDivision = $('#divisionSelect').val();
 
                     if (!selectedDivision) {
-                        swal("Warning!", "Please select a division.", "warning");
+                        swal("Warning!", "Please select the event name.", "warning");
                         return;
                     }
 
@@ -468,7 +468,7 @@
                     const selectedDivision = $('#divisionSelect').val();
 
                     if (!selectedDivision) {
-                        swal("Warning!", "Please select a division.", "warning");
+                        swal("Warning!", "Please select the event name.", "warning");
                         return;
                     }
 
@@ -902,7 +902,7 @@
                 const selectedDivision = $('#divisionSelect').val();
 
                 if (!selectedDivision) {
-                    swal("Warning!", "Please select a division.", "warning");
+                    swal("Warning!", "Please select the event name.", "warning");
                     return;
                 }
 
