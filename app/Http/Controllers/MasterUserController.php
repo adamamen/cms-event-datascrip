@@ -8,6 +8,7 @@ use App\Models\M_MasterUser;
 use App\Models\M_CompanyEvent;
 use App\Models\M_SendEmailCust;
 use App\Models\M_SendWaCust;
+use App\Models\M_AccessUser;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -20,8 +21,21 @@ class MasterUserController extends Controller
 {
     function index($page)
     {
-        $type_menu   = 'master_user';
-        $data        = M_MasterUser::select('*')->get();
+        $type_menu  = 'master_user';
+        $accessUser = M_AccessUser::select('*')->where('id_divisi', Auth::user()->divisi)->where('status', 'A')->whereRaw('end_date >= CURRENT_DATE')->get();
+
+        if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            $data = M_MasterUser::select('*')->get();
+        } else {
+            if (!empty($accessUser)) {
+                $idDivisiOwners = $accessUser->pluck('id_divisi_owner')->toArray();
+                $idDivisi       = array_merge($idDivisiOwners, [Auth::user()->divisi]);
+                $data           = M_MasterUser::select('*')->whereIn('id_divisi', $idDivisi)->get();
+            } else {
+                $data = M_MasterUser::select('*')->where('id_divisi', Auth::user()->divisi)->get();
+            }
+        }
+
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
 
@@ -35,16 +49,40 @@ class MasterUserController extends Controller
 
     public function listEvent($id)
     {
-        // dd($id);
-        if ($id == 0) {
+        $email = $this->cms()->toArray();
+
+        if (empty($email)) {
+            return response()->json([
+                'listEvent' => [],
+                'message'   => 'email_failed',
+            ], 200);
+        }
+
+        if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0 && $id == 0) {
             $listEvent = M_SendEmailCust::select('tbl_master_event.id_event', 'tbl_master_event.title')
                 ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
                 ->where('tbl_send_email_cust.type', 'CMS_Admin')
+                ->get();
+        } else if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0 && $id == 1) {
+            $listEvent = M_SendWaCust::select('tbl_master_event.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->get();
+        } else if ($id == 0) {
+            $listEvent = M_SendEmailCust::select('tbl_master_event.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_email_cust.type', 'CMS_Admin')
+                ->where('tbl_master_event.company', Auth::user()->divisi)
+                ->where('tbl_master_event.status', 'A')
+                ->whereRaw('tanggal_terakhir_aplikasi >= CURRENT_DATE')
                 ->get();
         } else {
             $listEvent = M_SendWaCust::select('tbl_master_event.id_event', 'tbl_master_event.title')
                 ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
                 ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->where('tbl_master_event.company', Auth::user()->divisi)
+                ->where('tbl_master_event.status', 'A')
+                ->whereRaw('tanggal_terakhir_aplikasi >= CURRENT_DATE')
                 ->get();
         }
 
@@ -98,7 +136,13 @@ class MasterUserController extends Controller
 
     public function delete($id)
     {
-        $data = M_MasterUser::find($id);
+        $data = M_MasterUser::select('*')->where('id', $id)->where('id_divisi', Auth::user()->divisi)->first();
+
+        if (!empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            if ($data == null) {
+                return response()->json(['message' => 'failed_delete']);
+            }
+        }
 
         if ($data) {
             $data->delete();
@@ -113,6 +157,14 @@ class MasterUserController extends Controller
         $ids = $request->ids;
 
         if (!empty($ids)) {
+            $data = M_MasterUser::select('*')->whereIn('id', $ids)->where('id_divisi', Auth::user()->divisi)->get()->count();
+
+            if (!empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+                if ($data != count($ids)) {
+                    return response()->json(['message' => "failed_delete"]);
+                }
+            }
+
             DB::table('mst_cust')->whereIn('id', $ids)->delete();
             return response()->json(['success' => true]);
         }
@@ -122,8 +174,19 @@ class MasterUserController extends Controller
 
     public function sendEmailId(Request $request, $id)
     {
-        $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
-            ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+        $emailEvent = M_SendEmailCust::select(
+            'tbl_send_email_cust.id',
+            'tbl_send_email_cust.content',
+            'tbl_send_email_cust.type',
+            'tbl_send_email_cust.id_event',
+            'tbl_master_event.title_url',
+            'tbl_master_event.title',
+            'tbl_master_event.start_event',
+            'tbl_master_event.end_event',
+            'tbl_master_event.start_registrasi',
+            'tbl_master_event.end_registrasi',
+            'tbl_master_event.location'
+        )->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
             ->where('tbl_send_email_cust.type', 'CMS_Admin')
             ->where('tbl_send_email_cust.id_event', $request->division)
             ->first();
@@ -134,30 +197,44 @@ class MasterUserController extends Controller
         $registrationUrl = url('/register-visitor/' . $emailEvent['title_url'] . '/' . $encryptId);
 
         $bodyContent = str_replace(
-            ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
             [
-                ucwords($masterUser['name']),
-                ucwords($emailEvent['title']),
-                $registrationUrl
+                '#NamaUser',
+                '#NamaEvent',
+                '#LinkRegistrasi',
+                '#StartEvent',
+                '#EndEvent',
+                '#StartRegistrasi',
+                '#EndRegistrasi',
+                '#AlamatEvent',
+            ],
+            [
+                ucwords($masterUser->name),
+                ucwords($emailEvent->title),
+                $registrationUrl,
+                tgl_indo(date('Y-m-d', strtotime($emailEvent->start_event))),
+                tgl_indo(date('Y-m-d', strtotime($emailEvent->end_event))),
+                date('H:i', strtotime($emailEvent->start_registrasi)),
+                date('H:i', strtotime($emailEvent->end_registrasi)),
+                $emailEvent->location
             ],
             $bodyContent
         );
 
         $body = '<html>
             <head>
-                <style type="text/css">
+                <style type = "text/css">
                     body, td {
                         font-family: "Aptos", sans-serif;
-                        font-size: 16px;
+                        font-size  : 16px;
                     }
                     table#info {
-                        border: 1px solid #555;
+                        border         : 1px solid #555;
                         border-collapse: collapse;
                     }
                     table#info th,
                     table#info td {
                         padding: 3px;
-                        border: 1px solid #555;
+                        border : 1px solid #555;
                     }
                 </style>
             </head>
@@ -206,8 +283,7 @@ class MasterUserController extends Controller
             ->where('tbl_send_wa_cust.type', 'CMS_Admin')
             ->where('tbl_send_wa_cust.id_event', $request->division)
             ->first();
-
-        $masterUser      = M_MasterUser::select('*')->where('id', $id)->first();
+        $masterUser = M_MasterUser::select('*')->where('id', $id)->first();
 
         if (substr($masterUser->phone_no, 0, 1) === '0') {
             $phoneNo = '+62' . substr($masterUser->phone_no, 1);
@@ -268,8 +344,19 @@ class MasterUserController extends Controller
         $divisionId    = $request->input('division_id');
 
         if (!empty($ids)) {
-            $emailEvent = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title_url', 'tbl_master_event.title')
-                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+            $emailEvent = M_SendEmailCust::select(
+                'tbl_send_email_cust.id',
+                'tbl_send_email_cust.content',
+                'tbl_send_email_cust.type',
+                'tbl_send_email_cust.id_event',
+                'tbl_master_event.title_url',
+                'tbl_master_event.title',
+                'tbl_master_event.start_event',
+                'tbl_master_event.end_event',
+                'tbl_master_event.start_registrasi',
+                'tbl_master_event.end_registrasi',
+                'tbl_master_event.location'
+            )->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
                 ->where('tbl_send_email_cust.type', 'CMS_Admin')
                 ->where('tbl_send_email_cust.id_event', $divisionId)
                 ->first();
@@ -285,28 +372,42 @@ class MasterUserController extends Controller
                 $registrationUrl = url('/register-visitor/' . $emailEvent->title_url . '/' . $encryptId);
                 $bodyContent     = $emailEvent->content;
                 $bodyContent     = str_replace(
-                    ['#NamaUser', '#NamaEvent', '#LinkRegistrasi'],
+                    [
+                        '#NamaUser',
+                        '#NamaEvent',
+                        '#LinkRegistrasi',
+                        '#StartEvent',
+                        '#EndEvent',
+                        '#StartRegistrasi',
+                        '#EndRegistrasi',
+                        '#AlamatEvent',
+                    ],
                     [
                         ucwords($user->name),
                         ucwords($emailEvent->title),
                         $registrationUrl,
+                        tgl_indo(date('Y-m-d', strtotime($emailEvent->start_event))),
+                        tgl_indo(date('Y-m-d', strtotime($emailEvent->end_event))),
+                        date('H:i', strtotime($emailEvent->start_registrasi)),
+                        date('H:i', strtotime($emailEvent->end_registrasi)),
+                        $emailEvent->location
                     ],
                     $bodyContent
                 );
 
                 $body = '<html>
-                    <head>
-                        <style type="text/css">
-                            body, td {
-                                font-family: "Aptos", sans-serif;
-                                font-size: 16px;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ' . $bodyContent . '
-                    </body>
-                </html>';
+                            <head>
+                                <style type = "text/css">
+                                    body, td {
+                                        font-family: "Aptos", sans-serif;
+                                        font-size  : 16px;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                ' . $bodyContent . '
+                            </body>
+                        </html>';
 
                 $mail = new PHPMailer(true);
 
@@ -464,8 +565,15 @@ class MasterUserController extends Controller
             return response()->json(['message' => 'The following Division Names are not available: ' . implode(', ', $missingDivisi)], 400);
         }
 
-        $divisiData = M_CompanyEvent::whereIn('name', $divisiNames)
-            ->pluck('id', 'name')->toArray();
+        $divisiData = M_CompanyEvent::whereIn('name', $divisiNames)->pluck('id', 'name')->toArray();
+        $emails     = array_column($rows, 3);
+        $phoneNos   = array_column($rows, 4);
+
+        if (count($emails) !== count(array_unique($emails)) || count($phoneNos) !== count(array_unique($phoneNos))) {
+            return response()->json([
+                'message' => 'Duplicate data detected. Phone numbers and emails must not be the same.'
+            ], 400);
+        }
 
         foreach ($rows as $row) {
             if (strlen(trim($row[2])) !== 1) {
@@ -473,6 +581,29 @@ class MasterUserController extends Controller
             }
 
             $id_divisi = $divisiData[trim($row[6])];
+
+            $isDuplicate = DB::table('mst_cust')
+                ->where(function ($query) use ($row) {
+                    $query->where('phone_no', $row[4])
+                        ->where('name_divisi', trim($row[6]));
+                })
+                ->orWhere(function ($query) use ($row) {
+                    $query->where('email', $row[3])
+                        ->where('name_divisi', trim($row[6]));
+                })
+                ->exists();
+
+            // $isDuplicate = DB::table('mst_cust')
+            //     ->where('phone_no', $row[4])
+            //     ->where('name_divisi', trim($row[6]))
+            //     ->orWhere('email', $row[3])
+            //     ->exists();
+
+            if ($isDuplicate) {
+                return response()->json([
+                    'message' => 'Duplicate data detected. Phone number and email must not be the same.'
+                ], 422);
+            }
 
             DB::table('mst_cust')->insert([
                 'name'             => $row[1],
@@ -495,5 +626,23 @@ class MasterUserController extends Controller
         }
 
         return response()->json(['message' => 'Data successfully imported', 'count' => $countImported]);
+    }
+
+    private function cms()
+    {
+        if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            $data = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_email_cust.type', 'CMS_Admin')
+                ->get();
+        } else {
+            $data = M_SendEmailCust::select('tbl_send_email_cust.id', 'tbl_send_email_cust.content', 'tbl_send_email_cust.type', 'tbl_send_email_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_email_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_email_cust.type', 'CMS_Admin')
+                ->where('tbl_master_event.company', Auth::user()->divisi)
+                ->get();
+        }
+
+        return $data;
     }
 }

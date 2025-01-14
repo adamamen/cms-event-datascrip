@@ -92,10 +92,9 @@
                             </div>
                             <p>
                                 <center>
-                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptate in velit neque quod
-                                    perspiciatis eligendi sapiente adipisci, blanditiis ex, molestiae esse tempore? Error
-                                    ipsam,
-                                    suscipit cupiditate voluptatum tenetur inventore tempore.
+                                    Please enter your QR code in the field above to verify your attendance. A valid QR code
+                                    will grant you access to the event area. If you encounter any issues scanning or
+                                    entering the QR code, please contact the event staff on site.
                                 </center>
                             </p>
                         </div>

@@ -34,6 +34,18 @@
         margin-right: auto;
         width: 64%;
     }
+
+    .grecaptcha-badge {
+        z-index: 9999 !important;
+        position: fixed !important;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .background-walk-y {
+        z-index: 1;
+        position: relative;
+    }
 </style>
 
 <body>
@@ -114,7 +126,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 min-vh-100 background-walk-y position-relative overlay-gradient-bottom order-1"
-                    data-background="{{ asset('img/unsplash/bromo-2.jpg') }}">
+                    data-background="{{ asset('img/unsplash/bromo-2.jpg') }}" style="position: relative; z-index: 1;">
                     <div class="absolute-bottom-left index-2">
                         <div class="text-light p-5 pb-2">
                             <div class="mb-5 pb-3">
@@ -149,7 +161,9 @@
     <!-- Template JS File -->
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q"></script>
+    <div style="position: relative; z-index: 9999;">
+        <script src="https://www.google.com/recaptcha/api.js?render=6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q"></script>
+    </div>
     <script type="text/javascript">
         grecaptcha.ready(function() {
             grecaptcha.execute('6LcbfmIbAAAAAHPoz8CpApqVJNrh7_kKZhJfPZ3Q', {

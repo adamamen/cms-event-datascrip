@@ -44,11 +44,13 @@
                                             <th>Full Name</th>
                                             <th>Event Name</th>
                                             <th>E-mail</th>
+                                            <th>Division</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($data as $value)
+                                            {{-- @if ($value['divisi'] == Auth::user()->divisi) --}}
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>
@@ -61,8 +63,11 @@
                                                 <td>{{ $value['username'] }}</td>
                                                 <td>{{ $value['password_encrypts'] }}</td>
                                                 <td>{{ $value['full_name'] }}</td>
-                                                <td>{{ !empty($value['title']) ? $value['title'] : '-' }}</td>
-                                                <td>{{ $value['email'] }}</td>
+                                                <td>
+                                                    {{ !empty($value['title']) ? ucwords($value['title']) : 'CMS Event Datascrip' }}
+                                                </td>
+                                                <td>{{ $value['email'] ?? '-' }}</td>
+                                                <td>{{ $value['nama_divisi'] ?? '-' }}</td>
                                                 <td>
                                                     @if ($pages == 'cms')
                                                         <form method="POST"
@@ -77,14 +82,23 @@
                                                     <button name="edit" id="edit" class="btn btn-primary"><i
                                                             class="fas fa-edit"></i> Edit</button>
                                                     <meta name="csrf-token" content="{{ csrf_token() }}">
-                                                    @if ($value['event_id'] != '0')
+                                                    {{-- @if ($value['event_id'] != '0') --}}
+                                                    {{-- <a href="#" class="btn btn-danger"
+                                                        data-id="{{ $value['admin_id'] }}" name="btn_delete"
+                                                        id="btn_delete"><i class="fas fa-trash"></i> Delete</a> --}}
+                                                    {{-- @endif --}}
+                                                    @if ($value['event_id'] == 0 && is_null($value['divisi']))
+                                                        {{-- BUtton di hide --}}
+                                                    @else
                                                         <a href="#" class="btn btn-danger"
                                                             data-id="{{ $value['admin_id'] }}" name="btn_delete"
                                                             id="btn_delete"><i class="fas fa-trash"></i> Delete</a>
                                                     @endif
+
                                                     </form>
                                                 </td>
                                             </tr>
+                                            {{-- @endif --}}
                                         @endforeach
                                     </tbody>
                                 </table>

@@ -2,9 +2,9 @@
 
 namespace App\Exports;
 
-use App\Models\M_VisitorEvent;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use App\Models\M_AccessUser;
 
 class ExportExcel implements FromCollection, WithHeadings
 {
@@ -37,89 +37,110 @@ class ExportExcel implements FromCollection, WithHeadings
 
     function query($page)
     {
-        $queryVisitorEvent = visitorEvent();
-        $sequenceNumber    = 1;
-        if ($page == "cms") {
-            $queryMasterEvent = masterEvent_1();
+        if ($page == 'user_access') {
+            $query          = M_AccessUser::select('*')->get();
+            $sequenceNumber = 1;
+
+            foreach ($query as $value) {
+                $merge[]        = [
+                    'No'             => $sequenceNumber++,
+                    'Division'       => $value->nama_divisi,
+                    'Owner Division' => $value->nama_divisi_owner,
+                    'Start Date'     => date('d/m/Y', strtotime($value->start_date)),
+                    'End Date'       => date('d/m/Y', strtotime($value->end_date)),
+                    'Created By'     => $value->created_by,
+                    'Created Date'   => date('d/m/Y', strtotime($value->created_date)),
+                    'Status'         => $value->status == "A" ? 'Active' : 'Inactive',
+                ];
+            }
+
+            $merge = !empty($merge) ? $merge : [];
+            $q     = collect($merge);
+
+            return $q;
         } else {
-            $queryMasterEvent = masterEvent_2($page);
-        }
+            $queryVisitorEvent = visitorEvent();
+            $sequenceNumber    = 1;
+            if ($page == "cms") {
+                $queryMasterEvent = masterEvent_1();
+            } else {
+                $queryMasterEvent = masterEvent_2($page);
+            }
 
-        if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
-            foreach ($queryVisitorEvent as $visitor) {
-                foreach ($queryMasterEvent as $event) {
-                    if ($visitor->event_id == $event->id_event) {
-                        if ($page == "cms") {
-                            $merge[] = [
-                                'RowNumber'         => $sequenceNumber++,
-                                'ticket_no'         => $visitor->ticket_no,
-                                'title'             => $event->title,
-                                'full_name'         => $visitor->full_name,
-                                'mobile'            => $visitor->mobile,
-                                'email'             => $visitor->email,
-                                'address'           => $visitor->address,
-                                'no_invoice'        => $visitor->no_invoice,
-                                'sn_product'        => $visitor->sn_product,
-                                'status_pembayaran' => $visitor->status_pembayaran,
-                                'metode_bayar'      => $visitor->metode_bayar,
-                                'created_at'        => $visitor->created_at,
-                                'jenis_event'       => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
-                            ];
-                        } else if ($visitor->jenis_event == "A") {
-                            // dd('2');
-                            $merge[] = [
-                                'RowNumber'         => $sequenceNumber++,
-                                'ticket_no'         => $visitor->ticket_no,
-                                'title'             => $event->title,
-                                'full_name'         => $visitor->full_name,
-                                'mobile'            => $visitor->mobile,
-                                'email'             => $visitor->email,
-                                'address'           => $visitor->address,
-                                'no_invoice'        => $visitor->no_invoice,
-                                'sn_product'        => $visitor->sn_product,
-                                'status_pembayaran' => $visitor->status_pembayaran,
-                                'metode_bayar'      => $visitor->metode_bayar,
-                                'created_at'        => $visitor->created_at,
-                                'jenis_event'       => $visitor->jenis_event == 'A' ? 'Berbayar' : 'Non Berbayar',
-                            ];
-                        } else {
-                            // dd('3');
-                            $merge[] = [
-                                'RowNumber'         => $sequenceNumber++,
-                                'full_name'         => $visitor->full_name,
-                                'email'             => $visitor->email,
-                                'gender'            => $visitor->gender,
-                                'account_instagram' => $visitor->account_instagram,
-                                'mobile'            => $visitor->mobile,
-                                'type_invitation'   => $visitor->type_invitation,
-                                'invitation_name'   => $visitor->invitation_name,
-                                'barcode_no'        => $visitor->barcode_no,
-                                'scan_date'         => $visitor->scan_date,
-                                'email_status'      => $visitor->flag_email == 0 ? 'Not Delivered' : 'Delivered',
-                                'source_visitor'    => $visitor->source_visitor,
-                                'status_approval'   => $visitor->flag_approval == 1 ? 'Approve' : 'Waiting',
-                                'approve_by'        => $visitor->approve_by,
-                                'approve_date'      => $visitor->approve_date,
-
-                                // $merge[] = [
-                                //     'RowNumber'  => $sequenceNumber++,
-                                //     'ticket_no'  => $visitor->ticket_no,
-                                //     'title'      => $event->title,
-                                //     'full_name'  => $visitor->full_name,
-                                //     'mobile'     => $visitor->mobile,
-                                //     'email'      => $visitor->email,
-                                //     'address'    => $visitor->address,
-                                //     'created_at' => $visitor->created_at,
-                            ];
+            if (!empty($queryVisitorEvent) && !empty($queryMasterEvent)) {
+                foreach ($queryVisitorEvent as $visitor) {
+                    foreach ($queryMasterEvent as $event) {
+                        if ($visitor->event_id == $event->id_event) {
+                            if ($page == "cms") {
+                                $merge[] = [
+                                    'RowNumber'         => $sequenceNumber++,
+                                    'full_name'         => $visitor->full_name,
+                                    'email'             => $visitor->email,
+                                    'gender'            => $visitor->gender,
+                                    'account_instagram' => $visitor->account_instagram,
+                                    'event_name'        => ucwords($event->title),
+                                    'mobile'            => $visitor->mobile,
+                                    'type_invitation'   => $visitor->type_invitation,
+                                    'invitation_name'   => $visitor->invitation_name,
+                                    'barcode_no'        => $visitor->barcode_no,
+                                    'scan_date'         => $visitor->scan_date,
+                                    'email_status'      => $visitor->flag_email == 0 ? 'Not Delivered' : 'Delivered',
+                                    'whatsapp_status'   => $visitor->flag_whatsapp == 0 ? 'Not Delivered' : 'Delivered',
+                                    'source_visitor'    => $visitor->source_visitor,
+                                    'status_approval'   => $visitor->flag_approval == 1 ? 'Approve' : 'Waiting',
+                                    'approve_by'        => $visitor->approve_by,
+                                    'approve_date'      => $visitor->approve_date,
+                                ];
+                            } else if ($visitor->jenis_event == "A") {
+                                $merge[] = [
+                                    'RowNumber'         => $sequenceNumber++,
+                                    'full_name'         => $visitor->full_name,
+                                    'email'             => $visitor->email,
+                                    'gender'            => $visitor->gender,
+                                    'account_instagram' => $visitor->account_instagram,
+                                    'event_name'        => ucwords($event->title),
+                                    'mobile'            => $visitor->mobile,
+                                    'type_invitation'   => $visitor->type_invitation,
+                                    'invitation_name'   => $visitor->invitation_name,
+                                    'barcode_no'        => $visitor->barcode_no,
+                                    'scan_date'         => $visitor->scan_date,
+                                    'email_status'      => $visitor->flag_email == 0 ? 'Not Delivered' : 'Delivered',
+                                    'whatsapp_status'   => $visitor->flag_whatsapp == 0 ? 'Not Delivered' : 'Delivered',
+                                    'source_visitor'    => $visitor->source_visitor,
+                                    'status_approval'   => $visitor->flag_approval == 1 ? 'Approve' : 'Waiting',
+                                    'approve_by'        => $visitor->approve_by,
+                                    'approve_date'      => $visitor->approve_date,
+                                ];
+                            } else {
+                                $merge[] = [
+                                    'RowNumber'         => $sequenceNumber++,
+                                    'full_name'         => $visitor->full_name,
+                                    'email'             => $visitor->email,
+                                    'gender'            => $visitor->gender,
+                                    'account_instagram' => $visitor->account_instagram,
+                                    'event_name'        => ucwords($event->title),
+                                    'mobile'            => $visitor->mobile,
+                                    'type_invitation'   => $visitor->type_invitation,
+                                    'invitation_name'   => $visitor->invitation_name,
+                                    'barcode_no'        => $visitor->barcode_no,
+                                    'scan_date'         => $visitor->scan_date,
+                                    'email_status'      => $visitor->flag_email == 0 ? 'Not Delivered' : 'Delivered',
+                                    'whatsapp_status'   => $visitor->flag_whatsapp == 0 ? 'Not Delivered' : 'Delivered',
+                                    'source_visitor'    => $visitor->source_visitor,
+                                    'status_approval'   => $visitor->flag_approval == 1 ? 'Approve' : 'Waiting',
+                                    'approve_by'        => $visitor->approve_by,
+                                    'approve_date'      => $visitor->approve_date,
+                                ];
+                            }
                         }
                     }
                 }
             }
+
+            $merge = !empty($merge) ? $merge : [];
+            $q     = collect($merge);
+
+            return $q;
         }
-
-        $merge = !empty($merge) ? $merge : [];
-        $q     = collect($merge);
-
-        return $q;
     }
 }

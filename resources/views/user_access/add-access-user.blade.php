@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Admin Event')
+@section('title', 'Add Access User')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -15,10 +15,10 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Add Admin Event</h1>
+                <h1>Add Access User</h1>
             </div>
             <div class="section-body">
-                <h2 class="section-title">Add Admin Event</h2>
+                <h2 class="section-title">Add Access User</h2>
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="card">
@@ -26,35 +26,54 @@
                                 <meta name="csrf-token" content="{{ csrf_token() }}">
                                 <div class="row">
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Username</label>
-                                        <input type="text" class="form-control" value="" required=""
-                                            name="username" id="username">
+                                        <label>Division</label>
+                                        {{-- <select class="form-control select2" name="division" id="division"
+                                            onchange="fetchDivisionOwners(this.value)"> --}}
+                                        <select class="form-control select2" name="division" id="division">
+                                            <option selected disabled>-- Please Select --</option>
+                                            @foreach ($division as $value)
+                                                <option value="{{ $value->id }}">{{ ucwords($value->name) }}</option>
+                                            @endforeach
+                                        </select>
                                         <div class="invalid-feedback">
-                                            Username is required
+                                            Division is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Password</label>
-                                        <input type="password" class="form-control" value="" required=""
-                                            name="password" id="password">
+                                        <label>Division Owner</label>
+                                        <select class="form-control select2" name="division_owner" id="division_owner">
+                                            <option selected disabled>-- Please Select --</option>
+                                            @foreach ($division as $value)
+                                                <option value="{{ $value->id }}">{{ ucwords($value->name) }}</option>
+                                            @endforeach
+                                        </select>
                                         <div class="invalid-feedback">
-                                            Password is required
+                                            Division Owner is required
+                                        </div>
+                                    </div>
+                                    {{-- <div class="form-group col-md-4 col-12">
+                                        <label>Division Owner</label>
+                                        <select class="form-control select2" name="division_owner" id="division_owner">
+                                            <option selected disabled>-- Please Select --</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Division Owner is required
+                                        </div>
+                                    </div> --}}
+                                    <div class="form-group col-md-4 col-12">
+                                        <label>Start Date</label>
+                                        <input type="text" class="form-control datepicker" value="" required=""
+                                            name="start_date" id="start_date">
+                                        <div class="invalid-feedback">
+                                            Start Date is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
-                                        <label>Full Name</label>
-                                        <input type="text" class="form-control" value="" required=""
-                                            name="nama_lengkap" id="nama_lengkap">
+                                        <label>End Date</label>
+                                        <input type="text" class="form-control datepicker" value="" required=""
+                                            name="end_date" id="end_date" autocomplete="off">
                                         <div class="invalid-feedback">
-                                            Full Name is required
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-4 col-12">
-                                        <label>E-mail</label>
-                                        <input type="email" class="form-control" value="" required=""
-                                            name="email" id="email" autocomplete="off">
-                                        <div class="invalid-feedback">
-                                            E-mail is required
+                                            End Date is required
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4 col-12">
@@ -68,35 +87,6 @@
                                             Status is required
                                         </div>
                                     </div>
-                                    @if (!empty(Auth::user()->divisi) && Auth::user()->event_id == 0)
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>Event Name</label>
-                                            <select class="form-control select2" name="event" id="event">
-                                                <option selected disabled>-- Please Select --</option>
-                                                @foreach ($data as $value)
-                                                    <option value="{{ $value->id_event }}">{{ ucwords($value->title) }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <div class="invalid-feedback">
-                                                Event Name is required
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0)
-                                        <div class="form-group col-md-4 col-12">
-                                            <label>Division</label>
-                                            <select class="form-control select2" name="division" id="division">
-                                                <option selected disabled>-- Please Select --</option>
-                                                @foreach ($division as $value)
-                                                    <option value="{{ $value->id }}">{{ ucwords($value->name) }}</option>
-                                                @endforeach
-                                            </select>
-                                            <div class="invalid-feedback">
-                                                Division is required
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
                                 <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
                                     name="btn_submit"><i class="fas fa-check"></i> Submit</a>
@@ -148,7 +138,7 @@
                     })
                     .then((ok) => {
                         if (ok) {
-                            window.location.href = "{{ url('/') }}" + "/admin-event/" + params;
+                            window.location.href = "{{ url('/') }}" + "/user-access/" + params;
                         }
                     });
             });
@@ -156,7 +146,6 @@
 
         $(document).ready(function() {
             var pages = "<?php echo $pages; ?>";
-            var auth_divisi = "{{ Auth::user()->divisi }}";
             var params = "<?php echo $titleUrl; ?>";
 
             $("#btn_submit").click(function() {
@@ -164,39 +153,21 @@
                 $("#btn_submit").hide();
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
-                var username = $('#username').val();
-                var password = $('#password').val();
-                var nama_lengkap = $('#nama_lengkap').val();
-                var event = $('#event').val();
-                var status = $('#status').val();
-                var email = $('#email').val();
                 var division = $('#division').val();
-                var strongPasswordRegex =
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-                if (!strongPasswordRegex.test(password)) {
-                    swal({
-                        title: 'Weak Password',
-                        text: 'Password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.',
-                        icon: 'warning',
-                    }).then(() => {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    });
-                    return;
-                }
+                var division_owner = $('#division_owner').val();
+                var start_date = $('#start_date').val();
+                var end_date = $('#end_date').val();
+                var status = $('#status').val();
 
                 var formData = new FormData();
-                formData.append("username", username);
-                formData.append("password", password);
-                formData.append("nama_lengkap", nama_lengkap);
-                formData.append("event", event);
-                formData.append("status", status);
-                formData.append("email", email);
                 formData.append("division", division);
+                formData.append("division_owner", division_owner);
+                formData.append("start_date", start_date);
+                formData.append("end_date", end_date);
+                formData.append("status", status);
 
-                if (username == "") {
-                    var name = "Username";
+                if (division == null) {
+                    var name = "Division";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -208,47 +179,8 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
                     });
-                } else if (password == "") {
-                    var name = "Password";
-                    var content = document.createElement('div');
-                    content.innerHTML = '<strong>' + name +
-                        '</strong> cannot be empty, please try again';
-                    swal({
-                        title: 'Warning',
-                        content: content,
-                        icon: "warning",
-                    }).then(() => {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    });
-                } else if (nama_lengkap == "") {
-                    var name = "Full Name";
-                    var content = document.createElement('div');
-                    content.innerHTML = '<strong>' + name +
-                        '</strong> cannot be empty, please try again';
-                    swal({
-                        title: 'Warning',
-                        content: content,
-                        icon: "warning",
-                    }).then(() => {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    });
-                } else if (email == "") {
-                    var name = "E-mail";
-                    var content = document.createElement('div');
-                    content.innerHTML = '<strong>' + name +
-                        '</strong> cannot be empty, please try again';
-                    swal({
-                        title: 'Warning',
-                        content: content,
-                        icon: "warning",
-                    }).then(() => {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    });
-                } else if (event == null && auth_divisi != "") {
-                    var name = "Event Name";
+                } else if (division_owner == null) {
+                    var name = "Division Owner";
                     var content = document.createElement('div');
                     content.innerHTML = '<strong>' + name +
                         '</strong> cannot be empty, please try again';
@@ -273,22 +205,9 @@
                         $("#btn_progress").hide();
                         $("#btn_submit").show();
                     });
-                } else if (division == null && auth_divisi == "") {
-                    var name = "Division";
-                    var content = document.createElement('div');
-                    content.innerHTML = '<strong>' + name +
-                        '</strong> cannot be empty, please try again';
-                    swal({
-                        title: 'Warning',
-                        content: content,
-                        icon: "warning",
-                    }).then(() => {
-                        $("#btn_progress").hide();
-                        $("#btn_submit").show();
-                    });
                 } else {
                     $.ajax({
-                        url: '{{ route('add-admin') }}',
+                        url: '{{ route('add-user-access') }}',
                         type: "POST",
                         data: formData,
                         contentType: false,
@@ -301,21 +220,11 @@
                             $("#btn_progress").hide();
                             $("#btn_submit").show();
 
-                            if (alerts == "failed_space") {
-                                swal('Failed',
-                                    'Username cannot contain spaces, please try again',
-                                    'warning');
-                            } else if (alerts == "failed") {
-                                swal('Failed',
-                                    'Username is already registered, please try again',
-                                    'warning');
-                            } else if (alerts == "success") {
-                                swal('Success',
-                                    'Data saved successfully and email has been sent',
-                                    'success').then(
+                            if (alerts == "success") {
+                                swal('Success', 'Data saved successfully', 'success').then(
                                     () => {
                                         window.location.href = "{{ url('/') }}" +
-                                            "/admin-event/" + params;
+                                            "/user-access/" + params;
                                     });
                             } else {
                                 swal('Failed', 'Failed to save data', 'warning');
@@ -331,5 +240,32 @@
                 }
             });
         });
+
+        function fetchDivisionOwners(divisionId) {
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            if (divisionId) {
+                $.ajax({
+                    url: '{{ route('fetch-division-owners') }}',
+                    type: 'POST',
+                    data: {
+                        division_id: divisionId,
+                        _token: csrfToken
+                    },
+                    success: function(response) {
+                        $('#division_owner').empty();
+                        $('#division_owner').append('<option selected disabled>-- Please Select --</option>');
+                        response.data.forEach(function(owner) {
+                            $('#division_owner').append(
+                                `<option value="${owner.id}">${owner.username}</option>`);
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error(xhr);
+                        alert('Failed to fetch Division Owners. Please try again.');
+                    }
+                });
+            }
+        }
     </script>
 @endpush

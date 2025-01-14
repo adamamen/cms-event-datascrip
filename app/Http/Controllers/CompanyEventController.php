@@ -17,10 +17,12 @@ class CompanyEventController extends Controller
             ->select(DB::raw('ROW_NUMBER() OVER (Order by id) AS RowNumber'), 'id', 'status', 'name', 'description', 'created_by', 'created_at', 'updated_by', 'updated_at')
             ->get();
         $masterEvent = masterEvent($page);
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
 
-        if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
+        if (!empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            return view('error.error-404');
+        } else if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
             return view('company_event.index', [
                 'id'          => $userId,
                 'masterEvent' => $masterEvent,

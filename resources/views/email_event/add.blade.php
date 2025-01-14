@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
     <style>
         /* #content p {
-                                                                                                                                                                                                                    font-weight: normal !important;
-                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                            font-weight: normal !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
     </style>
 @endpush
 
@@ -73,6 +73,22 @@
                                                     <div class="col-sm-12 col-md-7">
                                                         <textarea class="summernote-simple" id="content" name="content"></textarea>
                                                     </div>
+                                                    <small class="form-text text-muted mt-2">
+                                                        <strong style="color: black">Hashtag yang bisa dipakai:</strong>
+                                                        <ul>
+                                                            <li style="color: black">#NamaUser</li>
+                                                            <li style="color: black">#NamaEvent</li>
+                                                            <li style="color: black">#LinkRegistrasi</li>
+                                                            @if ($page != 'cms')
+                                                                <li style="color: black">#LinkBarcode</li>
+                                                            @endif
+                                                            <li style="color: black">#StartEvent</li>
+                                                            <li style="color: black">#EndEvent</li>
+                                                            <li style="color: black">#StartRegistrasi</li>
+                                                            <li style="color: black">#EndRegistrasi</li>
+                                                            <li style="color: black">#AlamatEvent</li>
+                                                        </ul>
+                                                    </small>
                                                 </div>
                                                 <div class="form-group row mb-4">
                                                     <label

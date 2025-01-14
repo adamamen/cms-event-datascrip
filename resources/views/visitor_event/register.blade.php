@@ -284,7 +284,18 @@
                             $("#btn_progress").hide();
                             $("#btn_submit").show();
 
-                            if (alerts == "success") {
+                            if (alerts == "phone_number") {
+                                swal('Failed',
+                                    'The Phone Number has already been registered before.',
+                                    'warning');
+                            } else if (alerts == "email") {
+                                swal('Failed', 'The Email has already been registered before.',
+                                    'warning');
+                            } else if (alerts == "phone_number_and_email") {
+                                swal('Failed',
+                                    'The Email and Phone Number has already been registered before.',
+                                    'warning');
+                            } else if (alerts == "success") {
                                 swal('Success', 'Data has been successfully saved', 'success')
                                     .then(
                                         () => {

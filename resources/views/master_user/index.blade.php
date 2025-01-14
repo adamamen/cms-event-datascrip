@@ -336,6 +336,12 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        if (data.message === 'email_failed') {
+                            $('#divisionModal').modal('hide');
+                            swal("Failed!", "Make sure email settings are correct.", "error");
+                            return;
+                        }
+
                         function ucwords(str) {
                             return str.replace(/\b\w/g, char => char.toUpperCase());
                         }
@@ -404,10 +410,9 @@
                                             window.location.reload();
                                         });
                                     } else {
-                                        swal("Failed!", "Emails failed to send.",
-                                            "error").then(() => {
-                                            window.location.reload();
-                                        });
+                                        swal("Failed!",
+                                            "Emails failed to send.",
+                                            "error")
                                     }
                                 })
                                 .catch(error => {
@@ -628,7 +633,11 @@
                             success: function(response) {
                                 var alerts = response.message
 
-                                if (alerts == "success") {
+                                if (alerts == "failed_delete") {
+                                    swal('Failed',
+                                        'The user is not allowed to delete other divisions.',
+                                        'warning');
+                                } else if (alerts == "success") {
                                     swal('Success', 'Data has been successfully deleted...',
                                         'success').then(
                                         () => {
@@ -700,13 +709,14 @@
                             },
                             success: function(response) {
                                 if (response.success) {
-                                    swal("Success", response.message, "success").then(
-                                        () => {
-                                            $(`.arrival-btn[data-id="${visitorId}"]`)
-                                                .hide();
-                                            window.location
-                                                .reload();
-                                        });
+                                    swal("Success", response.message, "success")
+                                        .then(
+                                            () => {
+                                                $(`.arrival-btn[data-id="${visitorId}"]`)
+                                                    .hide();
+                                                window.location
+                                                    .reload();
+                                            });
                                 } else {
                                     swal("Failed", response.message, "error");
                                 }
@@ -753,7 +763,8 @@
                             selectedCheckboxes.push(id);
                         }
                     } else {
-                        selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !==
+                        selectedCheckboxes = selectedCheckboxes.filter(selectedId =>
+                            selectedId !==
                             id);
                     }
                 });
@@ -774,7 +785,8 @@
                     selectedCheckboxes = selectedCheckboxes.filter(selectedId => selectedId !== id);
                 }
 
-                $('#select-all').prop('checked', $('.checkbox-item:checked').length === $('.checkbox-item')
+                $('#select-all').prop('checked', $('.checkbox-item:checked').length === $(
+                        '.checkbox-item')
                     .length);
                 updateSendEmailButton();
                 updateSendWhatsappButton();
@@ -824,6 +836,12 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        if (data.message === 'email_failed') {
+                            $('#divisionModal').modal('hide');
+                            swal("Failed!", "Make sure email settings are correct.", "error");
+                            return;
+                        }
+
                         function ucwords(str) {
                             return str.replace(/\b\w/g, char => char.toUpperCase());
                         }
@@ -1011,7 +1029,11 @@
                                 ids: selectedCheckboxes
                             },
                             success: function(response) {
-                                if (response.success) {
+                                if (response.message) {
+                                    swal('Failed',
+                                        'The user is not allowed to delete other divisions.',
+                                        'warning');
+                                } else if (response.success) {
                                     selectedCheckboxes.forEach(id => {
                                         $('input[value="' + id + '"]')
                                             .closest(

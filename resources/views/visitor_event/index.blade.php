@@ -25,69 +25,70 @@
             @endif
 
             <div class="row">
+                @if (Auth::user()->event_id != 0)
+                    <div class="col-md-6">
+                        <div class="card">
 
-                <div class="col-md-6">
-                    <div class="card">
-
-                        <div class="card-header">
-                            <h4>Import Excel</h4>
-                            <a href="{{ route('template.excel', ['page' => 'cms']) }}" class="btn btn-success"><i
-                                    class="fa-solid fa-file-excel"></i>&emsp; Download Template
-                            </a>
-                        </div>
-
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
+                            <div class="card-header">
+                                <h4>Import Excel</h4>
+                                <a href="{{ route('template.excel', ['page' => 'cms']) }}" class="btn btn-success"><i
+                                        class="fa-solid fa-file-excel"></i>&emsp; Download Template
+                                </a>
                             </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
 
-                        <form id="uploadForm" action="{{ route('import.excel', ['page' => $titleUrl]) }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group row align-items-center">
-                                    <label class="form-control-label col-sm-3 text-md-right">Upload</label>
-                                    <div class="col-sm-6 col-md-9">
-                                        <div class="custom-file">
-                                            <input type="file" name="excel_file" class="custom-file-input"
-                                                id="excel-file"
-                                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                                            <label class="custom-file-label">Choose File</label>
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <form id="uploadForm" action="{{ route('import.excel', ['page' => $titleUrl]) }}"
+                                method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card-body">
+                                    <div class="form-group row align-items-center">
+                                        <label class="form-control-label col-sm-3 text-md-right">Upload</label>
+                                        <div class="col-sm-6 col-md-9">
+                                            <div class="custom-file">
+                                                <input type="file" name="excel_file" class="custom-file-input"
+                                                    id="excel-file"
+                                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                                <label class="custom-file-label">Choose File</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-footer bg-whitesmoke text-md-right">
-                                <button class="btn btn-primary" id="save-btn"><i class="fa-solid fa-save"></i>
-                                    &nbsp; Save Changes
-                                </button>
-                                <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
-                                    name="btn_progress" style="display: none;">
-                                    Submit
-                                </a>
-                                <button class="btn btn-secondary" type="button" id="reset-btn">
-                                    <i class="fa-solid fa-rotate-left"></i>
-                                    &nbsp; Reset
-                                </button>
-                            </div>
-                        </form>
+                                <div class="card-footer bg-whitesmoke text-md-right">
+                                    <button class="btn btn-primary" id="save-btn"><i class="fa-solid fa-save"></i>
+                                        &nbsp; Save Changes
+                                    </button>
+                                    <a href="#" class="btn disabled btn-primary btn-progress" id="btn_progress"
+                                        name="btn_progress" style="display: none;">
+                                        Submit
+                                    </a>
+                                    <button class="btn btn-secondary" type="button" id="reset-btn">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                        &nbsp; Reset
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <div class="col-12">
                     <div class="card">
@@ -109,50 +110,52 @@
                                 = <b>{{ count($data) }}</b>
                             </a>
                             &emsp;
-                            <a href="#" class="btn btn-info"><i class="fa-solid fa-user-check"></i>&emsp; Total
-                                Arrival Visitor = <b>{{ $dataArrival }}</b>
-                            </a>
-                            &emsp;
-                            <a href="#" class="btn btn-light"><i class="fa-solid fa-check"></i>&emsp; Total Approval =
-                                <b>{{ $totalApproval }}</b>
-                            </a>
-                            &emsp;
-                            @if ($pages == 'cms')
-                                <a href="{{ route('landing.page', ['page' => 'cms']) }}" class="btn btn-warning"
-                                    id="view-link-qr" target="_blank">
-                                    <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
+                            @if (Auth::user()->event_id != 0)
+                                <a href="#" class="btn btn-info"><i class="fa-solid fa-user-check"></i>&emsp; Total
+                                    Arrival Visitor = <b>{{ $dataArrival }}</b>
                                 </a>
-                            @else
-                                @foreach ($data as $value)
-                                    <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
-                                        class="btn btn-warning" id="view-link-qr" target="_blank">
+                                &emsp;
+                                <a href="#" class="btn btn-light"><i class="fa-solid fa-check"></i>&emsp; Total
+                                    Approval =
+                                    <b>{{ $totalApproval }}</b>
+                                </a>
+                                &emsp;
+                                @if ($pages == 'cms')
+                                    <a href="{{ route('landing.page', ['page' => 'cms']) }}" class="btn btn-warning"
+                                        id="view-link-qr" target="_blank">
                                         <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
                                     </a>
-                                @break
-                            @endforeach
-                        @endif
-                        &emsp;
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-tasks"></i>&emsp; Actions Selected
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" id="delete-checkbox-btn">
-                                    <i class="fas fa-trash"></i>&emsp; Delete Selected
-                                </a>
-                                <a class="dropdown-item" href="#" id="approval-checkbox-btn">
-                                    <i class="fas fa-check"></i>&emsp; Approval Selected
-                                </a>
-                                <a class="dropdown-item" href="#" id="send-whatsapp-btn">
-                                    &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp; Send WhatsApp Selected
-                                </a>
-                                <a class="dropdown-item" href="#" id="send-email-btn">
-                                    <i class="fas fa-envelope"></i>&emsp; Send Email Selected
-                                </a>
+                                @else
+                                    @foreach ($data as $value)
+                                        <a href="{{ route('landing.page', ['page' => $value['title_url']]) }}"
+                                            class="btn btn-warning" id="view-link-qr" target="_blank">
+                                            <i class="fas fa-qrcode"></i>&emsp; View Link QR Verification
+                                        </a>
+                                    @break
+                                @endforeach
+                            @endif
+                            &emsp;
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-tasks"></i>&emsp; Actions Selected
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#" id="delete-checkbox-btn">
+                                        <i class="fas fa-trash"></i>&emsp; Delete Selected
+                                    </a>
+                                    <a class="dropdown-item" href="#" id="approval-checkbox-btn">
+                                        <i class="fas fa-check"></i>&emsp; Approval Selected
+                                    </a>
+                                    <a class="dropdown-item" href="#" id="send-whatsapp-btn">
+                                        &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp; Send WhatsApp Selected
+                                    </a>
+                                    <a class="dropdown-item" href="#" id="send-email-btn">
+                                        <i class="fas fa-envelope"></i>&emsp; Send Email Selected
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-
+                        @endif
                     </div>
                     <div class="card-body">
                         <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -166,6 +169,7 @@
                                         <th>Email</th>
                                         <th>Gender</th>
                                         <th>Instagram Account</th>
+                                        <th>Event Name</th>
                                         <th>Phone Number</th>
                                         <th>Invitation Type</th>
                                         <th>Name Of Agency / Company</th>
@@ -191,6 +195,7 @@
                                             <td>{{ $value['email'] }}</td>
                                             <td>{{ $value['gender'] }}</td>
                                             <td>{{ $value['account_instagram'] }}</td>
+                                            <td>{{ ucwords($value['title']) }}</td>
                                             <td>{{ $value['mobile'] }}</td>
                                             <td>{{ $value['type_invitation'] }}</td>
                                             <td>{{ $value['invitation_name'] }}</td>
@@ -246,35 +251,38 @@
                                                             style="font-size: 14px">
                                                             <i class="fas fa-edit"></i>&emsp; Edit
                                                         </button>
-                                                        <a class="dropdown-item" id="delete-btn"
-                                                            data-id="{{ $value['id'] }}" title="Delete">
-                                                            <i class="fas fa-trash"></i>&emsp; Delete
-                                                        </a>
-                                                        <a href="{{ route('visitor.event.qrcode', ['id' => encrypt($value['id'])]) }}"
-                                                            target="_blank" class="dropdown-item" title="View QR">
-                                                            <i class="fas fa-eye"></i>&emsp; View QR
-                                                        </a>
-                                                        <a href="{{ route('visitor.event.downloadQR', ['id' => $value['id']]) }}"
-                                                            class="dropdown-item" title="Download QR">
-                                                            <i class="fas fa-download"></i>&emsp; Download QR
-                                                        </a>
-                                                        <a class="send-email-btn-id dropdown-item"
-                                                            data-id="{{ $value['id'] }}" title="Send Email">
-                                                            <i class="fas fa-envelope"></i>&emsp; Send Email
-                                                        </a>
-                                                        <a class="send-whatsapp-btn-id dropdown-item"
-                                                            data-id="{{ $value['id'] }}" title="Send WhatsApp">
-                                                            &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp;&nbsp;
-                                                            Send WhatsApp
-                                                        </a>
-                                                        @if (empty($value['scan_date']))
-                                                            <a href="#" class="dropdown-item arrival-btn"
-                                                                data-id="{{ $value['id'] }}"
-                                                                data-name="{{ $value['full_name'] }}"
-                                                                data-flag-approval="{{ $value['flag_approval'] }}"
-                                                                title="Arrival">
-                                                                <i class="fas fa-plane-arrival"></i>&emsp;Arrival
+                                                        @if (Auth::user()->event_id != 0)
+                                                            <a class="dropdown-item" id="delete-btn"
+                                                                data-id="{{ $value['id'] }}" title="Delete">
+                                                                <i class="fas fa-trash"></i>&emsp; Delete
                                                             </a>
+                                                            <a href="{{ route('visitor.event.qrcode', ['id' => encrypt($value['id'])]) }}"
+                                                                target="_blank" class="dropdown-item"
+                                                                title="View QR">
+                                                                <i class="fas fa-eye"></i>&emsp; View QR
+                                                            </a>
+                                                            <a href="{{ route('visitor.event.downloadQR', ['id' => $value['id']]) }}"
+                                                                class="dropdown-item" title="Download QR">
+                                                                <i class="fas fa-download"></i>&emsp; Download QR
+                                                            </a>
+                                                            <a class="send-email-btn-id dropdown-item"
+                                                                data-id="{{ $value['id'] }}" title="Send Email">
+                                                                <i class="fas fa-envelope"></i>&emsp; Send Email
+                                                            </a>
+                                                            <a class="send-whatsapp-btn-id dropdown-item"
+                                                                data-id="{{ $value['id'] }}" title="Send WhatsApp">
+                                                                &nbsp;<i class="fa-brands fa-whatsapp"></i>&emsp;&nbsp;
+                                                                Send WhatsApp
+                                                            </a>
+                                                            @if (empty($value['scan_date']))
+                                                                <a href="#" class="dropdown-item arrival-btn"
+                                                                    data-id="{{ $value['id'] }}"
+                                                                    data-name="{{ $value['full_name'] }}"
+                                                                    data-flag-approval="{{ $value['flag_approval'] }}"
+                                                                    title="Arrival">
+                                                                    <i class="fas fa-plane-arrival"></i>&emsp;Arrival
+                                                                </a>
+                                                            @endif
                                                         @endif
 
                                                         @if ($value['flag_approval'] == 0 || $value['flag_approval'] == null)
@@ -362,7 +370,13 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.message === 'not_approved') {
+                    if (data.message == 'email_failed') {
+                        swal({
+                            title: "Email failed to send, make sure email settings.",
+                            icon: "error",
+                            dangerMode: true,
+                        })
+                    } else if (data.message === 'not_approved') {
                         swal({
                             title: "Cannot send email because it has not been approved yet.",
                             icon: "error",
@@ -572,12 +586,26 @@
                     });
                 },
                 error: function(xhr) {
-                    swal({
-                        title: "Error!",
-                        text: "Failed to import data, please try again.",
-                        icon: "error",
-                        button: "OK",
-                    });
+                    if (xhr.status === 422) {
+                        var content = document.createElement('div');
+                        content.innerHTML =
+                            '<strong>Duplicate data detected.</strong> phone number and email must not be the same.';
+
+                        swal({
+                            title: "Validation Error!",
+                            content: content,
+                            icon: "error",
+                            button: "OK",
+                        });
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: xhr.responseJSON.message ||
+                                "An error occurred while importing the file.",
+                            icon: "error",
+                            button: "OK",
+                        });
+                    }
 
                     $('#btn_progress').addClass('disabled');
                     $('#save-btn').show();
@@ -650,10 +678,13 @@
     })
 
     // Reset upload excel
-    document.getElementById('reset-btn').addEventListener('click', function() {
-        document.getElementById('uploadForm').reset();
-        document.querySelector('.custom-file-label').textContent = 'Choose File';
-    });
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            document.getElementById('uploadForm').reset();
+            document.querySelector('.custom-file-label').textContent = 'Choose File';
+        });
+    }
 
     // Arrival
     $(document).ready(function() {
@@ -866,191 +897,208 @@
         }
 
         // Send Email Selected
-        document.getElementById('send-email-btn').addEventListener('click', function(e) {
-            e.preventDefault();
+        const sendEmailButton = document.getElementById('send-email-btn');
+        if (sendEmailButton) {
+            document.getElementById('send-email-btn').addEventListener('click', function(e) {
+                e.preventDefault();
 
-            if (selectedCheckboxes.length === 0) {
-                swal('No data selected.', 'Please select at least one item to send the email.',
-                    'warning');
-                return;
-            }
+                if (selectedCheckboxes.length === 0) {
+                    swal('No data selected.', 'Please select at least one item to send the email.',
+                        'warning');
+                    return;
+                }
 
-            fetch("{{ route('check.approval') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        ids: selectedCheckboxes
+                fetch("{{ route('check.approval') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            ids: selectedCheckboxes
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'not_approved') {
-                        swal("Cannot send email", "One or more items are not approved.", "error");
-                    } else {
-                        swal({
-                            title: "Are you sure you want to send the email?",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        }).then((willSend) => {
-                            if (willSend) {
-                                swal({
-                                    title: "Sending email, please wait...",
-                                    text: "The process is ongoing.",
-                                    icon: "info",
-                                    buttons: false,
-                                    closeOnClickOutside: false,
-                                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message == 'email_failed') {
+                            swal({
+                                title: "Email failed to send, make sure email settings.",
+                                icon: "error",
+                                dangerMode: true,
+                            })
+                        } else if (data.status === 'not_approved') {
+                            swal("Cannot send email", "One or more items are not approved.",
+                                "error");
+                        } else {
+                            swal({
+                                title: "Are you sure you want to send the email?",
+                                icon: "warning",
+                                buttons: true,
+                                dangerMode: true,
+                            }).then((willSend) => {
+                                if (willSend) {
+                                    swal({
+                                        title: "Sending email, please wait...",
+                                        text: "The process is ongoing.",
+                                        icon: "info",
+                                        buttons: false,
+                                        closeOnClickOutside: false,
+                                    });
 
-                                fetch("{{ route('send.email') }}", {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        body: JSON.stringify({
-                                            ids: selectedCheckboxes
+                                    fetch("{{ route('send.email') }}", {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                            },
+                                            body: JSON.stringify({
+                                                ids: selectedCheckboxes
+                                            })
                                         })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        const emailsSent = data.emails_sent;
-                                        const totalSelected = data.total_selected;
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const emailsSent = data.emails_sent;
+                                            const totalSelected = data.total_selected;
 
-                                        if (emailsSent > 0) {
-                                            var content = document.createElement('div');
-                                            content.innerHTML =
-                                                "Email has been successfully sent to <b>" +
-                                                emailsSent + " out of " +
-                                                totalSelected + " people.</b>";
+                                            if (emailsSent > 0) {
+                                                var content = document.createElement(
+                                                    'div');
+                                                content.innerHTML =
+                                                    "Email has been successfully sent to <b>" +
+                                                    emailsSent + " out of " +
+                                                    totalSelected + " people.</b>";
 
-                                            swal({
-                                                title: "Success!",
-                                                content: content,
-                                                icon: "success",
-                                            }).then(() => {
-                                                window.location.reload();
-                                            });
-                                        } else {
-                                            swal("Failed!", "Emails failed to send.",
+                                                swal({
+                                                    title: "Success!",
+                                                    content: content,
+                                                    icon: "success",
+                                                }).then(() => {
+                                                    window.location.reload();
+                                                });
+                                            } else {
+                                                swal("Failed!",
+                                                    "Emails failed to send.",
+                                                    "error").then(() => {
+                                                    window.location.reload();
+                                                });
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            swal("Failed!",
+                                                "An error occurred while sending the email.",
                                                 "error").then(() => {
                                                 window.location.reload();
                                             });
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        swal("Failed!",
-                                            "An error occurred while sending the email.",
-                                            "error").then(() => {
-                                            window.location.reload();
                                         });
-                                    });
-                            }
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking approvals:', error);
-                    swal("Failed!", "An error occurred while checking approvals.", "error");
-                });
-        });
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking approvals:', error);
+                        swal("Failed!", "An error occurred while checking approvals.", "error");
+                    });
+            });
+        }
 
         // Send WhatsApp Selected
-        document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
-            e.preventDefault();
+        const sendWhatsappButton = document.getElementById('send-whatsapp-btn');
+        if (sendWhatsappButton) {
+            document.getElementById('send-whatsapp-btn').addEventListener('click', function(e) {
+                e.preventDefault();
 
-            if (selectedCheckboxes.length === 0) {
-                swal('No data selected.', 'Please select at least one item to send the whatsapp.',
-                    'warning');
-                return;
-            }
+                if (selectedCheckboxes.length === 0) {
+                    swal('No data selected.', 'Please select at least one item to send the whatsapp.',
+                        'warning');
+                    return;
+                }
 
-            fetch("{{ route('check.approval') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        ids: selectedCheckboxes
+                fetch("{{ route('check.approval') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            ids: selectedCheckboxes
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'not_approved') {
-                        swal("Cannot send whatsapp", "One or more items are not approved.",
-                            "error");
-                    } else {
-                        swal({
-                            title: "Are you sure you want to send the whatsapp?",
-                            icon: "warning",
-                            buttons: true,
-                            dangerMode: true,
-                        }).then((willSend) => {
-                            if (willSend) {
-                                swal({
-                                    title: "Sending whatsapp, please wait...",
-                                    text: "The process is ongoing.",
-                                    icon: "info",
-                                    buttons: false,
-                                    closeOnClickOutside: false,
-                                });
-
-                                fetch("{{ route('send.whatsapp') }}", {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        body: JSON.stringify({
-                                            ids: selectedCheckboxes
-                                        })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        const whatsappSent = data.whatsapp_sent;
-                                        const totalSelected = data.total_selected;
-
-                                        if (whatsappSent > 0) {
-                                            var content = document.createElement('div');
-                                            content.innerHTML =
-                                                "WhatsApp has been successfully sent to <b>" +
-                                                whatsappSent + " out of " +
-                                                totalSelected + " people.</b>";
-
-                                            swal({
-                                                title: "Success!",
-                                                content: content,
-                                                icon: "success",
-                                            }).then(() => {
-                                                window.location.reload();
-                                            });
-                                        } else {
-                                            swal("Failed!", "WhatsApp failed to send.",
-                                                "error").then(() => {
-                                                window.location.reload();
-                                            });
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        swal("Failed!",
-                                            "An error occurred while sending the whatsapp.",
-                                            "error").then(() => {
-                                            // window.location.reload();
-                                        });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'not_approved') {
+                            swal("Cannot send whatsapp", "One or more items are not approved.",
+                                "error");
+                        } else {
+                            swal({
+                                title: "Are you sure you want to send the whatsapp?",
+                                icon: "warning",
+                                buttons: true,
+                                dangerMode: true,
+                            }).then((willSend) => {
+                                if (willSend) {
+                                    swal({
+                                        title: "Sending whatsapp, please wait...",
+                                        text: "The process is ongoing.",
+                                        icon: "info",
+                                        buttons: false,
+                                        closeOnClickOutside: false,
                                     });
-                            }
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking approvals:', error);
-                    swal("Failed!", "An error occurred while checking approvals.", "error");
-                });
-        });
+
+                                    fetch("{{ route('send.whatsapp') }}", {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                            },
+                                            body: JSON.stringify({
+                                                ids: selectedCheckboxes
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const whatsappSent = data.whatsapp_sent;
+                                            const totalSelected = data.total_selected;
+
+                                            if (whatsappSent > 0) {
+                                                var content = document.createElement(
+                                                    'div');
+                                                content.innerHTML =
+                                                    "WhatsApp has been successfully sent to <b>" +
+                                                    whatsappSent + " out of " +
+                                                    totalSelected + " people.</b>";
+
+                                                swal({
+                                                    title: "Success!",
+                                                    content: content,
+                                                    icon: "success",
+                                                }).then(() => {
+                                                    window.location.reload();
+                                                });
+                                            } else {
+                                                swal("Failed!",
+                                                    "WhatsApp failed to send.",
+                                                    "error").then(() => {
+                                                    window.location.reload();
+                                                });
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            swal("Failed!",
+                                                "An error occurred while sending the whatsapp.",
+                                                "error").then(() => {
+                                                // window.location.reload();
+                                            });
+                                        });
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking approvals:', error);
+                        swal("Failed!", "An error occurred while checking approvals.", "error");
+                    });
+            });
+        }
 
         // Delete Selected
         $('#delete-checkbox-btn').on('click', function(e) {
@@ -1148,7 +1196,13 @@
                             ids: selectedCheckboxes
                         },
                         success: function(response) {
-                            if (response.success) {
+                            console.log(response)
+
+                            if (response.success == false) {
+                                swal('Failed!',
+                                    'There is data that has already been approved.',
+                                    'error');
+                            } else if (response.success) {
                                 selectedCheckboxes.forEach(id => {
                                     $('input[value="' + id + '"]').closest(
                                         'tr').remove();
@@ -1161,7 +1215,7 @@
                                 });
                             } else {
                                 swal('Failed!',
-                                    'An error occurred while deleting the item.',
+                                    'An error occurred while approved.',
                                     'error');
                             }
                         }

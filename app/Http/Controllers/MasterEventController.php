@@ -12,29 +12,102 @@ class MasterEventController extends Controller
 {
     function index($page)
     {
-        $data        = $this->query();
-        $type_menu   = 'master_event';
-        $masterEvent = masterEvent($page);
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
+        $user = userAdmin(Auth::user()->username, Auth::user()->divisi);
 
-        if (!empty($masterEvent) && $userId == Auth::user()->id || $page == "cms") {
+        if (!empty(masterEvent($page)) && $user[0]['id'] == Auth::user()->id || $page == "cms") {
             return view('master_event.index', [
-                'id'          => $userId,
-                'masterEvent' => $masterEvent,
-                'data'        => !empty($data) ? $data : array(),
-                'type_menu'   => $type_menu
+                'id'          => !empty($user) ? $user[0]['id'] : '',
+                'masterEvent' => masterEvent($page),
+                'data'        => !empty($this->query()) ? $this->query() : array(),
+                'type_menu'   => 'master_event'
             ]);
         } else {
             return view('error.error-404');
         }
     }
 
+    //     public function query()
+    //     {
+    //         $masterEvent = DB::table('tbl_master_event')
+    //             ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by', 'jenis_event', 'tanggal_terakhir_aplikasi', 'title_url', 'start_registrasi', 'end_registrasi')
+    //             ->orderBy('created_at', 'ASC')
+    //             ->get();
+    //         $companyEvent = companyEvent();
+    // 
+    //         foreach ($masterEvent as $master) {
+    //             foreach ($companyEvent as $company) {
+    //                 if ($master->company == $company->id) {
+    //                     $merge[] = [
+    //                         'RowNumber'                      => $master->RowNumber,
+    //                         'jenis_event'                    => $master->jenis_event,
+    //                         'title_url'                      => $master->title_url,
+    //                         'tanggal_terakhir_aplikasi'      => $master->tanggal_terakhir_aplikasi,
+    //                         'tanggal_terakhir_aplikasi_indo' => tgl_indo(date('Y-m-d', strtotime($master->tanggal_terakhir_aplikasi))),
+    //                         'status'                         => $master->status,
+    //                         'title'                          => $master->title,
+    //                         'desc'                           => $master->desc,
+    //                         'company'                        => $master->company,
+    //                         'start_event'                    => tgl_indo(date('Y-m-d', strtotime($master->start_event))),
+    //                         'end_event'                      => tgl_indo(date('Y-m-d', strtotime($master->end_event))),
+    //                         'logo'                           => $master->logo,
+    //                         'location'                       => $master->location,
+    //                         'id_event'                       => $master->id_event,
+    //                         'created_at'                     => $master->created_at,
+    //                         'createed_by'                    => $master->createed_by,
+    //                         'updated_at'                     => $master->updated_at,
+    //                         'updated_by'                     => $master->updated_by,
+    //                         'start_registrasi'               => $master->start_registrasi,
+    //                         'end_registrasi'                 => $master->end_registrasi,
+    //                         'nama_divisi'                    => $company->name,
+    //                     ];
+    //                 }
+    //             }
+    //         }
+    // 
+    //         $merge = !empty($merge) ? $merge : '';
+    //         return $merge;
+    //     }
+
     public function query()
     {
         $masterEvent = DB::table('tbl_master_event')
-            ->select(DB::raw('ROW_NUMBER() OVER (Order by id_event) AS RowNumber'), 'status', 'title', 'desc', 'company', 'start_event', 'end_event', 'logo', 'location', 'id_event', 'created_at', 'createed_by', 'updated_at', 'updated_by', 'jenis_event', 'tanggal_terakhir_aplikasi', 'title_url', 'start_registrasi', 'end_registrasi')
+            ->select(
+                DB::raw('ROW_NUMBER() OVER (Order by 
+                (CASE 
+                    WHEN status = "A" THEN 0 
+                    WHEN status = "D" AND tanggal_terakhir_aplikasi <= CURDATE() THEN 1
+                    ELSE 2 
+                END), 
+                tanggal_terakhir_aplikasi DESC) AS RowNumber'),
+                'status',
+                'title',
+                'desc',
+                'company',
+                'start_event',
+                'end_event',
+                'logo',
+                'location',
+                'id_event',
+                'created_at',
+                'createed_by',
+                'updated_at',
+                'updated_by',
+                'jenis_event',
+                'tanggal_terakhir_aplikasi',
+                'title_url',
+                'start_registrasi',
+                'end_registrasi'
+            )
+            ->orderByRaw(
+                'CASE 
+                WHEN status = "A" THEN 0 
+                WHEN status = "D" AND tanggal_terakhir_aplikasi <= CURDATE() THEN 1
+                ELSE 2 
+            END'
+            )
+            ->orderBy('tanggal_terakhir_aplikasi', 'DESC')
             ->get();
+
         $companyEvent = companyEvent();
 
         foreach ($masterEvent as $master) {
@@ -71,15 +144,13 @@ class MasterEventController extends Controller
         return $merge;
     }
 
+
     public function add_index($page)
     {
-        $type_menu  = 'master_event';
-        $listDivisi = listDivisi();
-
         if ($page == "cms") {
             return view('master_event.add_event', [
-                'type_menu'  => $type_menu,
-                'listDivisi' => !empty($listDivisi) ? $listDivisi : '',
+                'type_menu'  => 'master_event',
+                'listDivisi' => !empty(listDivisi()) ? listDivisi() : '',
             ]);
         }
     }
@@ -170,7 +241,7 @@ class MasterEventController extends Controller
                 $imageName = time() . '.' . $logo->getClientOriginalExtension();
                 $logo->move(public_path('images'), $imageName);
 
-                $a = DB::table('tbl_master_event')
+                DB::table('tbl_master_event')
                     ->where('id_event', $request->id_event)
                     ->update([
                         'title'                     => preg_replace('/\s+/', ' ', $request->namaEvent),

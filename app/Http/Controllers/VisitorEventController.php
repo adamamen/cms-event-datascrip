@@ -25,49 +25,33 @@ class VisitorEventController extends Controller
 {
     function index($page)
     {
-        $type_menu     = 'visitor_event';
         $data          = visitorEventandMasterEvent($page);
         $masterEvent   = masterEvent($page);
-        $user          = userAdmin();
-        $userId        = $user[0]['id'];
-        $userIdSession = Auth::user()->event_id;
+        $user          = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId        = !empty($user[0]['id']) ? $user[0]['id'] : '';
         $titleUrl      = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $title         = str_replace('-', ' ', $titleUrl);
         $output        = ucwords($title);
+        $event_id      = !empty($data) ? $data[0]['event_id'] : '';
+        $filters       = $page === 'cms' ? ['event_id' => $event_id] : ['event_id' => $event_id];
+        $totalApproval = $this->getApprovalCount($filters, $data);
+        $dataArrival   = $this->getArrivalCount($filters, $data);
 
-        if ($page == 'cms') {
-            $totalApproval = M_VisitorEvent::select('*')
-                ->where('flag_approval', '=', '1')
-                ->get();
-            $dataArrival = M_VisitorEvent::select('*')
-                ->whereNotNull('scan_date')
-                ->get();
-        } else {
-            $totalApproval = M_VisitorEvent::select('*')
-                ->where('event_id', $data[0]['event_id'])
-                ->where('flag_approval', '=', '1')
-                ->get();
-            $dataArrival = M_VisitorEvent::select('*')
-                ->where('event_id', $data[0]['event_id'])
-                ->whereNotNull('scan_date')
-                ->get();
-        }
-
-        if ($userIdSession != 0 && $page == "cms") {
+        if (Auth::user()->event_id != 0 && $page == "cms") {
             return view('error.error-403');
         }
 
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.index', [
+                'type_menu'     => 'visitor_event',
                 'id'            => $userId,
                 'masterEvent'   => $masterEvent,
                 'data'          => $data,
-                'type_menu'     => $type_menu,
                 'titleUrl'      => $titleUrl,
                 'pages'         => $page,
                 'output'        => $output,
-                'dataArrival'   => count($dataArrival),
-                'totalApproval' => count($totalApproval),
+                'dataArrival'   => $dataArrival,
+                'totalApproval' => $totalApproval,
                 'jenis_events'  => !empty($data[0]['jenis_event']) ? $data[0]['jenis_event'] : ''
             ]);
         } else if ($page == "cetak-invoice") {
@@ -81,36 +65,41 @@ class VisitorEventController extends Controller
 
     public function add_visitor_index($page)
     {
-        $type_menu   = 'visitor_event';
         $masterEvent = masterEvent($page);
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-
-        if ($page == "cms") {
-            $data = masterEvent_3();
-        } else {
-            $data = masterEvent_4($page);
-        }
+        $data        = $page == "cms" ? masterEvent_3() : masterEvent_4($page);
 
         return view('visitor_event.add-visitor-event', [
+            'type_menu'   => 'visitor_event',
             'id'          => $userId,
             'titleUrl'    => $titleUrl,
             'masterEvent' => $masterEvent,
             'data'        => $data,
-            'type_menu'   => $type_menu
         ]);
     }
 
     public function add(Request $request, $page)
     {
         $getIdEvent = M_MasterEvent::select('*')->where('title_url', trim($page))->first();
-        $barcodeNo = strtoupper(generateUniqueCode());
-        $filename  = $barcodeNo . '-qrcode.png';
-        $qrCode    = new QrCode($barcodeNo);
-        $writer    = new PngWriter();
-        $path1     = 'qrcodes/' . $filename;
-        $path2     = 'storage/qrcodes/' . $filename;
+        $barcodeNo  = strtoupper(generateUniqueCode());
+        $filename   = $barcodeNo . '-qrcode.png';
+        $qrCode     = new QrCode($barcodeNo);
+        $writer     = new PngWriter();
+        $path1      = 'qrcodes/' . $filename;
+        $path2      = 'storage/qrcodes/' . $filename;
+        $validation = M_VisitorEvent::select('event_id', 'full_name', 'mobile', 'email')->where('event_id', $getIdEvent->id_event)->first();
+
+        if (!empty($validation)) {
+            if ($validation->mobile == $request->phone_number) {
+                return response()->json(['message' => 'phone_number']);
+            } else if ($validation->email == $request->email) {
+                return response()->json(['message' => 'email']);
+            } else if ($validation->email == $request->email && $validation->mobile == $request->phone_number) {
+                return response()->json(['message' => 'phone_number_and_email']);
+            }
+        }
 
         $writer->write($qrCode)->saveToFile(storage_path('app/public/' . $path1));
         $writer->write($qrCode)->saveToFile(public_path($path2));
@@ -151,11 +140,10 @@ class VisitorEventController extends Controller
         $page        = request('page');
         $page_1      = request('page_1');
         $id          = request('id');
-        $type_menu   = 'visitor_event';
         $data        = M_VisitorEvent::select('*')->where('id', $id)->get();
         $masterEvent = masterEvent($page);
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
         $metodeBayar = M_MetodeBayar::select('*')->get();
         $title       = str_replace('-', ' ', $titleUrl);
@@ -169,11 +157,11 @@ class VisitorEventController extends Controller
 
         if (!empty($masterEvent) || $page == "cms") {
             return view('visitor_event.edit-visitor-event', [
+                'type_menu'   => 'visitor_event',
                 'titleUrl'    => $titleUrl,
                 'id'          => $userId,
                 'masterEvent' => $masterEvent,
                 'data'        => $data,
-                'type_menu'   => $type_menu,
                 'event'       => $event,
                 'metodeBayar' => $metodeBayar,
                 'event_1'     => $event,
@@ -220,7 +208,7 @@ class VisitorEventController extends Controller
     {
         $tanggal_terakhir_aplikasi = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->first();
         $data                      = masterEvent_4($page);
-        $type_menu                 = 'register_visitor';
+
         if (strtotime(!empty($tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi) ? $tanggal_terakhir_aplikasi->tanggal_terakhir_aplikasi : '') > strtotime(date('Y-m-d H:i:s'))) {
             $masterEvent = M_MasterEvent::select('*')->where('title_url', $page)->where('status', 'A')->get()->toArray();
         }
@@ -236,10 +224,10 @@ class VisitorEventController extends Controller
         if (!empty($masterEvent)) {
             if ($page == $masterEvent[0]['title_url']) {
                 return view('visitor_event.register', [
+                    'type_menu'   => 'register_visitor',
                     'masterEvent' => $masterEvent,
                     'data'        => $data,
                     'page'        => $page,
-                    'type_menu'   => $type_menu
                 ]);
             } else {
                 return view('error.error-404');
@@ -268,7 +256,25 @@ class VisitorEventController extends Controller
         $pages = ucwords(str_replace('-', ' ', $page));
 
         if (!empty($query)) {
-            $customHeadings = ['No', 'Name', 'Email', 'Gender', 'Instagram Account', 'Phone Number', 'Invitation Type', 'Name Of Agency / Company', 'Barcode No', 'Date Arrival', 'Email Status', 'Source Visitor', 'Status Approval', 'Approve By', 'Approve Date'];
+            $customHeadings = [
+                'No',
+                'Name',
+                'Email',
+                'Gender',
+                'Instagram Account',
+                'Event Name',
+                'Phone Number',
+                'Invitation Type',
+                'Name Of Agency / Company',
+                'Barcode No',
+                'Date Arrival',
+                'Email Status',
+                'WhatsApp Status',
+                'Source Visitor',
+                'Status Approval',
+                'Approve By',
+                'Approve Date'
+            ];
         }
 
         $filename = 'Data Visitor Event - ' . ucfirst($pages) . '.xlsx';
@@ -300,8 +306,57 @@ class VisitorEventController extends Controller
         $rows = Excel::toArray([], $file)[0];
         unset($rows[0]);
 
-        $event = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
+        $event         = M_MasterEvent::where('status', 'A')->where('title_url', $page)->first();
         $countImported = 0;
+
+        $duplicateInExcel   = [];
+        $existingDuplicates = [];
+        $uniqueEntries      = [];
+
+        foreach ($rows as $index => $row) {
+            $key = $row[5] . '|' . $row[2];
+
+            if (isset($uniqueEntries[$key])) {
+                $duplicateInExcel[] = [
+                    'row'    => $index + 1,
+                    'mobile' => $row[5],
+                    'email'  => $row[2]
+                ];
+            } else {
+                $uniqueEntries[$key] = $row;
+            }
+        }
+
+        if (!empty($duplicateInExcel)) {
+            return response()->json([
+                'message' => 'Duplicate data found in Excel file.',
+                'errors'  => $duplicateInExcel
+            ], 422);
+        }
+
+        foreach ($rows as $row) {
+            $isDuplicate = DB::table('tbl_visitor_event')
+                ->where('event_id', $event->id_event)
+                ->where(function ($query) use ($row) {
+                    $query->where('mobile', $row[5])
+                        ->orWhere('email', $row[2]);
+                })
+                ->exists();
+
+            if ($isDuplicate) {
+                $existingDuplicates[] = [
+                    'mobile' => $row[5],
+                    'email'  => $row[2]
+                ];
+            }
+        }
+
+        if (!empty($existingDuplicates)) {
+            return response()->json([
+                'message' => 'Duplicate data found in database.',
+                'errors'  => $existingDuplicates
+            ], 422);
+        }
 
         if (!empty($event)) {
             foreach ($rows as $row) {
@@ -414,7 +469,16 @@ class VisitorEventController extends Controller
 
     public function approvalMultipleVisitors(Request $request)
     {
-        $ids = $request->ids;
+        $ids   = $request->ids;
+        $check = M_VisitorEvent::whereIn('id', $ids)->where('flag_approval', '1')->get()->toArray();
+
+        if (!empty($check)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'hehe'
+            ]);
+            exit;
+        }
 
         if (!empty($ids)) {
             DB::table('tbl_visitor_event')
@@ -691,7 +755,12 @@ class VisitorEventController extends Controller
 
     public function checkApproval(Request $request)
     {
-        $ids = $request->input('ids');
+        $ids   = $request->input('ids');
+        $email = M_SendEmailCust::select('*')->where('id_event', Auth::user()->event_id)->get()->toArray();
+
+        if ($email == null) {
+            return response()->json(['message' => 'email_failed'], 200);
+        }
 
         $unapprovedCount = M_VisitorEvent::whereIn('id', $ids)
             ->where(function ($query) {
@@ -710,6 +779,11 @@ class VisitorEventController extends Controller
     public function checkApprovalId($id)
     {
         $visitor = M_VisitorEvent::find($id);
+        $email   = M_SendEmailCust::select('*')->where('id_event', Auth::user()->event_id)->get()->toArray();
+
+        if ($email == null) {
+            return response()->json(['message' => 'email_failed'], 200);
+        }
 
         if (!$visitor) {
             return response()->json(['message' => 'Visitor not found'], 404);
@@ -973,5 +1047,33 @@ class VisitorEventController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    private function getApprovalCount(array $filters = [], $data)
+    {
+        if (empty($data)) {
+            return 0;
+        }
+
+        $query = M_VisitorEvent::where('flag_approval', '=', '1');
+        if (!empty($filters['event_id'])) {
+            $query->where('event_id', $filters['event_id']);
+        }
+
+        return $query->count();
+    }
+
+    private function getArrivalCount(array $filters = [], $data)
+    {
+        if (empty($data)) {
+            return 0;
+        }
+
+        $query = M_VisitorEvent::whereNotNull('scan_date');
+        if (!empty($filters['event_id'])) {
+            $query->where('event_id', $filters['event_id']);
+        }
+
+        return $query->count();
     }
 }

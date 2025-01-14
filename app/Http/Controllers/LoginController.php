@@ -128,8 +128,16 @@ class LoginController extends Controller
                                 }
                             }
                         } else {
-                            Auth::login($user);
-                            return redirect()->route('dashboard', ['page' => $selectedPage]);
+                            $q = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $selectedPage)->first();
+                            if ($user->event_id == 0 && empty($user->divisi)) {
+                                Auth::login($user);
+                                return redirect()->route('dashboard', ['page' => $selectedPage]);
+                            } else if ($user->event_id == 0 && ($q->company != $user->divisi)) {
+                                return redirect()->route('login_param', ['page' => $selectedPage])->withErrors(['message' => 'User anda tidak berhak untuk login di event ini']);
+                            } else {
+                                Auth::login($user);
+                                return redirect()->route('dashboard', ['page' => $selectedPage]);
+                            }
                         }
                     } else {
                         if ($title == "cms") {
@@ -160,7 +168,7 @@ class LoginController extends Controller
 
     public function register_action(Request $request)
     {
-        $checkUser      = M_User::where('event_id', '=', '0')->first();
+        $checkUser      = M_User::where('event_id', '=', '0')->whereNull('divisi')->first();
         $checkUsers     = $checkUser == null ? '' : $checkUser->username;
         $passwordLength = strlen($request->password);
 
@@ -197,7 +205,6 @@ class LoginController extends Controller
 
     public function logout(Request $request, $page)
     {
-        $username = Auth::user()->username;
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

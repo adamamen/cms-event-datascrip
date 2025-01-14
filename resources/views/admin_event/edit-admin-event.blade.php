@@ -30,8 +30,7 @@
                                             <label>Username</label>
                                             <input name="events_id" id="events_id" value="{{ $value['event_id'] }}" hidden>
                                             <input type="text" class="form-control" value="{{ $value['username'] }}"
-                                                required="" name="username" id="username"
-                                                {{ $value['event_id'] == '0' ? 'readonly' : '' }}>
+                                                required="" name="username" id="username" {{-- {{ $value['event_id'] == '0' ? 'readonly' : '' }} --}}>
 
                                             <input type="hidden" class="form-control" value="{{ $value['admin_id'] }}"
                                                 required="" name="admin_id" id="admin_id">
@@ -64,24 +63,9 @@
                                             </div>
                                         </div>
                                         <div class="form-group col-md-4 col-12">
-                                            <label>Event Name</label>
-                                            <select class="form-control select2" name="event" id="event"
-                                                {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
-                                                <option selected disabled>-- Please Select --</option>
-                                                @foreach ($event as $event)
-                                                    <option value="{{ $event->id_event }}"
-                                                        {{ $event->id_event == $value['event_id'] ? 'selected' : $event->id_event }}>
-                                                        {{ $event->title }}</option>
-                                                @endforeach
-                                            </select>
-                                            <div class="invalid-feedback">
-                                                Status is required
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-md-4 col-12">
                                             <label>Status</label>
                                             <select class="form-control select2" name="status" id="status"
-                                                {{ $value['event_id'] == '0' ? 'disabled' : '' }}>
+                                                {{-- {{ $value['event_id'] == '0' ? 'disabled' : '' }} --}}>
                                                 <option selected disabled>-- Please Select --</option>
                                                 <option value="A" {{ $value['status'] == 'A' ? 'selected' : '' }}>
                                                     Aktif</option>
@@ -92,6 +76,56 @@
                                                 Status is required
                                             </div>
                                         </div>
+                                        {{-- Role Super Admin  --}}
+                                        @if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0)
+                                            @if (empty($value['divisi']) && $value['event_id'] == 0)
+                                                {{-- Button di hide  --}}
+                                            @else
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>Division</label>
+                                                    <select class="form-control select2" name="division" id="division">
+                                                        <option selected disabled>-- Please Select --</option>
+                                                        @foreach ($division as $divisi)
+                                                            <option value="{{ $divisi['id'] }}"
+                                                                {{ $divisi['id'] == $value['divisi'] ? 'selected' : '' }}>
+                                                                {{ ucwords($divisi['name']) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Division is required
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @else
+                                            @if (Auth::user()->event_id == $value['event_id'])
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>Event Name</label>
+                                                    <input type="text" class="form-control" value="CMS Event Datascrip"
+                                                        required="" name="event" id="event" autocomplete="off"
+                                                        disabled>
+                                                    <div class="invalid-feedback">
+                                                        Event Name is required
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="form-group col-md-4 col-12">
+                                                    <label>Event Name</label>
+                                                    <select class="form-control select2" name="event" id="event"
+                                                        {{-- {{ $value['event_id'] == '0' ? 'disabled' : '' }} --}}>
+                                                        <option selected disabled>-- Please Select --</option>
+                                                        @foreach ($event as $event)
+                                                            <option value="{{ $event['id_event'] }}"
+                                                                {{ $event['id_event'] == $value['event_id'] ? 'selected' : $event['id_event'] }}>
+                                                                {{ $event['title'] }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Status is required
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endif
                                     </div>
                                     <a href="#" class="btn btn-primary mr-1" type="submit" id="btn_submit"
                                         name="btn_submit"><i class="fas fa-check"></i> Submit</a>
@@ -167,6 +201,20 @@
                 var events_id = $('#events_id').val();
                 var email = $('#email').val();
                 var formData = new FormData();
+                var strongPasswordRegex =
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+                if (!strongPasswordRegex.test(password)) {
+                    swal({
+                        title: 'Weak Password',
+                        text: 'Password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.',
+                        icon: 'warning',
+                    }).then(() => {
+                        $("#btn_progress").hide();
+                        $("#btn_submit").show();
+                    });
+                    return;
+                }
 
                 formData.append("admin_id", admin_id);
                 formData.append("event", event);

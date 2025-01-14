@@ -13,31 +13,17 @@ class WhatsappEventController extends Controller
 {
     function index($page)
     {
-        $type_menu   = 'whatsapp_event';
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
         $title       = str_replace('-', ' ', $titleUrl);
         $output      = ucwords($title);
-        if ($page == "cms") {
-            // $data = M_SendWaCust::select('*')->where('type', 'CMS_Admin')->get();
-            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
-                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
-                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
-                ->get();
-        } else {
-            // $data = M_SendWaCust::select('*')->where('type', 'Event_Admin')->get();
-            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
-                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
-                ->where('tbl_send_wa_cust.type', 'Event_Admin')
-                ->where('tbl_send_wa_cust.id_event', $masterEvent[0]['id_event'])
-                ->get();
-        }
+        $data        = $page == "cms" ? $this->cms() : $this->non_cms();
 
         return view('whatsapp_event.index', [
+            'type_menu'   => 'whatsapp_event',
             'id'          => $userId,
-            'type_menu'   => $type_menu,
             'page'        => $page,
             'data'        => $data,
             'titleUrl'    => $titleUrl,
@@ -48,24 +34,17 @@ class WhatsappEventController extends Controller
 
     public function add_index($page)
     {
-        $type_menu   = 'whatsapp_event';
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
-
-        if ($page == "cms") {
-            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->get();
-            $status = 0;
-        } else {
-            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
-            $status = 1;
-        }
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
+        $listEvent   = $this->getListEvent($page);
+        $status      = $page == 'cms' ? 0 : 1;
 
         return view('whatsapp_event.add', [
+            'type_menu'   => 'whatsapp_event',
             'status'      => $status,
             'id'          => $userId,
-            'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
             'titleUrl'    => $titleUrl,
             'page'        => $page,
@@ -101,21 +80,16 @@ class WhatsappEventController extends Controller
 
     function edit($page, $id)
     {
-        $type_menu   = 'whatsapp_event';
         $data        = M_SendWaCust::select('*')->where('id', $id)->first();
         $masterEvent = masterEvent($page);
         $titleUrl    = !empty($masterEvent) ? $masterEvent[0]['title_url'] : 'cms';
-        $user        = userAdmin();
-        $userId      = $user[0]['id'];
-        if ($page == "cms") {
-            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->get();
-        } else {
-            $listEvent   = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
-        }
+        $user        = userAdmin(Auth::user()->username, Auth::user()->divisi);
+        $userId      = !empty($user) ? $user[0]['id'] : '';
+        $listEvent   = $this->getListEvent($page);
 
         return view('whatsapp_event.edit', [
+            'type_menu'   => 'whatsapp_event',
             'id'          => $userId,
-            'type_menu'   => $type_menu,
             'listDivisi'  => !empty($listDivisi) ? $listDivisi : '',
             'titleUrl'    => $titleUrl,
             'page'        => $page,
@@ -138,5 +112,56 @@ class WhatsappEventController extends Controller
             ]);
 
         return response()->json(['message' => 'success']);
+    }
+
+    private function cms()
+    {
+        if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->get();
+        } else {
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->where('tbl_master_event.company', Auth::user()->divisi)
+                ->get();
+        }
+
+        return $data;
+    }
+
+    private function non_cms()
+    {
+        if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->get();
+        } else {
+            $data = M_SendWaCust::select('tbl_send_wa_cust.id', 'tbl_send_wa_cust.content', 'tbl_send_wa_cust.type', 'tbl_send_wa_cust.id_event', 'tbl_master_event.title')
+                ->join('tbl_master_event', 'tbl_send_wa_cust.id_event', '=', 'tbl_master_event.id_event')
+                ->where('tbl_send_wa_cust.type', 'CMS_Admin')
+                ->where('tbl_master_event.company', Auth::user()->divisi)
+                ->get();
+        }
+
+        return $data;
+    }
+
+    private function getListEvent($page)
+    {
+        if ($page == "cms") {
+            if (empty(Auth::user()->divisi) && Auth::user()->event_id == 0) {
+                $listEvent = M_MasterEvent::select('*')->where('status', 'A')->get();
+            } else {
+                $listEvent = M_MasterEvent::select('*')->where('company', Auth::user()->divisi)->where('status', 'A')->get();
+            }
+        } else {
+            $listEvent = M_MasterEvent::select('*')->where('status', 'A')->where('title_url', $page)->get();
+        }
+
+        return $listEvent;
     }
 }

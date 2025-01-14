@@ -87,7 +87,7 @@
                                     <tbody>
                                         @foreach ($data as $value)
                                             <tr>
-                                                <td>{{ $value['RowNumber'] }}</td>
+                                                <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $value['title'] }}</td>
                                                 <td>
                                                     @if ($value['status'] == 'A')
