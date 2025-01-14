@@ -5,6 +5,7 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Models\M_AccessUser;
+use Illuminate\Support\Facades\DB;
 
 class ExportExcel implements FromCollection, WithHeadings
 {
@@ -51,6 +52,33 @@ class ExportExcel implements FromCollection, WithHeadings
                     'Created By'     => $value->created_by,
                     'Created Date'   => date('d/m/Y', strtotime($value->created_date)),
                     'Status'         => $value->status == "A" ? 'Active' : 'Inactive',
+                ];
+            }
+
+            $merge = !empty($merge) ? $merge : [];
+            $q     = collect($merge);
+
+            return $q;
+        } else if ($page == 'report_visitor_event') {
+            $query          = DB::table('v_report')->get();
+            $sequenceNumber = 1;
+
+            foreach ($query as $value) {
+                $merge[]        = [
+                    'No'                        => $sequenceNumber++,
+                    'Event'                     => $value->title_event,
+                    'Divisi Event Name'         => $value->nama_divisi,
+                    'Source Original Name Cust' => $value->name_mst_cust,
+                    'Name'                      => $value->nama_registrasi_event,
+                    'Gender'                    => $value->gender_registrasi,
+                    'E-mail'                    => $value->email_registrasi,
+                    'WhatsApp Number'           => $value->tlp_registrasi,
+                    'Institution'               => $value->invitaion_registrasi,
+                    'Institution Name'          => $value->invitation_name_registrasi,
+                    'Approve Date'              => date('d-m-Y H:i', strtotime($value->tgl_approve_registrasi)),
+                    'Approve By'                => $value->approveby_registrasi,
+                    'Visit Date'                => date('d-m-Y H:i', strtotime($value->tgl_visit)),
+                    'Source'                    => $value->source_visitor,
                 ];
             }
 

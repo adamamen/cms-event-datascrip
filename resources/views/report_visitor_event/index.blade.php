@@ -42,26 +42,38 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
+                                            <th>Event</th>
+                                            <th>Divisi Event Name</th>
+                                            <th>Source Original Name Cust</th>
                                             <th>Name</th>
                                             <th>Gender</th>
                                             <th>E-mail</th>
-                                            <th>Whatsapp Number</th>
+                                            <th>WhatsApp Number</th>
                                             <th>Institution</th>
                                             <th>Institution Name</th>
-                                            <th>Event</th>
+                                            <th>Approve Date</th>
+                                            <th>Approve By</th>
+                                            <th>Visit Date</th>
+                                            <th>Source</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($data as $value)
                                             <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $value->title_event }}</td>
+                                                <td>{{ $value->nama_divisi }}</td>
+                                                <td>{{ $value->name_mst_cust }}</td>
+                                                <td>{{ $value->nama_registrasi_event }}</td>
+                                                <td>{{ $value->gender_registrasi }}</td>
+                                                <td>{{ $value->email_registrasi }}</td>
+                                                <td>{{ $value->tlp_registrasi }}</td>
+                                                <td>{{ $value->invitaion_registrasi }}</td>
+                                                <td>{{ $value->invitation_name_registrasi }}</td>
+                                                <td>{{ date('d-m-Y H:i', strtotime($value->tgl_approve_registrasi)) }}</td>
+                                                <td>{{ $value->approveby_registrasi }}</td>
+                                                <td>{{ date('d-m-Y H:i', strtotime($value->tgl_visit)) }}</td>
+                                                <td>{{ $value->source_visitor }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -94,6 +106,12 @@
     <!-- Page Specific JS File -->
     <script src="{{ asset('js/page/modules-sweetalert.js') }}"></script>
     <script>
-        //
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = '{{ $type_menu }}';
+
+            if (currentPage === 'report_visitor_event') {
+                document.body.classList.add('sidebar-mini');
+            }
+        });
     </script>
 @endpush
